@@ -1,5 +1,5 @@
 
-Sql Querry :
+Sql Queries :
 Data base Name : Tms
 Table Name : Invitations
 
@@ -12,4 +12,7 @@ Name Varchar
 City Varchar
 RelationType varchar
 Invited Status Varchar
+
+Insert Details Queries:
+"INSERT INTO Invitations  (NAME , CITY ,RELATION_TYPE ,  NUMBER_OF_PEOPLE_WILL_COME , INVITED_STATUS ) values ( ? , ? , ? ,? , ?)"
 

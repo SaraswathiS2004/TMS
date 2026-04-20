@@ -1,6 +1,6 @@
 package com.tms.data.dto;
 
-import com.tms.data.respository.tmsDB;
+import com.tms.data.respository.TmsDB;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,7 +16,7 @@ public class People {
     private Connection conn;
 
     public People() throws SQLException, ClassNotFoundException {
-        conn = tmsDB.getInstance().getConnection();
+        conn = TmsDB.getInstance().getConnection();
     }
 
 

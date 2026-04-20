@@ -4,11 +4,11 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class tmsDB {
+public class TmsDB {
 
-    private static tmsDB tmsdb;
+    private static TmsDB tmsdb;
     Connection con = null;
-    private tmsDB() throws ClassNotFoundException, SQLException {
+    private TmsDB() throws ClassNotFoundException, SQLException {
         Class.forName("com.mysql.cj.jdbc.Driver");
         String url = "jdbc:mysql://localhost:3306/Tms";
         String user = "root";
@@ -16,9 +16,9 @@ public class tmsDB {
         con = DriverManager.getConnection(url, user, password);
     }
 
-    public static tmsDB getInstance() throws ClassNotFoundException, SQLException{
+    public static TmsDB getInstance() throws ClassNotFoundException, SQLException{
         if(tmsdb == null){
-            tmsdb = new tmsDB();
+            tmsdb = new TmsDB();
         }
         return tmsdb;
     }

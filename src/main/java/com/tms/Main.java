@@ -3,6 +3,7 @@ package com.tms;
 import com.tms.data.dto.InvitedStatus;
 import com.tms.data.dto.RelationType;
 import com.tms.features.peopleAdded.PeoplesAddedView;
+import com.tms.features.personinvited.InvitedView;
 
 import java.sql.SQLException;
 import java.util.Scanner;
@@ -26,6 +27,9 @@ public class Main {
                     PeoplesAddedView peoplesAddedView =new PeoplesAddedView();
                     peoplesAddedView.init();
                     break;
+                case 2:
+                    InvitedView view = new InvitedView();
+                    view.init();
                 default:
                     break;
             }

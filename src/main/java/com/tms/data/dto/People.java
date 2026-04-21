@@ -76,7 +76,7 @@ public class People {
                 return "Successfully Added!";
             }
             else{
-               return "Do not added";
+               return "cannot add people";
             }
         }
         catch (Exception e){

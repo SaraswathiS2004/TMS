@@ -1,21 +1,20 @@
-package com.tms.features.personinvited;
+package com.tms.features.MarkAsInvited;
 
 import com.tms.data.dto.InvitedStatus;
 import com.tms.data.dto.PeopleInvited;
-import com.tms.data.dto.RelationType;
 
 import java.sql.SQLException;
 
-class InvitedModel {
+class MarkAsInvitedModel {
 
-    private InvitedView invitedView;
-    public InvitedModel(InvitedView invitedView){
-        this.invitedView = invitedView;
+    private MarkAsInvitedView markAsInvitedView;
+    public MarkAsInvitedModel(MarkAsInvitedView markAsInvitedView){
+        this.markAsInvitedView = markAsInvitedView;
     }
 
     public void setData(int id , InvitedStatus invitedStatus) throws SQLException, ClassNotFoundException {
         PeopleInvited peopleInvited = new PeopleInvited();
         String message = peopleInvited.setData(id , invitedStatus);
-        invitedView.showMessage(message);
+        markAsInvitedView.showMessage(message);
     }
 }

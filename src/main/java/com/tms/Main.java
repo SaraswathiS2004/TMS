@@ -1,14 +1,12 @@
 package com.tms;
 
-import com.tms.data.dto.InvitedStatus;
-import com.tms.data.dto.RelationType;
 import com.tms.features.list.allpeople.AllPeopleView;
 import com.tms.features.list.bothinvited.BothInvitedView;
 import com.tms.features.list.engagementinvited.EngagementInvitedView;
 import com.tms.features.list.marriageinvited.MarriageInvitedView;
 import com.tms.features.list.notinvited.NotInvitedView;
 import com.tms.features.peopleAdded.PeoplesAddedView;
-import com.tms.features.personinvited.InvitedView;
+import com.tms.features.MarkAsInvited.MarkAsInvitedView;
 
 import java.sql.SQLException;
 import java.util.Scanner;
@@ -33,7 +31,7 @@ public class Main {
                     peoplesAddedView.init();
                     break;
                 case 2:
-                    InvitedView view = new InvitedView();
+                    MarkAsInvitedView view = new MarkAsInvitedView();
                     view.init();
                     break;
                 case 3:

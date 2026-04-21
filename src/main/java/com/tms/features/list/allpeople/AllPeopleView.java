@@ -1,16 +1,15 @@
-package com.tms.features.list.notinvited;
-
+package com.tms.features.list.allpeople;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class NotInvitedView {
-    private NotInvitedModel notInvitedModel;
-    public NotInvitedView() throws SQLException, ClassNotFoundException {
-        this.notInvitedModel = new NotInvitedModel(this);
+public class AllPeopleView {
+    private AllPeopleModel allPeopleModel;
+    public AllPeopleView() throws SQLException, ClassNotFoundException {
+        this.allPeopleModel = new AllPeopleModel(this);
     }
     public void init() throws SQLException {
-        ResultSet set = notInvitedModel.DisplayAllPeople();
+        ResultSet set = allPeopleModel.DisplayAllPeople();
         if(set!= null) {
             int i = 0;
             while (set.next()) {

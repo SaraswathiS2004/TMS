@@ -23,7 +23,7 @@ public class TmsDB {
         return tmsdb;
     }
 
-    public  Connection getConnection() {
+    public Connection getConnection() {
         return con;
     }
 }

@@ -19,7 +19,7 @@ public class Main {
 
         Scanner scan = new Scanner(System.in);
         int process = 0;
-        String[] questions = {"1.People Added" , "2.Mark as Invited" , "3.List All People" ,"4.List Marriage Invited People"  , "5.List Engagement Invited People", "6.List Both Invited People" , "7.List Not Invited People" ,"4.Exit"};
+        String[] questions = {"1.People Added" , "2.Mark as Invited" , "3.List All People" ,"4.List Marriage Invited People"  , "5.List Engagement Invited People", "6.List Both Invited People" , "7.List Not Invited People" ,"8.Exit"};
         do {
 
             for(int i = 0; i< questions.length; i++){
@@ -60,6 +60,6 @@ public class Main {
                     break;
             }
         }
-        while(process != 4);
+        while(process != 8);
     }
 }

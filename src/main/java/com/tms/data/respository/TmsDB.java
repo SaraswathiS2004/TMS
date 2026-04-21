@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class TmsDB {
 
     private static TmsDB tmsdb;
-    Connection con = null;
+    Connection con;
     private TmsDB() throws ClassNotFoundException, SQLException {
         Class.forName("com.mysql.cj.jdbc.Driver");
         String url = "jdbc:mysql://localhost:3306/Tms";

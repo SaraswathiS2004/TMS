@@ -1,0 +1,89 @@
+﻿TMS 
+
+Tech : Java , SQL
+Time : 1 week
+
+
+Requirement Analysis
+
+Account Creation (Users , Admin)
+
+Peoples added
+
+Feasibility Analysis :
+
+
+Account Creation (Users , Admin)
+
+
+Features :
+
+
+Add :
+
+Names String
+Number Of people Come int
+Type (Close , distance , Friends) enum
+City String
+InviteStatus => ( Not invite  , Marriage Invite , Engagement Invite , Both) enum
+
+Invite : 
+
+Id int
+Invite 
+
+List Status : 
+
+Invite
+Not Invite
+
+Querry : 
+
+Invitations :
+
+Id  | Name | City | Relation Type | Number of People will Come | Invited Status (Not invite  , Marriage Invite , Engagement Invite , Both) |
+
+Id Primary Key int
+Name Varchar
+City Varchar
+RelationType varchar
+Invited Status Varchar
+
+PeopleAddDetails :
+
+Names String
+Number Of people Come int
+Type (Close , distance , Friends) enum
+City String
+InviteStatus => ( Not invite  , Marriage Invite , Engagement Invite , Both) enum
+
+
+
+
+Features :
+
+
+Modal Classes :
+  
+Dto : 
+
+
+ Invited Status :
+
+     Enum  NOT_INVITED  , MARRIAGE_INVITED , ENGAGEMENT_INVITED ,BOTH_INVITED
+
+
+  Relation Type CLOSE , DISTANCE , FRIENDS;
+
+
+   People :
+
+      name String
+      numberOfPerson int
+      relationType RelationType 
+       invitedStatus InvitedStatus
+      city String
+
+ People Invited:
+
+connection Connection

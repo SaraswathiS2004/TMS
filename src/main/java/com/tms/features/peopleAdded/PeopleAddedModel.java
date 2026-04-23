@@ -10,6 +10,8 @@ import java.util.Scanner;
 public class PeopleAddedModel {
 
     private PeoplesAddedView peoplesAddedView;
+
+    public PeopleAddedModel(){}
     public PeopleAddedModel(PeoplesAddedView peoplesAddedView){
         this.peoplesAddedView = peoplesAddedView;
     }
@@ -20,11 +22,16 @@ public class PeopleAddedModel {
         people.setNumberOfPeople(numberOfCount);
         people.setType(type);
         people.setInvitedStatus(InvitedStatus.NOT_INVITED);
+        setData(people);
+    }
+
+    public void setData(People people) throws SQLException {
         String result = people.storeData();
         successfullMessage(result);
     }
 
     public void successfullMessage(String Message){
+
         peoplesAddedView.showMessage(Message);
 
     }

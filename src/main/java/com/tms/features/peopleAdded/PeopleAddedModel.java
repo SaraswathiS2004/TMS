@@ -17,10 +17,10 @@ public class PeopleAddedModel {
     }
     public void setData(String name , String city , int numberOfCount , RelationType type) throws SQLException, ClassNotFoundException {
         People people = new People();
-        people.setNames(name);
+        people.setName(name);
         people.setCity(city);
-        people.setNumberOfPeople(numberOfCount);
-        people.setType(type);
+        people.setNumberOfPerson(numberOfCount);
+        people.setRelationType(type);
         people.setInvitedStatus(InvitedStatus.NOT_INVITED);
         setData(people);
     }

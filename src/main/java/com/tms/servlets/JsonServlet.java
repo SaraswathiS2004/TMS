@@ -20,7 +20,13 @@ public abstract class JsonServlet extends HttpServlet {
         if(!method.equals("GET")){
             try{
                 BufferedReader reader = request.getReader();
-                String read = reader.readLine();
+                StringBuilder builder = new StringBuilder();
+                String read;
+                while((read = reader.readLine()) != null){
+                    builder.append(read);
+                }
+                read = builder.toString();
+
                 Object input = JackSonUtils.deSerialize(read , getModalClass());
                 request.setAttribute("INPUT" , input);
 

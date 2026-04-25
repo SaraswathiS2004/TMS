@@ -3,12 +3,12 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
 <servlet>
-    <servlet-name>PeopleAdded</servlet-name>
-    <servlet-class>com.tms.features.peopleAdded.PeoplesAddedView</servlet-class>
+    <servlet-name>AddPeople</servlet-name>
+    <servlet-class>com.tms.servlets.PeopleServlet</servlet-class>
 </servlet>
 
 <servlet-mapping>
-<servlet-name>PeopleAdded</servlet-name>
-<url-pattern>/tms/peopleAdd</url-pattern>
+<servlet-name>AddPeople</servlet-name>
+<url-pattern>/tms/people</url-pattern>
 </servlet-mapping>
 </web-app>

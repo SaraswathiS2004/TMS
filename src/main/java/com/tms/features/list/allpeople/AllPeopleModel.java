@@ -28,4 +28,29 @@ class AllPeopleModel {
         }
         return null;
     }
+
+    public ResultSet getPeopleById(String id) throws SQLException{
+        try {
+            PreparedStatement pre = conn.prepareStatement("SELECT * FROM Invitations WHERE ID = ?");
+            pre.setInt(1, Integer.parseInt(id));
+            ResultSet set = pre.executeQuery();
+            return set;
+        }
+        catch (Exception e){
+            System.out.println(e);
+        }
+        return null;
+    }
+    public ResultSet getPeopleByType(String inviteType) throws SQLException{
+        try {
+            PreparedStatement pre = conn.prepareStatement("SELECT * FROM Invitations WHERE  INVITED_STATUS = ?");
+            pre.setString(1 , inviteType);
+            ResultSet set = pre.executeQuery();
+            return set;
+        }
+        catch (Exception e){
+            System.out.println(e);
+        }
+        return null;
+    }
 }

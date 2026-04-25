@@ -4,19 +4,31 @@ import com.tms.data.respository.TmsDB;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class People {
     private String name;
     private int numberOfPerson;
     private RelationType relationType;
-    private  InvitedStatus invitedStatus;
+    private InvitedStatus invitedStatus = InvitedStatus.NOT_INVITED;
+
     private String city;
+    private int id;
 
     private Connection conn;
 
     public People() throws SQLException, ClassNotFoundException {
         conn = TmsDB.getInstance().getConnection();
+    }
+    public People(ResultSet resultSet) throws SQLException, ClassNotFoundException {
+        this();
+        setId(resultSet.getInt("ID"));
+        setName(resultSet.getString("NAME"));
+        setCity(resultSet.getString("CITY"));
+        setNumberOfPerson(resultSet.getInt("NUMBER_OF_PEOPLE_WILL_COME"));
+        setInvitedStatus(InvitedStatus.valueOf(resultSet.getString("INVITED_STATUS")));
+        setRelationType(RelationType.valueOf(resultSet.getString("RELATION_TYPE")));
     }
 
 
@@ -25,30 +37,37 @@ public class People {
     }
 
     public void setInvitedStatus(InvitedStatus invitedStatus) {
-        this.invitedStatus = InvitedStatus.NOT_INVITED;
+        this.invitedStatus = invitedStatus;
     }
 
-    public String getNames() {
+    public String getName() {
         return name;
     }
+    public int getId() {
+        return id;
+    }
 
-    public void setNames(String name) {
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
         this.name = name;
     }
 
-    public int getNumberOfPeople() {
+    public int getNumberOfPerson() {
         return numberOfPerson;
     }
 
-    public void setNumberOfPeople(int numberOfPeople) {
+    public void setNumberOfPerson(int numberOfPeople) {
         this.numberOfPerson = numberOfPeople;
     }
 
-    public RelationType getType() {
+    public RelationType getRelationType() {
         return relationType;
     }
 
-    public void setType(RelationType relationType) {
+    public void setRelationType(RelationType relationType) {
         this.relationType = relationType;
     }
 

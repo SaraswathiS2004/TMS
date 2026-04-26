@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PeopleService } from '../../services/people.service';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-add-person',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
   templateUrl: './add-person.component.html',
   styleUrl: './add-person.component.css'
 })
@@ -14,64 +15,104 @@ export class AddPersonComponent implements OnInit {
 
   form: FormGroup;
 
-  // Stores unique cities from existing records for the autocomplete datalist
-  existingCities: string[] = [];
+  allNames: string[] = [];
+  allCities: string[] = [];
+  filteredNames: string[] = [];
+  filteredCities: string[] = [];
+  showNameDropdown = false;
+  showCityDropdown = false;
 
   successMessage = '';
   errorMessage = '';
   isSubmitting = false;
 
   constructor(private fb: FormBuilder, private peopleService: PeopleService) {
-    // Set up the form with default values and validation rules
     this.form = this.fb.group({
       name:           ['', [Validators.required, Validators.minLength(2)]],
       city:           ['', Validators.required],
       numberOfPerson: [1, [Validators.required, Validators.min(1)]],
-      relationType:   ['CLOSE', Validators.required],
-      invitedStatus:  ['NOT_INVITED']
+      relationType:   ['CLOSE', Validators.required]
     });
   }
 
   ngOnInit(): void {
-    // Load all existing people so we can extract city suggestions
     this.peopleService.getAllPeople().subscribe({
       next: (people) => {
-        // Use a Set to remove duplicate city names
-        this.existingCities = [...new Set(people.map(p => p.city))];
+        this.allNames  = [...new Set(people.map(p => p.name))].sort();
+        this.allCities = [...new Set(people.map(p => p.city))].sort();
       }
     });
   }
 
-  // Helper used in the template to check if a field has a validation error
   hasError(field: string, error: string): boolean {
     const control = this.form.get(field);
     return !!(control?.invalid && control?.touched && control?.hasError(error));
   }
 
+  onNameInput(event: Event): void {
+    const val = (event.target as HTMLInputElement).value.toLowerCase();
+    this.filteredNames = val.length === 0 ? [] : this.allNames.filter(n => n.toLowerCase().includes(val));
+    this.showNameDropdown = this.filteredNames.length > 0;
+  }
+
+  selectName(name: string): void {
+    this.form.patchValue({ name });
+    this.showNameDropdown = false;
+  }
+
+  hideNameDropdown(): void {
+    setTimeout(() => { this.showNameDropdown = false; }, 150);
+  }
+
+  onCityInput(event: Event): void {
+    const val = (event.target as HTMLInputElement).value.toLowerCase();
+    this.filteredCities = val.length === 0 ? [...this.allCities] : this.allCities.filter(c => c.toLowerCase().includes(val));
+    this.showCityDropdown = this.filteredCities.length > 0;
+  }
+
+  showAllCities(): void {
+    this.filteredCities = [...this.allCities];
+    this.showCityDropdown = this.filteredCities.length > 0;
+  }
+
+  selectCity(city: string): void {
+    this.form.patchValue({ city });
+    this.showCityDropdown = false;
+  }
+
+  hideCityDropdown(): void {
+    setTimeout(() => { this.showCityDropdown = false; }, 150);
+  }
+
   onSubmit(): void {
     if (this.form.invalid) {
-      // Mark all fields as touched so error messages show up
       this.form.markAllAsTouched();
       return;
     }
-
     this.isSubmitting = true;
     this.successMessage = '';
     this.errorMessage = '';
 
-    this.peopleService.addPerson(this.form.value).subscribe({
+    const payload = { ...this.form.value, invitedFunctionIds: [] };
+
+    this.peopleService.addPerson(payload).subscribe({
       next: (response) => {
         if (response.status === 'SUCCESS') {
-          this.successMessage = 'Person added successfully to the invitation list!';
-          // Reset form to defaults, keeping relation and status values
-          this.form.reset({ numberOfPerson: 1, relationType: 'CLOSE', invitedStatus: 'NOT_INVITED' });
+          this.successMessage = 'addPerson.success';
+          this.form.reset({ numberOfPerson: 1, relationType: 'CLOSE' });
+          this.peopleService.getAllPeople().subscribe({
+            next: (people) => {
+              this.allNames  = [...new Set(people.map(p => p.name))].sort();
+              this.allCities = [...new Set(people.map(p => p.city))].sort();
+            }
+          });
         } else {
-          this.errorMessage = response.message || 'Could not add person. Please try again.';
+          this.errorMessage = 'addPerson.serverError';
         }
         this.isSubmitting = false;
       },
       error: () => {
-        this.errorMessage = 'Server error. Make sure the backend is running.';
+        this.errorMessage = 'addPerson.serverError';
         this.isSubmitting = false;
       }
     });

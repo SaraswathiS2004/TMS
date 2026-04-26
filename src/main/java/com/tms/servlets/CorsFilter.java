@@ -24,7 +24,7 @@ public class CorsFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         httpResponse.setHeader("Access-Control-Allow-Origin", "http://localhost:4200");
-        httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
+        httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         httpResponse.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
         // Preflight requests (browser sends OPTIONS before actual request)

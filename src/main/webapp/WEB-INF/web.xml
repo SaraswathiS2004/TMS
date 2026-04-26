@@ -12,12 +12,21 @@
     </filter-mapping>
 
     <servlet>
-        <servlet-name>AddPeople</servlet-name>
+        <servlet-name>PeopleServlet</servlet-name>
         <servlet-class>com.tms.servlets.PeopleServlet</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>AddPeople</servlet-name>
+        <servlet-name>PeopleServlet</servlet-name>
         <url-pattern>/api/people</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>FunctionServlet</servlet-name>
+        <servlet-class>com.tms.servlets.FunctionServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FunctionServlet</servlet-name>
+        <url-pattern>/api/functions</url-pattern>
     </servlet-mapping>
 
 </web-app>

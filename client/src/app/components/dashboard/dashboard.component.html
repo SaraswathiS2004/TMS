@@ -1,63 +1,82 @@
-<h2 class="page-title">Dashboard</h2>
+<h2 class="page-title">{{ 'dashboard.title' | translate }}</h2>
 
-<!-- Loading state -->
-<p *ngIf="isLoading" class="loading-text">Loading...</p>
+<p *ngIf="isLoading" class="loading-text">
+  <i class="bi bi-arrow-repeat spin"></i>
+  {{ 'common.loading' | translate }}
+</p>
 
-<!-- Stats grid shown after data loads -->
-<div *ngIf="!isLoading" class="stats-grid">
+<ng-container *ngIf="!isLoading">
 
-  <!-- Total People -->
-  <div class="stat-card card-total">
-    <div class="stat-icon">👥</div>
-    <div class="stat-body">
-      <span class="stat-number">{{ totalPeople }}</span>
-      <span class="stat-label">Total People</span>
+  <!-- Highlight Strip: per-function expected counts -->
+  <div *ngIf="functionStats.length > 0; else noFunctions" class="highlight-strip">
+
+    <div *ngFor="let stat of functionStats" class="highlight-card" [style.background]="stat.fn.color">
+      <div class="hc-count">{{ stat.expectedCount }}</div>
+      <div class="hc-label">
+        <i class="bi bi-people-fill"></i>
+        {{ 'dashboard.expectedAt' | translate }} {{ stat.fn.name }}
+      </div>
+      <div class="hc-sub">{{ stat.inviteeCount }} {{ 'dashboard.invitees' | translate }}</div>
     </div>
+
+    <div class="highlight-card hc-pending">
+      <div class="hc-count">{{ notInvitedCount }}</div>
+      <div class="hc-label">
+        <i class="bi bi-clock"></i>
+        {{ 'dashboard.notInvited' | translate }}
+      </div>
+      <div class="hc-sub">{{ 'dashboard.outOf' | translate }} {{ totalPeople }} {{ 'dashboard.people' | translate }}</div>
+    </div>
+
+    <div class="highlight-card hc-total">
+      <div class="hc-count">{{ totalExpected }}</div>
+      <div class="hc-label">
+        <i class="bi bi-people-fill"></i>
+        {{ 'dashboard.totalExpected' | translate }}
+      </div>
+      <div class="hc-sub">{{ 'dashboard.acrossAllEvents' | translate }}</div>
+    </div>
+
   </div>
 
-  <!-- Not Yet Invited -->
-  <div class="stat-card card-pending">
-    <div class="stat-icon">⏳</div>
-    <div class="stat-body">
-      <span class="stat-number">{{ notInvitedCount }}</span>
-      <span class="stat-label">Yet to Invite</span>
+  <ng-template #noFunctions>
+    <div class="no-functions-banner card">
+      <i class="bi bi-calendar2-x banner-icon"></i>
+      <div>
+        <div class="banner-title">{{ 'dashboard.noFunctions' | translate }}</div>
+        <div class="banner-hint">{{ 'dashboard.noFunctionsHint' | translate }}</div>
+      </div>
     </div>
+  </ng-template>
+
+  <!-- Summary stat row -->
+  <div class="stats-row">
+
+    <div class="stat-card">
+      <i class="bi bi-people-fill stat-icon"></i>
+      <div class="stat-body">
+        <span class="stat-number">{{ totalPeople }}</span>
+        <span class="stat-label">{{ 'dashboard.totalPeople' | translate }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card stat-pending">
+      <i class="bi bi-clock stat-icon"></i>
+      <div class="stat-body">
+        <span class="stat-number">{{ notInvitedCount }}</span>
+        <span class="stat-label">{{ 'dashboard.notInvited' | translate }}</span>
+      </div>
+    </div>
+
+    <div *ngFor="let stat of functionStats" class="stat-card" [style.border-left-color]="stat.fn.color">
+      <i class="bi bi-calendar2-check stat-icon" [style.color]="stat.fn.color"></i>
+      <div class="stat-body">
+        <span class="stat-number">{{ stat.inviteeCount }}</span>
+        <span class="stat-label">{{ stat.fn.name }}</span>
+        <span class="stat-sub">{{ stat.expectedCount }} {{ 'dashboard.people' | translate }} {{ 'dashboard.expectedAt' | translate }}</span>
+      </div>
+    </div>
+
   </div>
 
-  <!-- Engagement Invited -->
-  <div class="stat-card card-engagement">
-    <div class="stat-icon">💍</div>
-    <div class="stat-body">
-      <span class="stat-number">{{ engagementInvited.length }}</span>
-      <span class="stat-label">Engagement Invited</span>
-      <span class="stat-sub">
-        {{ engagementExpectedCount }} people expected at function
-      </span>
-    </div>
-  </div>
-
-  <!-- Marriage Invited -->
-  <div class="stat-card card-marriage">
-    <div class="stat-icon">💒</div>
-    <div class="stat-body">
-      <span class="stat-number">{{ marriageInvited.length }}</span>
-      <span class="stat-label">Marriage Invited</span>
-      <span class="stat-sub">
-        {{ marriageExpectedCount }} people expected at function
-      </span>
-    </div>
-  </div>
-
-  <!-- Both Events Invited -->
-  <div class="stat-card card-both">
-    <div class="stat-icon">🎉</div>
-    <div class="stat-body">
-      <span class="stat-number">{{ bothInvited.length }}</span>
-      <span class="stat-label">Both Events Invited</span>
-      <span class="stat-sub">
-        {{ bothExpectedCount }} people expected at function
-      </span>
-    </div>
-  </div>
-
-</div>
+</ng-container>

@@ -1,71 +1,68 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FunctionService } from '../../services/function.service';
 import { PeopleService } from '../../services/people.service';
+import { TmsFunction } from '../../models/function.model';
 import { People } from '../../models/people.model';
+import { TranslatePipe } from '../../pipes/translate.pipe';
+
+interface FunctionStat {
+  fn: TmsFunction;
+  inviteeCount: number;
+  expectedCount: number;
+}
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent implements OnInit {
 
   people: People[] = [];
+  functions: TmsFunction[] = [];
+  functionStats: FunctionStat[] = [];
   isLoading = true;
 
-  constructor(private peopleService: PeopleService) {}
+  constructor(
+    private functionService: FunctionService,
+    private peopleService: PeopleService
+  ) {}
 
   ngOnInit(): void {
-    this.peopleService.getAllPeople().subscribe({
-      next: (data) => {
-        this.people = data;
-        this.isLoading = false;
+    this.functionService.getAllFunctions().subscribe({
+      next: (fns) => {
+        this.functions = fns;
+        this.peopleService.getAllPeople().subscribe({
+          next: (people) => {
+            this.people = people;
+            this.functionStats = fns.map(fn => ({
+              fn,
+              inviteeCount: people.filter(p => p.invitedFunctionIds.includes(fn.id)).length,
+              expectedCount: people
+                .filter(p => p.invitedFunctionIds.includes(fn.id))
+                .reduce((sum, p) => sum + p.numberOfPerson, 0)
+            }));
+            this.isLoading = false;
+          },
+          error: () => { this.isLoading = false; }
+        });
       },
-      error: () => {
-        this.isLoading = false;
-      }
+      error: () => { this.isLoading = false; }
     });
   }
 
-  // Total number of people in the list
   get totalPeople(): number {
     return this.people.length;
   }
 
-  // People who have not been invited yet
   get notInvitedCount(): number {
-    return this.people.filter(p => p.invitedStatus === 'NOT_INVITED').length;
+    return this.people.filter(p => p.invitedFunctionIds.length === 0).length;
   }
 
-  // People invited only to the engagement
-  get engagementInvited(): People[] {
-    return this.people.filter(p => p.invitedStatus === 'ENGAGEMENT_INVITED');
-  }
-
-  // People invited only to the marriage
-  get marriageInvited(): People[] {
-    return this.people.filter(p => p.invitedStatus === 'MARRIAGE_INVITED');
-  }
-
-  // People invited to both events
-  get bothInvited(): People[] {
-    return this.people.filter(p => p.invitedStatus === 'BOTH_INVITED');
-  }
-
-  // Total attendees expected at the engagement
-  get engagementExpectedCount(): number {
-    return this.engagementInvited.reduce((total, p) => total + p.numberOfPerson, 0);
-  }
-
-  // Total attendees expected at the marriage
-  get marriageExpectedCount(): number {
-    return this.marriageInvited.reduce((total, p) => total + p.numberOfPerson, 0);
-  }
-
-  // Total attendees expected for both events combined
-  get bothExpectedCount(): number {
-    return this.bothInvited.reduce((total, p) => total + p.numberOfPerson, 0);
+  get totalExpected(): number {
+    return this.people.reduce((sum, p) => sum + p.numberOfPerson, 0);
   }
 }

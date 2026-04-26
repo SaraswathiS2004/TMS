@@ -1,37 +1,56 @@
-<h2 class="page-title">People List</h2>
+<h2 class="page-title">{{ 'peopleList.title' | translate }}</h2>
 
 <!-- Filter tabs -->
 <div class="filter-tabs">
+  <button class="tab-btn" [class.tab-active]="activeFilter === 'ALL'" (click)="setFilter('ALL')">
+    <i class="bi bi-people"></i>
+    {{ 'peopleList.all' | translate }}
+  </button>
+  <button class="tab-btn" [class.tab-active]="activeFilter === 'NONE'" (click)="setFilter('NONE')">
+    <i class="bi bi-clock"></i>
+    {{ 'peopleList.notInvited' | translate }}
+  </button>
   <button
-    *ngFor="let tab of filterTabs"
-    class="tab-btn"
-    [class.tab-active]="activeFilter === tab.value"
-    (click)="selectFilter(tab.value)"
+    *ngFor="let fn of functions"
+    class="tab-btn tab-fn"
+    [class.tab-active]="activeFilter === fn.id"
+    [style.--fn-color]="fn.color"
+    (click)="setFilter(fn.id)"
   >
-    {{ tab.label }}
+    <i class="bi bi-calendar2-check"></i>
+    {{ fn.name }}
   </button>
 </div>
 
-<!-- Feedback toast shown after marking someone -->
+<!-- Feedback toast -->
 <div *ngIf="feedbackMessage" class="feedback-toast">
-  ✅ {{ feedbackMessage }}
+  <i class="bi bi-check-circle"></i>
+  {{ feedbackMessage }}
 </div>
 
-<!-- Loading state -->
-<p *ngIf="isLoading" class="loading-text">Loading...</p>
+<p *ngIf="isLoading" class="loading-text">
+  <i class="bi bi-arrow-repeat spin"></i>
+  {{ 'common.loading' | translate }}
+</p>
+
+<!-- No functions configured notice -->
+<div *ngIf="!isLoading && functions.length === 0" class="info-banner card">
+  <i class="bi bi-info-circle"></i>
+  {{ 'peopleList.noFunctionsSetup' | translate }}
+</div>
 
 <!-- Empty state -->
-<div *ngIf="!isLoading && people.length === 0" class="empty-state card">
-  <span class="empty-icon">🎉</span>
-  <p>No people found for this filter.</p>
+<div *ngIf="!isLoading && filteredPeople.length === 0" class="empty-state card">
+  <i class="bi bi-person-x empty-icon"></i>
+  <p>{{ 'peopleList.noResults' | translate }}</p>
 </div>
 
-<!-- People cards -->
-<div *ngIf="!isLoading && people.length > 0" class="people-grid">
+<!-- People cards grid -->
+<div *ngIf="!isLoading && filteredPeople.length > 0" class="people-grid">
 
-  <div *ngFor="let person of people" class="person-card card">
+  <div *ngFor="let person of filteredPeople" class="person-card card">
 
-    <!-- Card Header: name + status badge -->
+    <!-- Header -->
     <div class="card-header">
       <div>
         <h3 class="person-name">{{ person.name }}</h3>
@@ -39,49 +58,86 @@
           {{ person.relationType }}
         </span>
       </div>
-      <span class="status-badge" [ngClass]="statusBadgeClass(person.invitedStatus)">
-        {{ formatStatus(person.invitedStatus) }}
-      </span>
+      <button class="btn-delete" (click)="requestDelete(person.id!)" title="Delete">
+        <i class="bi bi-trash3"></i>
+      </button>
     </div>
 
-    <!-- Card Body: city and attendee count -->
+    <!-- Info -->
     <div class="card-body">
       <div class="info-row">
-        <span class="info-icon">📍</span>
+        <i class="bi bi-geo-alt-fill info-icon"></i>
         <span>{{ person.city }}</span>
       </div>
       <div class="info-row">
-        <span class="info-icon">👥</span>
-        <span>{{ person.numberOfPerson }} expected</span>
+        <i class="bi bi-people info-icon"></i>
+        <span>{{ person.numberOfPerson }} {{ 'peopleList.expected' | translate }}</span>
       </div>
     </div>
 
-    <!-- Card Footer: Mark as Invited action -->
-    <div class="card-footer">
-      <div class="popup-container">
+    <!-- Invited functions tags -->
+    <div class="fn-tags" *ngIf="person.invitedFunctionIds.length > 0">
+      <span
+        *ngFor="let fnId of person.invitedFunctionIds"
+        class="fn-tag"
+        [style.background]="functionColor(fnId) + '22'"
+        [style.color]="functionColor(fnId)"
+        [style.border-color]="functionColor(fnId) + '55'"
+      >
+        <i class="bi bi-check2"></i>
+        {{ functionName(fnId) }}
+      </span>
+    </div>
 
-        <button class="btn-invite" (click)="togglePopup(person.id!)">
-          Mark as Invited ▾
+    <!-- Delete confirmation -->
+    <div *ngIf="deleteConfirmId === person.id" class="delete-confirm">
+      <span>{{ 'peopleList.confirmDelete' | translate }} <strong>{{ person.name }}</strong>?</span>
+      <div class="confirm-actions">
+        <button class="btn-danger" (click)="confirmDelete(person)">
+          <i class="bi bi-trash3"></i>
+          {{ 'peopleList.yesDelete' | translate }}
         </button>
-
-        <!-- Inline popup with status options -->
-        <div *ngIf="openPopupId === person.id" class="invite-popup">
-          <button (click)="markAsInvited(person, 'ENGAGEMENT_INVITED')" class="popup-option option-engagement">
-            💍 Engagement Only
-          </button>
-          <button (click)="markAsInvited(person, 'MARRIAGE_INVITED')" class="popup-option option-marriage">
-            💒 Marriage Only
-          </button>
-          <button (click)="markAsInvited(person, 'BOTH_INVITED')" class="popup-option option-both">
-            🎉 Both Events
-          </button>
-          <button (click)="markAsInvited(person, 'NOT_INVITED')" class="popup-option option-reset">
-            ↩ Reset to Not Invited
-          </button>
-        </div>
-
+        <button class="btn-ghost" (click)="cancelDelete()">{{ 'peopleList.cancel' | translate }}</button>
       </div>
+    </div>
+
+    <!-- Edit Invitations panel -->
+    <div *ngIf="editingId === person.id" class="edit-panel">
+      <div class="edit-fn-list">
+        <label
+          *ngFor="let fn of functions"
+          class="fn-checkbox-label"
+          [style.--fn-color]="fn.color"
+        >
+          <input
+            type="checkbox"
+            [checked]="pendingFunctionIds.includes(fn.id)"
+            (change)="togglePendingFunction(fn.id)"
+          />
+          <span class="fn-check-dot" [style.background]="fn.color"></span>
+          {{ fn.name }}
+        </label>
+        <p *ngIf="functions.length === 0" class="no-fns-hint">
+          {{ 'peopleList.noFunctionsSetup' | translate }}
+        </p>
+      </div>
+      <div class="edit-actions">
+        <button class="btn-save-inv" (click)="saveInvitations(person)" [disabled]="isSaving">
+          <i class="bi bi-check2"></i>
+          {{ (isSaving ? 'peopleList.saving' : 'peopleList.saveInvitations') | translate }}
+        </button>
+        <button class="btn-ghost" (click)="cancelEdit()">{{ 'peopleList.cancel' | translate }}</button>
+      </div>
+    </div>
+
+    <!-- Card Footer -->
+    <div class="card-footer" *ngIf="editingId !== person.id && deleteConfirmId !== person.id">
+      <button class="btn-invite" (click)="startEdit(person)">
+        <i class="bi bi-pencil-square"></i>
+        {{ 'peopleList.editInvitations' | translate }}
+      </button>
     </div>
 
   </div>
+
 </div>

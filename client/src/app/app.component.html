@@ -1,17 +1,38 @@
-<!-- Navigation Bar -->
 <nav class="navbar">
   <div class="nav-brand">
-    <span class="nav-icon">🎊</span>
-    <span class="nav-title">TMS</span>
+    <i class="bi bi-stars nav-brand-icon"></i>
+    <span class="nav-title">{{ 'app.title' | translate }}</span>
   </div>
+
   <div class="nav-links">
-    <a routerLink="/dashboard" routerLinkActive="active-link">Dashboard</a>
-    <a routerLink="/add" routerLinkActive="active-link">Add Person</a>
-    <a routerLink="/list" routerLinkActive="active-link">People List</a>
+    <a routerLink="/dashboard" routerLinkActive="active-link">
+      <i class="bi bi-speedometer2"></i>
+      {{ 'nav.dashboard' | translate }}
+    </a>
+    <a routerLink="/add" routerLinkActive="active-link">
+      <i class="bi bi-person-plus"></i>
+      {{ 'nav.addPerson' | translate }}
+    </a>
+    <a routerLink="/list" routerLinkActive="active-link">
+      <i class="bi bi-people"></i>
+      {{ 'nav.peopleList' | translate }}
+    </a>
+    <a routerLink="/city-group" routerLinkActive="active-link">
+      <i class="bi bi-geo-alt"></i>
+      {{ 'nav.byCity' | translate }}
+    </a>
+    <a routerLink="/functions" routerLinkActive="active-link">
+      <i class="bi bi-calendar2-event"></i>
+      {{ 'nav.manageFunctions' | translate }}
+    </a>
   </div>
+
+  <button class="lang-toggle" (click)="toggleLanguage()" [title]="'common.language' | translate">
+    <i class="bi bi-translate"></i>
+    <span>{{ isTamil ? 'English' : 'தமிழ்' }}</span>
+  </button>
 </nav>
 
-<!-- Page Content -->
 <main class="main-content">
   <router-outlet></router-outlet>
 </main>

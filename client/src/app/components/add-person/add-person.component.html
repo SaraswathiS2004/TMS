@@ -1,90 +1,110 @@
-<h2 class="page-title">Add Person</h2>
+<h2 class="page-title">{{ 'addPerson.title' | translate }}</h2>
 
 <div class="form-wrapper card">
 
-  <!-- Success message -->
   <div *ngIf="successMessage" class="alert alert-success">
-    ✅ {{ successMessage }}
+    <i class="bi bi-check-circle"></i>
+    {{ successMessage | translate }}
   </div>
 
-  <!-- Error message -->
   <div *ngIf="errorMessage" class="alert alert-error">
-    ❌ {{ errorMessage }}
+    <i class="bi bi-exclamation-circle"></i>
+    {{ errorMessage | translate }}
   </div>
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
 
-    <!-- Name -->
+    <!-- Name with dynamic suggestions -->
     <div class="form-group">
-      <label for="name">Full Name</label>
-      <input
-        id="name"
-        type="text"
-        formControlName="name"
-        placeholder="e.g. Ramalingam"
-        autocomplete="off"
-      />
-      <span *ngIf="hasError('name', 'required')" class="field-error">Name is required.</span>
-      <span *ngIf="hasError('name', 'minlength')" class="field-error">Name must be at least 2 characters.</span>
+      <label for="name">{{ 'addPerson.fullName' | translate }}</label>
+      <div class="autocomplete-wrap">
+        <i class="bi bi-person field-icon"></i>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          [placeholder]="'addPerson.namePlaceholder' | translate"
+          autocomplete="off"
+          (input)="onNameInput($event)"
+          (blur)="hideNameDropdown()"
+        />
+        <ul *ngIf="showNameDropdown" class="suggestion-list">
+          <li *ngFor="let n of filteredNames" (mousedown)="selectName(n)" class="suggestion-item">
+            <i class="bi bi-person"></i> {{ n }}
+          </li>
+        </ul>
+      </div>
+      <span *ngIf="hasError('name', 'required')" class="field-error">
+        <i class="bi bi-exclamation-circle"></i>
+        {{ 'addPerson.nameRequired' | translate }}
+      </span>
+      <span *ngIf="hasError('name', 'minlength')" class="field-error">
+        <i class="bi bi-exclamation-circle"></i>
+        {{ 'addPerson.nameMinLength' | translate }}
+      </span>
     </div>
 
-    <!-- City with autocomplete from previous entries -->
+    <!-- City with dynamic suggestions -->
     <div class="form-group">
-      <label for="city">City</label>
-      <input
-        id="city"
-        type="text"
-        formControlName="city"
-        placeholder="e.g. Tirunelveli"
-        list="city-suggestions"
-        autocomplete="off"
-      />
-      <!-- datalist provides the browser-native autocomplete dropdown -->
-      <datalist id="city-suggestions">
-        <option *ngFor="let city of existingCities" [value]="city"></option>
-      </datalist>
-      <p class="field-hint">Cities from previous entries are suggested automatically.</p>
-      <span *ngIf="hasError('city', 'required')" class="field-error">City is required.</span>
+      <label for="city">{{ 'addPerson.city' | translate }}</label>
+      <div class="autocomplete-wrap">
+        <i class="bi bi-geo-alt field-icon"></i>
+        <input
+          id="city"
+          type="text"
+          formControlName="city"
+          [placeholder]="'addPerson.cityPlaceholder' | translate"
+          autocomplete="off"
+          (input)="onCityInput($event)"
+          (focus)="showAllCities()"
+          (blur)="hideCityDropdown()"
+        />
+        <ul *ngIf="showCityDropdown" class="suggestion-list">
+          <li *ngFor="let c of filteredCities" (mousedown)="selectCity(c)" class="suggestion-item">
+            <i class="bi bi-geo-alt-fill"></i> {{ c }}
+          </li>
+        </ul>
+      </div>
+      <span *ngIf="hasError('city', 'required')" class="field-error">
+        <i class="bi bi-exclamation-circle"></i>
+        {{ 'addPerson.cityRequired' | translate }}
+      </span>
     </div>
 
-    <!-- Number of people expected -->
+    <!-- Expected Attendees -->
     <div class="form-group">
-      <label for="numberOfPerson">Expected Attendees</label>
-      <input
-        id="numberOfPerson"
-        type="number"
-        formControlName="numberOfPerson"
-        min="1"
-      />
-      <p class="field-hint">How many people from this family/group will attend?</p>
-      <span *ngIf="hasError('numberOfPerson', 'required')" class="field-error">This field is required.</span>
-      <span *ngIf="hasError('numberOfPerson', 'min')" class="field-error">Must be at least 1.</span>
+      <label for="numberOfPerson">{{ 'addPerson.expectedAttendees' | translate }}</label>
+      <div class="input-with-icon">
+        <i class="bi bi-people field-icon"></i>
+        <input id="numberOfPerson" type="number" formControlName="numberOfPerson" min="1" />
+      </div>
+      <p class="field-hint">{{ 'addPerson.attendeesHint' | translate }}</p>
+      <span *ngIf="hasError('numberOfPerson', 'required')" class="field-error">
+        <i class="bi bi-exclamation-circle"></i>
+        {{ 'addPerson.numberRequired' | translate }}
+      </span>
+      <span *ngIf="hasError('numberOfPerson', 'min')" class="field-error">
+        <i class="bi bi-exclamation-circle"></i>
+        {{ 'addPerson.numberMin' | translate }}
+      </span>
     </div>
 
-    <!-- Relation type -->
+    <!-- Relation Type -->
     <div class="form-group">
-      <label for="relationType">Relation Type</label>
-      <select id="relationType" formControlName="relationType">
-        <option value="CLOSE">Close (Family / Very close friends)</option>
-        <option value="DISTANCE">Distance (Relatives)</option>
-        <option value="FRIENDS">Friends</option>
-      </select>
+      <label for="relationType">{{ 'addPerson.relationType' | translate }}</label>
+      <div class="input-with-icon">
+        <i class="bi bi-diagram-3 field-icon"></i>
+        <select id="relationType" formControlName="relationType">
+          <option value="CLOSE">{{ 'addPerson.close' | translate }}</option>
+          <option value="DISTANCE">{{ 'addPerson.distance' | translate }}</option>
+          <option value="FRIENDS">{{ 'addPerson.friends' | translate }}</option>
+        </select>
+      </div>
     </div>
 
-    <!-- Invitation status (default NOT_INVITED) -->
-    <div class="form-group">
-      <label for="invitedStatus">Initial Invitation Status</label>
-      <select id="invitedStatus" formControlName="invitedStatus">
-        <option value="NOT_INVITED">Not Invited Yet</option>
-        <option value="ENGAGEMENT_INVITED">Engagement Invited</option>
-        <option value="MARRIAGE_INVITED">Marriage Invited</option>
-        <option value="BOTH_INVITED">Both Events Invited</option>
-      </select>
-    </div>
-
-    <!-- Submit -->
     <button type="submit" class="btn-primary" [disabled]="isSubmitting">
-      {{ isSubmitting ? 'Adding...' : 'Add to List' }}
+      <i class="bi bi-person-plus"></i>
+      {{ (isSubmitting ? 'addPerson.adding' : 'addPerson.addToList') | translate }}
     </button>
 
   </form>

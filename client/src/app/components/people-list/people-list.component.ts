@@ -32,7 +32,7 @@ export class PeopleListComponent implements OnInit {
   activeFilter: 'ALL' | 'NONE' | number = 'NONE';
 
   editPersonId: number | null = null;
-  editData: EditData = { name: '', city: '', numberOfPerson: 1, relationType: 'CLOSE', invitedFunctionIds: [] };
+  editData: EditData = { name: '', city: '', numberOfPerson: 1, relationType: 'CLOSE_RELATIVE', invitedFunctionIds: [] };
   isSaving = false;
 
   markingStatusPersonId: number | null = null;

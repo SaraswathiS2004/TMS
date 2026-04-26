@@ -1,8 +1,9 @@
 package com.tms.servlets.actions;
 
+import com.tms.data.dto.InvitedStatus;
 import com.tms.data.dto.People;
+import com.tms.data.dto.PeopleInvited;
 import com.tms.data.respository.TmsDB;
-import com.tms.features.list.allpeople.AllPeopleView;
 import com.tms.servlets.message.Message;
 
 import java.sql.Connection;
@@ -54,6 +55,19 @@ public class PeopleActions {
             }
         }
         return listOfPeople;
+    }
+
+    public Message markAsInvited(int id, InvitedStatus invitedStatus) {
+        Message message = new Message();
+        try {
+            PeopleInvited peopleInvited = new PeopleInvited();
+            message.setMessage(peopleInvited.setData(id, invitedStatus));
+            message.setStatus(Message.Status.SUCCESS);
+        } catch (Exception e) {
+            System.out.println(e);
+            message.setStatus(Message.Status.FAIL);
+        }
+        return message;
     }
 
     public ResultSet getAllPeople() throws SQLException {

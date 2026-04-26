@@ -1,0 +1,87 @@
+<h2 class="page-title">People List</h2>
+
+<!-- Filter tabs -->
+<div class="filter-tabs">
+  <button
+    *ngFor="let tab of filterTabs"
+    class="tab-btn"
+    [class.tab-active]="activeFilter === tab.value"
+    (click)="selectFilter(tab.value)"
+  >
+    {{ tab.label }}
+  </button>
+</div>
+
+<!-- Feedback toast shown after marking someone -->
+<div *ngIf="feedbackMessage" class="feedback-toast">
+  ✅ {{ feedbackMessage }}
+</div>
+
+<!-- Loading state -->
+<p *ngIf="isLoading" class="loading-text">Loading...</p>
+
+<!-- Empty state -->
+<div *ngIf="!isLoading && people.length === 0" class="empty-state card">
+  <span class="empty-icon">🎉</span>
+  <p>No people found for this filter.</p>
+</div>
+
+<!-- People cards -->
+<div *ngIf="!isLoading && people.length > 0" class="people-grid">
+
+  <div *ngFor="let person of people" class="person-card card">
+
+    <!-- Card Header: name + status badge -->
+    <div class="card-header">
+      <div>
+        <h3 class="person-name">{{ person.name }}</h3>
+        <span class="badge" [ngClass]="relationBadgeClass(person.relationType)">
+          {{ person.relationType }}
+        </span>
+      </div>
+      <span class="status-badge" [ngClass]="statusBadgeClass(person.invitedStatus)">
+        {{ formatStatus(person.invitedStatus) }}
+      </span>
+    </div>
+
+    <!-- Card Body: city and attendee count -->
+    <div class="card-body">
+      <div class="info-row">
+        <span class="info-icon">📍</span>
+        <span>{{ person.city }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-icon">👥</span>
+        <span>{{ person.numberOfPerson }} expected</span>
+      </div>
+    </div>
+
+    <!-- Card Footer: Mark as Invited action -->
+    <div class="card-footer">
+      <div class="popup-container">
+
+        <button class="btn-invite" (click)="togglePopup(person.id!)">
+          Mark as Invited ▾
+        </button>
+
+        <!-- Inline popup with status options -->
+        <div *ngIf="openPopupId === person.id" class="invite-popup">
+          <button (click)="markAsInvited(person, 'ENGAGEMENT_INVITED')" class="popup-option option-engagement">
+            💍 Engagement Only
+          </button>
+          <button (click)="markAsInvited(person, 'MARRIAGE_INVITED')" class="popup-option option-marriage">
+            💒 Marriage Only
+          </button>
+          <button (click)="markAsInvited(person, 'BOTH_INVITED')" class="popup-option option-both">
+            🎉 Both Events
+          </button>
+          <button (click)="markAsInvited(person, 'NOT_INVITED')" class="popup-option option-reset">
+            ↩ Reset to Not Invited
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

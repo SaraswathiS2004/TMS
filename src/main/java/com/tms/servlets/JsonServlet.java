@@ -38,7 +38,7 @@ public abstract class JsonServlet extends HttpServlet {
         }
         super.service(request , response);
         String output = JackSonUtils.serialize(request.getAttribute("OUTPUT"));
-        response.setContentType("text/json");
+        response.setContentType("application/json");
         PrintWriter resOutput = response.getWriter();
         resOutput.println(output);
         resOutput.close();

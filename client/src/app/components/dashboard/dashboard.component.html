@@ -1,0 +1,63 @@
+<h2 class="page-title">Dashboard</h2>
+
+<!-- Loading state -->
+<p *ngIf="isLoading" class="loading-text">Loading...</p>
+
+<!-- Stats grid shown after data loads -->
+<div *ngIf="!isLoading" class="stats-grid">
+
+  <!-- Total People -->
+  <div class="stat-card card-total">
+    <div class="stat-icon">👥</div>
+    <div class="stat-body">
+      <span class="stat-number">{{ totalPeople }}</span>
+      <span class="stat-label">Total People</span>
+    </div>
+  </div>
+
+  <!-- Not Yet Invited -->
+  <div class="stat-card card-pending">
+    <div class="stat-icon">⏳</div>
+    <div class="stat-body">
+      <span class="stat-number">{{ notInvitedCount }}</span>
+      <span class="stat-label">Yet to Invite</span>
+    </div>
+  </div>
+
+  <!-- Engagement Invited -->
+  <div class="stat-card card-engagement">
+    <div class="stat-icon">💍</div>
+    <div class="stat-body">
+      <span class="stat-number">{{ engagementInvited.length }}</span>
+      <span class="stat-label">Engagement Invited</span>
+      <span class="stat-sub">
+        {{ engagementExpectedCount }} people expected at function
+      </span>
+    </div>
+  </div>
+
+  <!-- Marriage Invited -->
+  <div class="stat-card card-marriage">
+    <div class="stat-icon">💒</div>
+    <div class="stat-body">
+      <span class="stat-number">{{ marriageInvited.length }}</span>
+      <span class="stat-label">Marriage Invited</span>
+      <span class="stat-sub">
+        {{ marriageExpectedCount }} people expected at function
+      </span>
+    </div>
+  </div>
+
+  <!-- Both Events Invited -->
+  <div class="stat-card card-both">
+    <div class="stat-icon">🎉</div>
+    <div class="stat-body">
+      <span class="stat-number">{{ bothInvited.length }}</span>
+      <span class="stat-label">Both Events Invited</span>
+      <span class="stat-sub">
+        {{ bothExpectedCount }} people expected at function
+      </span>
+    </div>
+  </div>
+
+</div>

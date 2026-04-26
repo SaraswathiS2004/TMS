@@ -1,0 +1,66 @@
+/* Global light theme styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f0f4f8;
+  color: #2d3748;
+  min-height: 100vh;
+}
+
+/* Shared card style used across all components */
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+}
+
+/* Page title used by all components */
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 24px;
+}
+
+/* Reusable badge for relation type */
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.badge-close    { background: #dbeafe; color: #1d4ed8; }
+.badge-distance { background: #fef9c3; color: #92400e; }
+.badge-friends  { background: #dcfce7; color: #15803d; }
+
+/* Reusable status badge */
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-not-invited     { background: #f1f5f9; color: #64748b; }
+.status-engagement      { background: #ede9fe; color: #6d28d9; }
+.status-marriage        { background: #fee2e2; color: #b91c1c; }
+.status-both            { background: #fce7f3; color: #be185d; }
+
+/* Shared spinner */
+.loading-text {
+  text-align: center;
+  color: #94a3b8;
+  padding: 48px;
+  font-size: 16px;
+}

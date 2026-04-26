@@ -1,0 +1,91 @@
+<h2 class="page-title">Add Person</h2>
+
+<div class="form-wrapper card">
+
+  <!-- Success message -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    ✅ {{ successMessage }}
+  </div>
+
+  <!-- Error message -->
+  <div *ngIf="errorMessage" class="alert alert-error">
+    ❌ {{ errorMessage }}
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+    <!-- Name -->
+    <div class="form-group">
+      <label for="name">Full Name</label>
+      <input
+        id="name"
+        type="text"
+        formControlName="name"
+        placeholder="e.g. Ramalingam"
+        autocomplete="off"
+      />
+      <span *ngIf="hasError('name', 'required')" class="field-error">Name is required.</span>
+      <span *ngIf="hasError('name', 'minlength')" class="field-error">Name must be at least 2 characters.</span>
+    </div>
+
+    <!-- City with autocomplete from previous entries -->
+    <div class="form-group">
+      <label for="city">City</label>
+      <input
+        id="city"
+        type="text"
+        formControlName="city"
+        placeholder="e.g. Tirunelveli"
+        list="city-suggestions"
+        autocomplete="off"
+      />
+      <!-- datalist provides the browser-native autocomplete dropdown -->
+      <datalist id="city-suggestions">
+        <option *ngFor="let city of existingCities" [value]="city"></option>
+      </datalist>
+      <p class="field-hint">Cities from previous entries are suggested automatically.</p>
+      <span *ngIf="hasError('city', 'required')" class="field-error">City is required.</span>
+    </div>
+
+    <!-- Number of people expected -->
+    <div class="form-group">
+      <label for="numberOfPerson">Expected Attendees</label>
+      <input
+        id="numberOfPerson"
+        type="number"
+        formControlName="numberOfPerson"
+        min="1"
+      />
+      <p class="field-hint">How many people from this family/group will attend?</p>
+      <span *ngIf="hasError('numberOfPerson', 'required')" class="field-error">This field is required.</span>
+      <span *ngIf="hasError('numberOfPerson', 'min')" class="field-error">Must be at least 1.</span>
+    </div>
+
+    <!-- Relation type -->
+    <div class="form-group">
+      <label for="relationType">Relation Type</label>
+      <select id="relationType" formControlName="relationType">
+        <option value="CLOSE">Close (Family / Very close friends)</option>
+        <option value="DISTANCE">Distance (Relatives)</option>
+        <option value="FRIENDS">Friends</option>
+      </select>
+    </div>
+
+    <!-- Invitation status (default NOT_INVITED) -->
+    <div class="form-group">
+      <label for="invitedStatus">Initial Invitation Status</label>
+      <select id="invitedStatus" formControlName="invitedStatus">
+        <option value="NOT_INVITED">Not Invited Yet</option>
+        <option value="ENGAGEMENT_INVITED">Engagement Invited</option>
+        <option value="MARRIAGE_INVITED">Marriage Invited</option>
+        <option value="BOTH_INVITED">Both Events Invited</option>
+      </select>
+    </div>
+
+    <!-- Submit -->
+    <button type="submit" class="btn-primary" [disabled]="isSubmitting">
+      {{ isSubmitting ? 'Adding...' : 'Add to List' }}
+    </button>
+
+  </form>
+</div>

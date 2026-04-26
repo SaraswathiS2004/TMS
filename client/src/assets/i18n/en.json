@@ -51,7 +51,7 @@
   "peopleList.city": "City",
   "peopleList.expectedAttendees": "Expected Attendees",
   "peopleList.relationType": "Relation Type",
-  "peopleList.invitedFunctions": "Invited Functions",
+  "peopleList.invitedFunctions": "Functions",
   "peopleList.savePerson": "Save Changes",
   "peopleList.savePersonSuccess": "Person updated successfully.",
   "peopleList.editInvitations": "Edit",

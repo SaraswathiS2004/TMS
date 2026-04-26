@@ -31,7 +31,7 @@ export class AddPersonComponent implements OnInit {
       name:           ['', [Validators.required, Validators.minLength(2)]],
       city:           ['', Validators.required],
       numberOfPerson: [1, [Validators.required, Validators.min(1)]],
-      relationType:   ['CLOSE', Validators.required]
+      relationType:   ['CLOSE_RELATIVE', Validators.required]
     });
   }
 
@@ -99,7 +99,7 @@ export class AddPersonComponent implements OnInit {
       next: (response) => {
         if (response.status === 'SUCCESS') {
           this.successMessage = 'addPerson.success';
-          this.form.reset({ numberOfPerson: 1, relationType: 'CLOSE' });
+          this.form.reset({ numberOfPerson: 1, relationType: 'CLOSE_RELATIVE' });
           this.peopleService.getAllPeople().subscribe({
             next: (people) => {
               this.allNames  = [...new Set(people.map(p => p.name))].sort();

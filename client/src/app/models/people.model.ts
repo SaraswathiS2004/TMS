@@ -1,4 +1,4 @@
-export type RelationType = 'CLOSE' | 'DISTANCE' | 'FRIENDS';
+export type RelationType = 'CLOSE_RELATIVE' | 'DISTANCE_RELATIVE' | 'FRIENDS';
 
 export interface People {
   id?: number;

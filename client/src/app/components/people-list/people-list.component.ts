@@ -153,7 +153,7 @@ export class PeopleListComponent implements OnInit {
 
   relationBadgeClass(relation: string): string {
     const map: Record<string, string> = {
-      CLOSE: 'badge-close', DISTANCE: 'badge-distance', FRIENDS: 'badge-friends'
+      CLOSE_RELATIVE: 'badge-close', DISTANCE_RELATIVE: 'badge-distance', FRIENDS: 'badge-friends'
     };
     return map[relation] ?? '';
   }

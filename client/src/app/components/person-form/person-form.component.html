@@ -1,0 +1,135 @@
+<div *ngIf="successMessage" class="alert alert-success">
+  <i class="bi bi-check-circle"></i>
+  {{ successMessage | translate }}
+</div>
+
+<div *ngIf="errorMessage" class="alert alert-error">
+  <i class="bi bi-exclamation-circle"></i>
+  {{ errorMessage | translate }}
+</div>
+
+<form [formGroup]="form" [class.inline]="inline" (ngSubmit)="onSubmit()" novalidate>
+
+  <!-- Name with autocomplete -->
+  <div class="form-group">
+    <label for="pf-name">{{ 'addPerson.fullName' | translate }}</label>
+    <div class="autocomplete-wrap">
+      <i class="bi bi-person field-icon"></i>
+      <input
+        id="pf-name"
+        type="text"
+        formControlName="name"
+        [placeholder]="'addPerson.namePlaceholder' | translate"
+        autocomplete="off"
+        (input)="onNameInput($event)"
+        (blur)="hideNameDropdown()"
+      />
+      <ul *ngIf="showNameDropdown" class="suggestion-list">
+        <li *ngFor="let n of filteredNames" (mousedown)="selectName(n)" class="suggestion-item">
+          <i class="bi bi-person"></i> {{ n }}
+        </li>
+      </ul>
+    </div>
+    <span *ngIf="hasError('name', 'required')" class="field-error">
+      <i class="bi bi-exclamation-circle"></i>
+      {{ 'addPerson.nameRequired' | translate }}
+    </span>
+    <span *ngIf="hasError('name', 'minlength')" class="field-error">
+      <i class="bi bi-exclamation-circle"></i>
+      {{ 'addPerson.nameMinLength' | translate }}
+    </span>
+  </div>
+
+  <!-- City with autocomplete -->
+  <div class="form-group">
+    <label for="pf-city">{{ 'addPerson.city' | translate }}</label>
+    <div class="autocomplete-wrap">
+      <i class="bi bi-geo-alt field-icon"></i>
+      <input
+        id="pf-city"
+        type="text"
+        formControlName="city"
+        [placeholder]="'addPerson.cityPlaceholder' | translate"
+        autocomplete="off"
+        (input)="onCityInput($event)"
+        (focus)="showAllCities()"
+        (blur)="hideCityDropdown()"
+      />
+      <ul *ngIf="showCityDropdown" class="suggestion-list">
+        <li *ngFor="let c of filteredCities" (mousedown)="selectCity(c)" class="suggestion-item">
+          <i class="bi bi-geo-alt-fill"></i> {{ c }}
+        </li>
+      </ul>
+    </div>
+    <span *ngIf="hasError('city', 'required')" class="field-error">
+      <i class="bi bi-exclamation-circle"></i>
+      {{ 'addPerson.cityRequired' | translate }}
+    </span>
+  </div>
+
+  <!-- Expected Attendees -->
+  <div class="form-group">
+    <label for="pf-numberOfPerson">{{ 'addPerson.expectedAttendees' | translate }}</label>
+    <div class="input-with-icon">
+      <i class="bi bi-people field-icon"></i>
+      <input id="pf-numberOfPerson" type="number" formControlName="numberOfPerson" min="1" />
+    </div>
+    <p class="field-hint">{{ 'addPerson.attendeesHint' | translate }}</p>
+    <span *ngIf="hasError('numberOfPerson', 'required')" class="field-error">
+      <i class="bi bi-exclamation-circle"></i>
+      {{ 'addPerson.numberRequired' | translate }}
+    </span>
+    <span *ngIf="hasError('numberOfPerson', 'min')" class="field-error">
+      <i class="bi bi-exclamation-circle"></i>
+      {{ 'addPerson.numberMin' | translate }}
+    </span>
+  </div>
+
+  <!-- Relation Type -->
+  <div class="form-group">
+    <label for="pf-relationType">{{ 'addPerson.relationType' | translate }}</label>
+    <div class="input-with-icon">
+      <i class="bi bi-diagram-3 field-icon"></i>
+      <select id="pf-relationType" formControlName="relationType">
+        <option value="CLOSE_RELATIVE">{{ 'addPerson.close' | translate }}</option>
+        <option value="DISTANCE_RELATIVE">{{ 'addPerson.distance' | translate }}</option>
+        <option value="FRIENDS">{{ 'addPerson.friends' | translate }}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Functions (shown only when the parent supplies them) -->
+  <div class="form-group" *ngIf="functions.length > 0">
+    <label>{{ 'peopleList.invitedFunctions' | translate }}</label>
+    <div class="fn-checkbox-list">
+      <label
+        *ngFor="let fn of functions"
+        class="fn-checkbox-label"
+        [style.--fn-color]="fn.color"
+      >
+        <input
+          type="checkbox"
+          [checked]="selectedFunctionIds.includes(fn.id)"
+          (change)="toggleFunction(fn.id)"
+        />
+        <span class="fn-check-dot" [style.background]="fn.color"></span>
+        {{ fn.name }}
+      </label>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="form-actions">
+    <button type="submit" class="btn-primary" [disabled]="isSubmitting">
+      <i class="bi" [ngClass]="isEditMode ? 'bi-check2' : 'bi-person-plus'"></i>
+      {{ (isSubmitting
+          ? (isEditMode ? 'peopleList.saving' : 'addPerson.adding')
+          : (isEditMode ? 'peopleList.savePerson' : 'addPerson.addToList')
+         ) | translate }}
+    </button>
+    <button *ngIf="isEditMode" type="button" class="btn-ghost" (click)="onCancel()">
+      {{ 'peopleList.cancel' | translate }}
+    </button>
+  </div>
+
+</form>

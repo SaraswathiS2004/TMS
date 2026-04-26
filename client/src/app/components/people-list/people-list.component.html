@@ -55,7 +55,7 @@
       <div>
         <h3 class="person-name">{{ person.name }}</h3>
         <span class="badge" [ngClass]="relationBadgeClass(person.relationType)">
-          {{ person.relationType }}
+          {{ ('relationType.' + person.relationType) | translate }}
         </span>
       </div>
       <button class="btn-delete" (click)="requestDelete(person.id!)" title="Delete">
@@ -125,69 +125,20 @@
       </div>
     </div>
 
-    <!-- Full edit panel -->
+    <!-- Edit panel (shared form component) -->
     <div *ngIf="editPersonId === person.id" class="edit-panel">
       <div class="edit-section-title">
         <i class="bi bi-pencil-square"></i>
         {{ 'peopleList.editPerson' | translate }}
       </div>
-
-      <div class="edit-field">
-        <label class="edit-label">{{ 'peopleList.fullName' | translate }}</label>
-        <input type="text" class="edit-input" [(ngModel)]="editData.name" />
-      </div>
-
-      <div class="edit-field">
-        <label class="edit-label">{{ 'peopleList.city' | translate }}</label>
-        <input type="text" class="edit-input" [(ngModel)]="editData.city" [attr.list]="'cities-' + person.id" />
-        <datalist [attr.id]="'cities-' + person.id">
-          <option *ngFor="let c of existingCities" [value]="c"></option>
-        </datalist>
-      </div>
-
-      <div class="edit-field">
-        <label class="edit-label">{{ 'peopleList.expectedAttendees' | translate }}</label>
-        <input type="number" class="edit-input edit-input-number" [(ngModel)]="editData.numberOfPerson" min="1" />
-      </div>
-
-      <div class="edit-field">
-        <label class="edit-label">{{ 'peopleList.relationType' | translate }}</label>
-        <select class="edit-select" [(ngModel)]="editData.relationType">
-          <option value="CLOSE">{{ 'addPerson.close' | translate }}</option>
-          <option value="DISTANCE">{{ 'addPerson.distance' | translate }}</option>
-          <option value="FRIENDS">{{ 'addPerson.friends' | translate }}</option>
-        </select>
-      </div>
-
-      <div class="edit-field">
-        <label class="edit-label">{{ 'peopleList.invitedFunctions' | translate }}</label>
-        <div class="edit-fn-list">
-          <label
-            *ngFor="let fn of functions"
-            class="fn-checkbox-label"
-            [style.--fn-color]="fn.color"
-          >
-            <input
-              type="checkbox"
-              [checked]="editData.invitedFunctionIds.includes(fn.id)"
-              (change)="toggleEditFunction(fn.id)"
-            />
-            <span class="fn-check-dot" [style.background]="fn.color"></span>
-            {{ fn.name }}
-          </label>
-          <p *ngIf="functions.length === 0" class="no-fns-hint">
-            {{ 'peopleList.noFunctionsSetup' | translate }}
-          </p>
-        </div>
-      </div>
-
-      <div class="edit-actions">
-        <button class="btn-save-inv" (click)="savePersonEdit()" [disabled]="isSaving">
-          <i class="bi bi-check2"></i>
-          {{ (isSaving ? 'peopleList.saving' : 'peopleList.savePerson') | translate }}
-        </button>
-        <button class="btn-ghost" (click)="cancelEditPerson()">{{ 'peopleList.cancel' | translate }}</button>
-      </div>
+      <app-person-form
+        [person]="person"
+        [allPeople]="allPeople"
+        [functions]="functions"
+        [inline]="true"
+        (saved)="onPersonSaved()"
+        (cancelled)="cancelEditPerson()"
+      ></app-person-form>
     </div>
 
     <!-- Card Footer -->

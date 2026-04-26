@@ -60,20 +60,21 @@
       </div>
     </div>
 
+    <div class="stat-card stat-invited">
+      <i class="bi bi-check-circle-fill stat-icon"></i>
+      <div class="stat-body">
+        <span class="stat-number">{{ totalInvited }}</span>
+        <span class="stat-label">{{ 'dashboard.totalInvited' | translate }}</span>
+        <span class="stat-sub">{{ 'dashboard.outOf' | translate }} {{ totalPeople }} {{ 'dashboard.people' | translate }}</span>
+      </div>
+    </div>
+
     <div class="stat-card stat-pending">
       <i class="bi bi-clock stat-icon"></i>
       <div class="stat-body">
         <span class="stat-number">{{ notInvitedCount }}</span>
         <span class="stat-label">{{ 'dashboard.notInvited' | translate }}</span>
-      </div>
-    </div>
-
-    <div *ngFor="let stat of functionStats" class="stat-card" [style.border-left-color]="stat.fn.color">
-      <i class="bi bi-calendar2-check stat-icon" [style.color]="stat.fn.color"></i>
-      <div class="stat-body">
-        <span class="stat-number">{{ stat.inviteeCount }}</span>
-        <span class="stat-label">{{ stat.fn.name }}</span>
-        <span class="stat-sub">{{ stat.expectedCount }} {{ 'dashboard.people' | translate }} {{ 'dashboard.expectedAt' | translate }}</span>
+        <span class="stat-sub">{{ 'dashboard.outOf' | translate }} {{ totalPeople }} {{ 'dashboard.people' | translate }}</span>
       </div>
     </div>
 

@@ -62,6 +62,10 @@ export class DashboardComponent implements OnInit {
     return this.people.filter(p => p.invitedFunctionIds.length === 0).length;
   }
 
+  get totalInvited(): number {
+    return this.people.filter(p => p.invitedFunctionIds.length > 0).length;
+  }
+
   get totalExpected(): number {
     return this.people.reduce((sum, p) => sum + p.numberOfPerson, 0);
   }

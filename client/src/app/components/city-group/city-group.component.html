@@ -60,7 +60,7 @@
           <div class="person-left">
             <span class="person-name">{{ person.name }}</span>
             <span class="badge" [ngClass]="relationBadgeClass(person.relationType)">
-              {{ person.relationType }}
+              {{ ('relationType.' + person.relationType) | translate }}
             </span>
           </div>
 

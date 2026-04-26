@@ -1,25 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { PeopleService } from '../../services/people.service';
 import { FunctionService } from '../../services/function.service';
 import { People, RelationType } from '../../models/people.model';
 import { TmsFunction } from '../../models/function.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { TranslateService } from '../../services/translate.service';
-
-interface EditData {
-  name: string;
-  city: string;
-  numberOfPerson: number;
-  relationType: RelationType;
-  invitedFunctionIds: number[];
-}
+import { PersonFormComponent } from '../person-form/person-form.component';
 
 @Component({
   selector: 'app-people-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe],
+  imports: [CommonModule, TranslatePipe, PersonFormComponent],
   templateUrl: './people-list.component.html',
   styleUrl: './people-list.component.css'
 })
@@ -32,8 +24,6 @@ export class PeopleListComponent implements OnInit {
   activeFilter: 'ALL' | 'NONE' | number = 'NONE';
 
   editPersonId: number | null = null;
-  editData: EditData = { name: '', city: '', numberOfPerson: 1, relationType: 'CLOSE_RELATIVE', invitedFunctionIds: [] };
-  isSaving = false;
 
   markingStatusPersonId: number | null = null;
 
@@ -105,10 +95,6 @@ export class PeopleListComponent implements OnInit {
     });
   }
 
-  get existingCities(): string[] {
-    return [...new Set(this.allPeople.map(p => p.city).filter(c => !!c))];
-  }
-
   setFilter(f: 'ALL' | 'NONE' | number): void {
     this.activeFilter = f;
     this.editPersonId = null;
@@ -125,13 +111,6 @@ export class PeopleListComponent implements OnInit {
 
   startEditPerson(person: People): void {
     this.editPersonId = person.id!;
-    this.editData = {
-      name: person.name,
-      city: person.city,
-      numberOfPerson: person.numberOfPerson,
-      relationType: person.relationType,
-      invitedFunctionIds: [...person.invitedFunctionIds]
-    };
     this.deleteConfirmId = null;
   }
 
@@ -139,44 +118,10 @@ export class PeopleListComponent implements OnInit {
     this.editPersonId = null;
   }
 
-  toggleEditFunction(fnId: number): void {
-    if (this.editData.invitedFunctionIds.includes(fnId)) {
-      this.editData.invitedFunctionIds = this.editData.invitedFunctionIds.filter(id => id !== fnId);
-    } else {
-      this.editData.invitedFunctionIds = [...this.editData.invitedFunctionIds, fnId];
-    }
-  }
-
-  savePersonEdit(): void {
-    if (!this.editPersonId) { return; }
-    this.isSaving = true;
-    const person: People = {
-      id: this.editPersonId,
-      name: this.editData.name,
-      city: this.editData.city,
-      numberOfPerson: this.editData.numberOfPerson,
-      relationType: this.editData.relationType,
-      invitedFunctionIds: this.editData.invitedFunctionIds
-    };
-    this.peopleService.updatePerson(person).subscribe({
-      next: (resp) => {
-        if (resp.status === 'SUCCESS') {
-          this.feedbackMessage = this.translateService.translate('peopleList.savePersonSuccess');
-          this.loadAll();
-          setTimeout(() => { this.feedbackMessage = ''; }, 3000);
-        } else {
-          this.feedbackMessage = this.translateService.translate('peopleList.updateFailed');
-          setTimeout(() => { this.feedbackMessage = ''; }, 3000);
-        }
-        this.isSaving = false;
-        this.editPersonId = null;
-      },
-      error: () => {
-        this.feedbackMessage = this.translateService.translate('peopleList.updateFailed');
-        this.isSaving = false;
-        setTimeout(() => { this.feedbackMessage = ''; }, 3000);
-      }
-    });
+  onPersonSaved(): void {
+    this.feedbackMessage = this.translateService.translate('peopleList.savePersonSuccess');
+    this.loadAll();
+    setTimeout(() => { this.feedbackMessage = ''; }, 3000);
   }
 
   requestDelete(id: number): void {

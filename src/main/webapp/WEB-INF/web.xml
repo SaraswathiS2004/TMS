@@ -29,4 +29,13 @@
         <url-pattern>/api/functions</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>PersonFunctionServlet</servlet-name>
+        <servlet-class>com.tms.servlets.PersonFunctionServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PersonFunctionServlet</servlet-name>
+        <url-pattern>/api/person-function</url-pattern>
+    </servlet-mapping>
+
 </web-app>

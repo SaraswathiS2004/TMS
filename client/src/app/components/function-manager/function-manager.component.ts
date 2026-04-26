@@ -7,6 +7,12 @@ import { TmsFunction } from '../../models/function.model';
 import { People } from '../../models/people.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
+interface EditFnData {
+  name: string;
+  color: string;
+  displayOrder: number;
+}
+
 @Component({
   selector: 'app-function-manager',
   standalone: true,
@@ -24,6 +30,10 @@ export class FunctionManagerComponent implements OnInit {
   newColor = '#4f46e5';
   isSaving = false;
   nameError = false;
+
+  editFunctionId: number | null = null;
+  editData: EditFnData = { name: '', color: '#4f46e5', displayOrder: 0 };
+  isEditSaving = false;
 
   deleteConfirmId: number | null = null;
   feedbackMessage = '';
@@ -59,6 +69,12 @@ export class FunctionManagerComponent implements OnInit {
     return this.people.filter(p => p.invitedFunctionIds.includes(fn.id)).length;
   }
 
+  invitedStatusCount(fn: TmsFunction): number {
+    return this.people.filter(p =>
+      p.functionStatuses?.[String(fn.id)] === 'INVITED'
+    ).length;
+  }
+
   saveFunction(): void {
     if (!this.newName.trim()) {
       this.nameError = true;
@@ -86,8 +102,46 @@ export class FunctionManagerComponent implements OnInit {
     });
   }
 
+  startEditFunction(fn: TmsFunction): void {
+    this.editFunctionId = fn.id;
+    this.editData = { name: fn.name, color: fn.color, displayOrder: fn.displayOrder };
+    this.deleteConfirmId = null;
+  }
+
+  cancelEditFunction(): void {
+    this.editFunctionId = null;
+  }
+
+  saveEditFunction(): void {
+    if (!this.editFunctionId || !this.editData.name.trim()) { return; }
+    this.isEditSaving = true;
+    const fn: TmsFunction = {
+      id: this.editFunctionId,
+      name: this.editData.name.trim(),
+      color: this.editData.color,
+      displayOrder: this.editData.displayOrder
+    };
+    this.functionService.updateFunction(fn).subscribe({
+      next: (resp) => {
+        if (resp.status === 'SUCCESS') {
+          this.showFeedback('functions.editSuccess', 'success');
+          this.editFunctionId = null;
+          this.loadAll();
+        } else {
+          this.showFeedback('functions.editError', 'error');
+        }
+        this.isEditSaving = false;
+      },
+      error: () => {
+        this.showFeedback('functions.editError', 'error');
+        this.isEditSaving = false;
+      }
+    });
+  }
+
   requestDelete(id: number): void {
     this.deleteConfirmId = id;
+    this.editFunctionId = null;
   }
 
   cancelDelete(): void {

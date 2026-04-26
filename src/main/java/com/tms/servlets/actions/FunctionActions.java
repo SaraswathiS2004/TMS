@@ -59,6 +59,31 @@ public class FunctionActions {
         return message;
     }
 
+    public Message updateFunction(Function function) {
+        Message message = new Message();
+        try {
+            PreparedStatement pre = conn.prepareStatement(
+                "UPDATE Functions SET NAME=?, COLOR=?, DISPLAY_ORDER=? WHERE ID=?"
+            );
+            pre.setString(1, function.getName());
+            pre.setString(2, function.getColor() != null ? function.getColor() : "#4f46e5");
+            pre.setInt(3, function.getDisplayOrder());
+            pre.setInt(4, function.getId());
+            int rows = pre.executeUpdate();
+            if (rows > 0) {
+                message.setMessage("Function updated.");
+                message.setStatus(Message.Status.SUCCESS);
+            } else {
+                message.setMessage("Function not found.");
+                message.setStatus(Message.Status.FAIL);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+            message.setStatus(Message.Status.FAIL);
+        }
+        return message;
+    }
+
     public Message deleteFunction(int id) {
         Message message = new Message();
         try {

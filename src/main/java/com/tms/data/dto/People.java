@@ -7,7 +7,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class People {
 
@@ -18,6 +20,8 @@ public class People {
     private String city;
     private int id;
     private List<Integer> invitedFunctionIds = new ArrayList<>();
+    // key: functionId (as string for JSON compat), value: "INVITED" | "NOT_INVITED"
+    private Map<String, String> functionStatuses = new LinkedHashMap<>();
 
     private Connection conn;
 
@@ -76,5 +80,10 @@ public class People {
     public List<Integer> getInvitedFunctionIds() { return invitedFunctionIds; }
     public void setInvitedFunctionIds(List<Integer> invitedFunctionIds) {
         this.invitedFunctionIds = invitedFunctionIds != null ? invitedFunctionIds : new ArrayList<>();
+    }
+
+    public Map<String, String> getFunctionStatuses() { return functionStatuses; }
+    public void setFunctionStatuses(Map<String, String> functionStatuses) {
+        this.functionStatuses = functionStatuses != null ? functionStatuses : new LinkedHashMap<>();
     }
 }

@@ -41,15 +41,13 @@ public class PeopleServlet extends JsonServlet {
         }
     }
 
-    // PUT — update a person's invited functions: body { id, invitedFunctionIds: [...] }
+    // PUT — full update: person details + invitation functions
     @Override
     public void doPut(HttpServletRequest request, HttpServletResponse response) {
         try {
             People people = (People) request.getAttribute("INPUT");
             PeopleActions actions = new PeopleActions();
-            Message message = actions.updateFunctionInvitations(
-                people.getId(), people.getInvitedFunctionIds()
-            );
+            Message message = actions.updatePeople(people);
             request.setAttribute("OUTPUT", message);
         } catch (Exception e) {
             System.out.println(e);

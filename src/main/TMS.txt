@@ -53,7 +53,7 @@ PeopleAddDetails :
 
 Names String
 Number Of people Come int
-Type (CLOSE_RELATIVE , DISTANCE_RELATIVE , FRIENDS) enum
+Type (Close , distance , Friends) enum
 City String
 InviteStatus => ( Not invite  , Marriage Invite , Engagement Invite , Both) enum
 

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TranslateService, Lang } from './services/translate.service';
@@ -13,7 +13,21 @@ import { TranslatePipe } from './pipes/translate.pipe';
 })
 export class AppComponent {
 
+  showInvMenu = false;
+
   constructor(public translateService: TranslateService) {}
+
+  toggleInvMenu(): void {
+    this.showInvMenu = !this.showInvMenu;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.inv-menu-wrapper')) {
+      this.showInvMenu = false;
+    }
+  }
 
   toggleLanguage(): void {
     const next: Lang = this.translateService.currentLang === 'en' ? 'ta' : 'en';

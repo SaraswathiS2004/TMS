@@ -32,7 +32,7 @@ export class PeopleListComponent implements OnInit {
   activeFilter: 'ALL' | 'NONE' | number = 'NONE';
 
   editPersonId: number | null = null;
-  editData: EditData = { name: '', city: '', numberOfPerson: 1, relationType: 'CLOSE', invitedFunctionIds: [] };
+  editData: EditData = { name: '', city: '', numberOfPerson: 1, relationType: 'CLOSE_RELATIVE', invitedFunctionIds: [] };
   isSaving = false;
 
   markingStatusPersonId: number | null = null;
@@ -207,7 +207,7 @@ export class PeopleListComponent implements OnInit {
 
   relationBadgeClass(relation: string): string {
     const map: Record<string, string> = {
-      CLOSE: 'badge-close', DISTANCE: 'badge-distance', FRIENDS: 'badge-friends'
+      CLOSE_RELATIVE: 'badge-close', DISTANCE_RELATIVE: 'badge-distance', FRIENDS: 'badge-friends'
     };
     return map[relation] ?? '';
   }

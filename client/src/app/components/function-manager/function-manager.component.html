@@ -1,0 +1,100 @@
+<h2 class="page-title">{{ 'functions.title' | translate }}</h2>
+
+<!-- Feedback toast -->
+<div *ngIf="feedbackMessage" class="feedback-toast" [class.toast-error]="feedbackType === 'error'">
+  <i class="bi" [class.bi-check-circle]="feedbackType === 'success'" [class.bi-exclamation-circle]="feedbackType === 'error'"></i>
+  {{ feedbackMessage | translate }}
+</div>
+
+<!-- Add Function Form -->
+<div class="add-card card">
+  <h3 class="section-title">
+    <i class="bi bi-plus-circle"></i>
+    {{ 'functions.addNew' | translate }}
+  </h3>
+
+  <div class="add-form">
+    <div class="field-group">
+      <label>{{ 'functions.name' | translate }}</label>
+      <input
+        type="text"
+        [(ngModel)]="newName"
+        [placeholder]="'functions.namePlaceholder' | translate"
+        [class.input-error]="nameError"
+        (input)="nameError = false"
+      />
+      <span *ngIf="nameError" class="field-error">
+        <i class="bi bi-exclamation-circle"></i>
+        {{ 'functions.nameRequired' | translate }}
+      </span>
+    </div>
+
+    <div class="field-group color-group">
+      <label>{{ 'functions.color' | translate }}</label>
+      <div class="color-wrap">
+        <input type="color" [(ngModel)]="newColor" class="color-input" />
+        <span class="color-preview" [style.background]="newColor"></span>
+        <span class="color-hex">{{ newColor }}</span>
+      </div>
+    </div>
+
+    <button class="btn-save" (click)="saveFunction()" [disabled]="isSaving">
+      <i class="bi bi-check2"></i>
+      {{ (isSaving ? 'functions.saving' : 'functions.save') | translate }}
+    </button>
+  </div>
+</div>
+
+<!-- Existing Functions -->
+<div class="section-header">
+  <h3 class="section-title">
+    <i class="bi bi-collection"></i>
+    {{ 'functions.existingTitle' | translate }}
+  </h3>
+</div>
+
+<p *ngIf="isLoading" class="loading-text">
+  <i class="bi bi-arrow-repeat spin"></i>
+  {{ 'common.loading' | translate }}
+</p>
+
+<div *ngIf="!isLoading && functions.length === 0" class="empty-state card">
+  <i class="bi bi-calendar2-x empty-icon"></i>
+  <p>{{ 'functions.noFunctions' | translate }}</p>
+</div>
+
+<div *ngIf="!isLoading && functions.length > 0" class="functions-grid">
+
+  <div *ngFor="let fn of functions" class="fn-card card">
+
+    <div class="fn-color-bar" [style.background]="fn.color"></div>
+
+    <div class="fn-body">
+      <div class="fn-name">{{ fn.name }}</div>
+      <div class="fn-meta">
+        <i class="bi bi-people"></i>
+        {{ invitedCount(fn) }} {{ 'functions.people' | translate }}
+      </div>
+    </div>
+
+    <!-- Delete confirmation -->
+    <div *ngIf="deleteConfirmId === fn.id" class="delete-confirm">
+      <p>{{ 'functions.confirmDelete' | translate }}</p>
+      <div class="confirm-actions">
+        <button class="btn-danger" (click)="confirmDelete(fn.id)">
+          <i class="bi bi-trash3"></i>
+          {{ 'functions.yesDelete' | translate }}
+        </button>
+        <button class="btn-ghost" (click)="cancelDelete()">
+          {{ 'functions.cancel' | translate }}
+        </button>
+      </div>
+    </div>
+
+    <button *ngIf="deleteConfirmId !== fn.id" class="btn-delete-fn" (click)="requestDelete(fn.id)" title="Delete">
+      <i class="bi bi-trash3"></i>
+    </button>
+
+  </div>
+
+</div>

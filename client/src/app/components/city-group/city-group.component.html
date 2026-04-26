@@ -1,0 +1,91 @@
+<h2 class="page-title">{{ 'cityGroup.title' | translate }}</h2>
+
+<p *ngIf="isLoading" class="loading-text">
+  <i class="bi bi-arrow-repeat spin"></i>
+  {{ 'common.loading' | translate }}
+</p>
+
+<div *ngIf="!isLoading && cityGroups.length === 0" class="empty-state card">
+  <i class="bi bi-buildings empty-icon"></i>
+  <p>{{ 'cityGroup.noPeople' | translate }}</p>
+</div>
+
+<div *ngIf="!isLoading && cityGroups.length > 0" class="city-list">
+
+  <div *ngFor="let group of cityGroups" class="city-section card">
+
+    <!-- City header -->
+    <div class="city-header" (click)="toggleCity(group)">
+      <div class="city-title-wrap">
+        <i class="bi bi-geo-alt-fill city-pin"></i>
+        <span class="city-name">{{ group.city }}</span>
+      </div>
+      <div class="city-meta">
+        <span class="meta-pill pill-count">
+          <i class="bi bi-people"></i>
+          {{ group.people.length }} {{ 'cityGroup.people' | translate }}
+        </span>
+        <span class="meta-pill pill-expected">
+          <i class="bi bi-person-check"></i>
+          {{ totalExpected(group) }} {{ 'cityGroup.expected' | translate }}
+        </span>
+        <i class="bi chevron" [class.bi-chevron-down]="group.expanded" [class.bi-chevron-right]="!group.expanded"></i>
+      </div>
+    </div>
+
+    <ng-container *ngIf="group.expanded">
+
+      <!-- Function breakdown row -->
+      <div class="status-summary" *ngIf="functions.length > 0">
+        <span
+          *ngFor="let fn of functions"
+          class="fn-pill"
+          [style.background]="fn.color + '22'"
+          [style.color]="fn.color"
+          [style.border-color]="fn.color + '55'"
+        >
+          <i class="bi bi-calendar2-check"></i>
+          {{ countByFunction(group, fn.id) }} {{ fn.name }}
+        </span>
+        <span class="fn-pill pill-none" *ngIf="notInvitedCount(group) > 0">
+          <i class="bi bi-clock"></i>
+          {{ notInvitedCount(group) }} {{ 'cityGroup.notInvited' | translate }}
+        </span>
+      </div>
+
+      <!-- People rows -->
+      <div class="people-rows">
+        <div *ngFor="let person of group.people" class="person-row">
+
+          <div class="person-left">
+            <span class="person-name">{{ person.name }}</span>
+            <span class="badge" [ngClass]="relationBadgeClass(person.relationType)">
+              {{ person.relationType }}
+            </span>
+          </div>
+
+          <div class="person-right">
+            <span class="person-count">
+              <i class="bi bi-people"></i>
+              {{ person.numberOfPerson }}
+            </span>
+            <!-- Function tags -->
+            <span
+              *ngFor="let fnId of person.invitedFunctionIds"
+              class="fn-dot"
+              [style.background]="functionColor(fnId)"
+              [title]="fnId"
+            ></span>
+            <span *ngIf="person.invitedFunctionIds.length === 0" class="not-inv-tag">
+              <i class="bi bi-clock"></i>
+            </span>
+          </div>
+
+        </div>
+      </div>
+
+    </ng-container>
+
+  </div>
+
+</div>

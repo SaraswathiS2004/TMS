@@ -1,0 +1,167 @@
+.city-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.city-section {
+  padding: 0;
+  overflow: hidden;
+}
+
+/* City header */
+.city-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.15s;
+}
+
+.city-header:hover { background: #f8fafc; }
+
+.city-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.city-pin {
+  font-size: 17px;
+  color: #4f46e5;
+}
+
+.city-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.city-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pill-count    { background: #e0e7ff; color: #4f46e5; }
+.pill-expected { background: #dcfce7; color: #15803d; }
+
+.chevron { font-size: 14px; color: #94a3b8; }
+
+/* Function breakdown strip */
+.status-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  background: #fafafa;
+}
+
+.fn-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid transparent;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.fn-pill i { font-size: 11px; }
+
+.pill-none {
+  background: #f1f5f9;
+  color: #64748b;
+  border-color: #e2e8f0;
+}
+
+/* People rows */
+.people-rows { display: flex; flex-direction: column; }
+
+.person-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  border-bottom: 1px solid #f8fafc;
+  gap: 8px;
+}
+
+.person-row:last-child { border-bottom: none; }
+
+.person-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.person-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.person-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.person-count {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* Small colored dot per function */
+.fn-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.not-inv-tag {
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 48px;
+  color: #94a3b8;
+}
+
+.empty-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 12px;
+  color: #cbd5e1;
+}
+
+.spin { animation: spin 1s linear infinite; display: inline-block; margin-right: 6px; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }

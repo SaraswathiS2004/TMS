@@ -36,3 +36,9 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Angular client ###
+client/node/
+client/node_modules/
+client/dist/
+client/.angular/

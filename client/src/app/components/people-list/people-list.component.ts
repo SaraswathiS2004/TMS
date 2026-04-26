@@ -1,16 +1,25 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { PeopleService } from '../../services/people.service';
 import { FunctionService } from '../../services/function.service';
-import { People } from '../../models/people.model';
+import { People, RelationType } from '../../models/people.model';
 import { TmsFunction } from '../../models/function.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { TranslateService } from '../../services/translate.service';
 
+interface EditData {
+  name: string;
+  city: string;
+  numberOfPerson: number;
+  relationType: RelationType;
+  invitedFunctionIds: number[];
+}
+
 @Component({
   selector: 'app-people-list',
   standalone: true,
-  imports: [CommonModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './people-list.component.html',
   styleUrl: './people-list.component.css'
 })
@@ -20,12 +29,13 @@ export class PeopleListComponent implements OnInit {
   functions: TmsFunction[] = [];
   isLoading = true;
 
-  // 'ALL' | 'NONE' | number (functionId)
   activeFilter: 'ALL' | 'NONE' | number = 'NONE';
 
-  editingId: number | null = null;
-  pendingFunctionIds: number[] = [];
+  editPersonId: number | null = null;
+  editData: EditData = { name: '', city: '', numberOfPerson: 1, relationType: 'CLOSE', invitedFunctionIds: [] };
   isSaving = false;
+
+  markingStatusPersonId: number | null = null;
 
   deleteConfirmId: number | null = null;
   feedbackMessage = '';
@@ -42,7 +52,7 @@ export class PeopleListComponent implements OnInit {
 
   loadAll(): void {
     this.isLoading = true;
-    this.editingId = null;
+    this.editPersonId = null;
     this.deleteConfirmId = null;
 
     this.functionService.getAllFunctions().subscribe({
@@ -66,9 +76,42 @@ export class PeopleListComponent implements OnInit {
     return this.allPeople.filter(p => p.invitedFunctionIds.includes(this.activeFilter as number));
   }
 
+  get isNumberFilter(): boolean {
+    return typeof this.activeFilter === 'number';
+  }
+
+  get activeFunctionId(): number {
+    return this.activeFilter as number;
+  }
+
+  getStatusForFunction(person: People, functionId: number): string {
+    return person.functionStatuses?.[String(functionId)] ?? 'NOT_INVITED';
+  }
+
+  markInvited(person: People, functionId: number): void {
+    if (!person.id) { return; }
+    this.markingStatusPersonId = person.id;
+    const currentStatus = this.getStatusForFunction(person, functionId);
+    const newStatus = currentStatus === 'INVITED' ? 'NOT_INVITED' : 'INVITED';
+    this.peopleService.updateFunctionStatus(person.id, functionId, newStatus).subscribe({
+      next: (resp) => {
+        if (resp.status === 'SUCCESS') {
+          if (!person.functionStatuses) { person.functionStatuses = {}; }
+          person.functionStatuses[String(functionId)] = newStatus;
+        }
+        this.markingStatusPersonId = null;
+      },
+      error: () => { this.markingStatusPersonId = null; }
+    });
+  }
+
+  get existingCities(): string[] {
+    return [...new Set(this.allPeople.map(p => p.city).filter(c => !!c))];
+  }
+
   setFilter(f: 'ALL' | 'NONE' | number): void {
     this.activeFilter = f;
-    this.editingId = null;
+    this.editPersonId = null;
     this.deleteConfirmId = null;
   }
 
@@ -80,33 +123,45 @@ export class PeopleListComponent implements OnInit {
     return this.functions.find(f => f.id === id)?.color ?? '#94a3b8';
   }
 
-  // Edit invitations
-  startEdit(person: People): void {
-    this.editingId = person.id!;
-    this.pendingFunctionIds = [...person.invitedFunctionIds];
+  startEditPerson(person: People): void {
+    this.editPersonId = person.id!;
+    this.editData = {
+      name: person.name,
+      city: person.city,
+      numberOfPerson: person.numberOfPerson,
+      relationType: person.relationType,
+      invitedFunctionIds: [...person.invitedFunctionIds]
+    };
     this.deleteConfirmId = null;
   }
 
-  cancelEdit(): void {
-    this.editingId = null;
+  cancelEditPerson(): void {
+    this.editPersonId = null;
   }
 
-  togglePendingFunction(fnId: number): void {
-    if (this.pendingFunctionIds.includes(fnId)) {
-      this.pendingFunctionIds = this.pendingFunctionIds.filter(id => id !== fnId);
+  toggleEditFunction(fnId: number): void {
+    if (this.editData.invitedFunctionIds.includes(fnId)) {
+      this.editData.invitedFunctionIds = this.editData.invitedFunctionIds.filter(id => id !== fnId);
     } else {
-      this.pendingFunctionIds = [...this.pendingFunctionIds, fnId];
+      this.editData.invitedFunctionIds = [...this.editData.invitedFunctionIds, fnId];
     }
   }
 
-  saveInvitations(person: People): void {
-    if (!person.id) { return; }
+  savePersonEdit(): void {
+    if (!this.editPersonId) { return; }
     this.isSaving = true;
-
-    this.peopleService.updateFunctionInvitations(person.id, this.pendingFunctionIds).subscribe({
+    const person: People = {
+      id: this.editPersonId,
+      name: this.editData.name,
+      city: this.editData.city,
+      numberOfPerson: this.editData.numberOfPerson,
+      relationType: this.editData.relationType,
+      invitedFunctionIds: this.editData.invitedFunctionIds
+    };
+    this.peopleService.updatePerson(person).subscribe({
       next: (resp) => {
         if (resp.status === 'SUCCESS') {
-          this.feedbackMessage = `${person.name} — ${this.translateService.translate('peopleList.markedAs')}`;
+          this.feedbackMessage = this.translateService.translate('peopleList.savePersonSuccess');
           this.loadAll();
           setTimeout(() => { this.feedbackMessage = ''; }, 3000);
         } else {
@@ -114,7 +169,7 @@ export class PeopleListComponent implements OnInit {
           setTimeout(() => { this.feedbackMessage = ''; }, 3000);
         }
         this.isSaving = false;
-        this.editingId = null;
+        this.editPersonId = null;
       },
       error: () => {
         this.feedbackMessage = this.translateService.translate('peopleList.updateFailed');
@@ -124,10 +179,9 @@ export class PeopleListComponent implements OnInit {
     });
   }
 
-  // Delete
   requestDelete(id: number): void {
     this.deleteConfirmId = id;
-    this.editingId = null;
+    this.editPersonId = null;
   }
 
   cancelDelete(): void {

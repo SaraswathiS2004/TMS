@@ -18,8 +18,16 @@ export class PeopleService {
     return this.http.post<ApiMessage>(this.apiUrl, person);
   }
 
+  updatePerson(person: People): Observable<ApiMessage> {
+    return this.http.put<ApiMessage>(this.apiUrl, person);
+  }
+
   updateFunctionInvitations(id: number, invitedFunctionIds: number[]): Observable<ApiMessage> {
     return this.http.put<ApiMessage>(this.apiUrl, { id, invitedFunctionIds });
+  }
+
+  updateFunctionStatus(personId: number, functionId: number, status: string): Observable<ApiMessage> {
+    return this.http.put<ApiMessage>('api/person-function', { personId, functionId, status });
   }
 
   deletePerson(id: number): Observable<ApiMessage> {

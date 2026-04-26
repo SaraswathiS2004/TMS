@@ -19,6 +19,10 @@ export class FunctionService {
     return this.http.post<ApiMessage>(this.apiUrl, fn);
   }
 
+  updateFunction(fn: TmsFunction): Observable<ApiMessage> {
+    return this.http.put<ApiMessage>(this.apiUrl, fn);
+  }
+
   deleteFunction(id: number): Observable<ApiMessage> {
     return this.http.delete<ApiMessage>(`${this.apiUrl}?id=${id}`);
   }

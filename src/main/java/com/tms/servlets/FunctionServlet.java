@@ -38,6 +38,19 @@ public class FunctionServlet extends JsonServlet {
         }
     }
 
+    // PUT /api/functions  body: { id, name, color, displayOrder }
+    @Override
+    public void doPut(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            Function function = (Function) request.getAttribute("INPUT");
+            FunctionActions actions = new FunctionActions();
+            Message message = actions.updateFunction(function);
+            request.setAttribute("OUTPUT", message);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
     // DELETE /api/functions?id=<id>
     @Override
     public void doDelete(HttpServletRequest request, HttpServletResponse response) {

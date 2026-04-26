@@ -146,6 +146,75 @@
 
 .fn-tag i { font-size: 11px; }
 
+/* Per-function invited status section */
+.fn-status-section {
+  margin-top: 2px;
+}
+
+.fn-status-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-left: 3px solid #e2e8f0;
+  border-radius: 0 8px 8px 0;
+  background: #f8fafc;
+  flex-wrap: wrap;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-invited {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.btn-toggle-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.15s;
+}
+
+.btn-toggle-status:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-mark-invited {
+  background: #4f46e5;
+  color: #fff;
+}
+
+.btn-mark-invited:hover:not(:disabled) { background: #4338ca; }
+
+.btn-mark-revoke {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.btn-mark-revoke:hover:not(:disabled) { background: #e2e8f0; }
+
 /* Delete button (top-right of card) */
 .btn-delete {
   width: 32px;
@@ -178,7 +247,7 @@
   color: #9f1239;
 }
 
-/* Edit invitations panel */
+/* Edit panel */
 .edit-panel {
   background: #f8fafc;
   border: 1.5px solid #e2e8f0;
@@ -186,11 +255,58 @@
   padding: 14px;
 }
 
+.edit-section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #4f46e5;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.edit-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.edit-input, .edit-select {
+  padding: 7px 10px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #1e293b;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.edit-input:focus, .edit-select:focus {
+  border-color: #4f46e5;
+}
+
+.edit-input-number {
+  width: 90px;
+}
+
 .edit-fn-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 14px;
+  gap: 8px;
 }
 
 .fn-checkbox-label {

@@ -5,26 +5,40 @@
   </div>
 
   <div class="nav-links">
-    <a routerLink="/dashboard" routerLinkActive="active-link">
-      <i class="bi bi-speedometer2"></i>
-      {{ 'nav.dashboard' | translate }}
-    </a>
-    <a routerLink="/add" routerLinkActive="active-link">
-      <i class="bi bi-person-plus"></i>
-      {{ 'nav.addPerson' | translate }}
-    </a>
-    <a routerLink="/list" routerLinkActive="active-link">
-      <i class="bi bi-people"></i>
-      {{ 'nav.peopleList' | translate }}
-    </a>
-    <a routerLink="/city-group" routerLinkActive="active-link">
-      <i class="bi bi-geo-alt"></i>
-      {{ 'nav.byCity' | translate }}
-    </a>
-    <a routerLink="/functions" routerLinkActive="active-link">
-      <i class="bi bi-calendar2-event"></i>
-      {{ 'nav.manageFunctions' | translate }}
-    </a>
+    <div class="inv-menu-wrapper">
+      <button
+        class="inv-menu-trigger"
+        [class.inv-menu-open]="showInvMenu"
+        (click)="toggleInvMenu()"
+      >
+        <i class="bi bi-journal-bookmark-fill"></i>
+        {{ 'nav.invitationManager' | translate }}
+        <i class="bi" [ngClass]="showInvMenu ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+      </button>
+
+      <div class="inv-menu-panel" *ngIf="showInvMenu">
+        <a routerLink="/dashboard" routerLinkActive="active-link" (click)="showInvMenu = false">
+          <i class="bi bi-speedometer2"></i>
+          {{ 'nav.dashboard' | translate }}
+        </a>
+        <a routerLink="/add" routerLinkActive="active-link" (click)="showInvMenu = false">
+          <i class="bi bi-person-plus"></i>
+          {{ 'nav.addPerson' | translate }}
+        </a>
+        <a routerLink="/list" routerLinkActive="active-link" (click)="showInvMenu = false">
+          <i class="bi bi-people"></i>
+          {{ 'nav.peopleList' | translate }}
+        </a>
+        <a routerLink="/city-group" routerLinkActive="active-link" (click)="showInvMenu = false">
+          <i class="bi bi-geo-alt"></i>
+          {{ 'nav.byCity' | translate }}
+        </a>
+        <a routerLink="/functions" routerLinkActive="active-link" (click)="showInvMenu = false">
+          <i class="bi bi-calendar2-event"></i>
+          {{ 'nav.manageFunctions' | translate }}
+        </a>
+      </div>
+    </div>
   </div>
 
   <button class="lang-toggle" (click)="toggleLanguage()" [title]="'common.language' | translate">

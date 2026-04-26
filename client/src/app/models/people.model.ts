@@ -7,6 +7,8 @@ export interface People {
   numberOfPerson: number;
   relationType: RelationType;
   invitedFunctionIds: number[];
+  // key is functionId as string (JSON map keys are always strings)
+  functionStatuses?: { [fnId: string]: string };
 }
 
 export interface ApiMessage {

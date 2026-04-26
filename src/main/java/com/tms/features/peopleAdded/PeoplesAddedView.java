@@ -23,7 +23,7 @@ public class PeoplesAddedView {
         int numberOfCount = scan.nextInt();
         System.out.println("Enter the Relation type : ");
         System.out.println("Example :");
-        System.out.println("CLOSE , DISTANCE , FRIENDS");
+        System.out.println("CLOSE_RELATIVE , DISTANCE_RELATIVE , FRIENDS;");
         RelationType type = RelationType.valueOf(scan.next().toUpperCase());
 
         peopleAddedModel.setData(name , city , numberOfCount , type);

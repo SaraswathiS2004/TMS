@@ -6,21 +6,25 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class People {
+
     private String name;
     private int numberOfPerson;
     private RelationType relationType;
     private InvitedStatus invitedStatus = InvitedStatus.NOT_INVITED;
-
     private String city;
     private int id;
+    private List<Integer> invitedFunctionIds = new ArrayList<>();
 
     private Connection conn;
 
     public People() throws SQLException, ClassNotFoundException {
         conn = TmsDB.getInstance().getConnection();
     }
+
     public People(ResultSet resultSet) throws SQLException, ClassNotFoundException {
         this();
         setId(resultSet.getInt("ID"));
@@ -31,78 +35,46 @@ public class People {
         setRelationType(RelationType.valueOf(resultSet.getString("RELATION_TYPE")));
     }
 
-
-    public InvitedStatus getInvitedStatus() {
-        return invitedStatus;
-    }
-
-    public void setInvitedStatus(InvitedStatus invitedStatus) {
-        this.invitedStatus = invitedStatus;
-    }
-
-    public String getName() {
-        return name;
-    }
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getNumberOfPerson() {
-        return numberOfPerson;
-    }
-
-    public void setNumberOfPerson(int numberOfPeople) {
-        this.numberOfPerson = numberOfPeople;
-    }
-
-    public RelationType getRelationType() {
-        return relationType;
-    }
-
-    public void setRelationType(RelationType relationType) {
-        this.relationType = relationType;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-
-    public String storeData() throws SQLException{
+    // storeData kept for CLI backward compatibility
+    public String storeData() throws SQLException {
         try {
-            PreparedStatement pre = conn.prepareStatement("INSERT INTO Invitations  (NAME , CITY ,RELATION_TYPE ,  NUMBER_OF_PEOPLE_WILL_COME , INVITED_STATUS ) values ( ? , ? , ? ,? , ?)");
-            pre.setString(1 , name);
-            pre.setString(2 , city);
-            pre.setString(3 , relationType.toString());
-            pre.setInt(4 , numberOfPerson);
-            pre.setString(5 , invitedStatus.toString());
+            PreparedStatement pre = conn.prepareStatement(
+                "INSERT INTO Invitations (NAME, CITY, RELATION_TYPE, NUMBER_OF_PEOPLE_WILL_COME, INVITED_STATUS) " +
+                "VALUES (?, ?, ?, ?, ?)"
+            );
+            pre.setString(1, name);
+            pre.setString(2, city);
+            pre.setString(3, relationType.toString());
+            pre.setInt(4, numberOfPerson);
+            pre.setString(5, invitedStatus.toString());
             int rowsAffected = pre.executeUpdate();
-
-            if(rowsAffected > 0){
-
-                return "Successfully Added!";
-            }
-            else{
-               return "cannot add people";
-            }
-        }
-        catch (Exception e){
+            return rowsAffected > 0 ? "Successfully Added!" : "Cannot add person";
+        } catch (Exception e) {
             System.out.println(e);
         }
         return "";
-
     }
 
+    public InvitedStatus getInvitedStatus() { return invitedStatus; }
+    public void setInvitedStatus(InvitedStatus invitedStatus) { this.invitedStatus = invitedStatus; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+
+    public int getNumberOfPerson() { return numberOfPerson; }
+    public void setNumberOfPerson(int numberOfPerson) { this.numberOfPerson = numberOfPerson; }
+
+    public RelationType getRelationType() { return relationType; }
+    public void setRelationType(RelationType relationType) { this.relationType = relationType; }
+
+    public String getCity() { return city; }
+    public void setCity(String city) { this.city = city; }
+
+    public List<Integer> getInvitedFunctionIds() { return invitedFunctionIds; }
+    public void setInvitedFunctionIds(List<Integer> invitedFunctionIds) {
+        this.invitedFunctionIds = invitedFunctionIds != null ? invitedFunctionIds : new ArrayList<>();
+    }
 }

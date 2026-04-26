@@ -9,6 +9,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 interface FunctionStat {
   fn: TmsFunction;
   inviteeCount: number;
+  pendingCount: number;
   expectedCount: number;
 }
 
@@ -38,13 +39,15 @@ export class DashboardComponent implements OnInit {
         this.peopleService.getAllPeople().subscribe({
           next: (people) => {
             this.people = people;
-            this.functionStats = fns.map(fn => ({
-              fn,
-              inviteeCount: people.filter(p => p.invitedFunctionIds.includes(fn.id)).length,
-              expectedCount: people
-                .filter(p => p.invitedFunctionIds.includes(fn.id))
-                .reduce((sum, p) => sum + p.numberOfPerson, 0)
-            }));
+            this.functionStats = fns.map(fn => {
+              const invited = people.filter(p => p.invitedFunctionIds.includes(fn.id));
+              return {
+                fn,
+                inviteeCount: invited.length,
+                pendingCount: people.length - invited.length,
+                expectedCount: invited.reduce((sum, p) => sum + p.numberOfPerson, 0)
+              };
+            });
             this.isLoading = false;
           },
           error: () => { this.isLoading = false; }
@@ -56,10 +59,6 @@ export class DashboardComponent implements OnInit {
 
   get totalPeople(): number {
     return this.people.length;
-  }
-
-  get notInvitedCount(): number {
-    return this.people.filter(p => p.invitedFunctionIds.length === 0).length;
   }
 
   get totalInvited(): number {

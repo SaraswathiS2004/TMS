@@ -1,10 +1,14 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, switchMap } from 'rxjs/operators';
 import { PeopleService } from '../../services/people.service';
 import { People } from '../../models/people.model';
 import { TmsFunction } from '../../models/function.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { TranslateService } from '../../services/translate.service';
+import { TransliterationService } from '../../services/transliteration.service';
 
 @Component({
   selector: 'app-person-form',
@@ -13,7 +17,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
   templateUrl: './person-form.component.html',
   styleUrl: './person-form.component.css'
 })
-export class PersonFormComponent implements OnInit, OnChanges {
+export class PersonFormComponent implements OnInit, OnChanges, OnDestroy {
 
   @Input() person?: People;
   @Input() allPeople: People[] = [];
@@ -33,15 +37,31 @@ export class PersonFormComponent implements OnInit, OnChanges {
   showNameDropdown = false;
   showCityDropdown = false;
 
+  nameTSuggestions: string[] = [];
+  cityTSuggestions: string[] = [];
+
   successMessage = '';
   errorMessage = '';
   isSubmitting = false;
+
+  private nameInput$ = new Subject<string>();
+  private cityInput$ = new Subject<string>();
+  private subs = new Subscription();
 
   get isEditMode(): boolean {
     return !!this.person;
   }
 
-  constructor(private fb: FormBuilder, private peopleService: PeopleService) {
+  get isTamilMode(): boolean {
+    return this.translateService.currentLang === 'ta';
+  }
+
+  constructor(
+    private fb: FormBuilder,
+    private peopleService: PeopleService,
+    private translateService: TranslateService,
+    private transliterationService: TransliterationService
+  ) {
     this.form = this.fb.group({
       name:           ['', [Validators.required, Validators.minLength(2)]],
       city:           ['', Validators.required],
@@ -52,18 +72,30 @@ export class PersonFormComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.updateAutocompleteData();
-    if (this.person) {
-      this.patchForm();
-    }
+    if (this.person) { this.patchForm(); }
+
+    this.subs.add(
+      this.nameInput$.pipe(
+        debounceTime(300),
+        switchMap(text => this.transliterationService.getSuggestions(text))
+      ).subscribe(items => { this.nameTSuggestions = items; })
+    );
+
+    this.subs.add(
+      this.cityInput$.pipe(
+        debounceTime(300),
+        switchMap(text => this.transliterationService.getSuggestions(text))
+      ).subscribe(items => { this.cityTSuggestions = items; })
+    );
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['allPeople']) {
-      this.updateAutocompleteData();
-    }
-    if (changes['person'] && this.person) {
-      this.patchForm();
-    }
+    if (changes['allPeople']) { this.updateAutocompleteData(); }
+    if (changes['person'] && this.person) { this.patchForm(); }
+  }
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
   }
 
   private updateAutocompleteData(): void {
@@ -87,26 +119,42 @@ export class PersonFormComponent implements OnInit, OnChanges {
   }
 
   onNameInput(event: Event): void {
-    const val = (event.target as HTMLInputElement).value.toLowerCase();
-    this.filteredNames = val.length === 0 ? [] : this.allNames.filter(n => n.toLowerCase().includes(val));
+    const val = (event.target as HTMLInputElement).value;
+    const lower = val.toLowerCase();
+    this.filteredNames = lower ? this.allNames.filter(n => n.toLowerCase().includes(lower)) : [];
     this.showNameDropdown = this.filteredNames.length > 0;
+
+    if (this.isTamilMode && val.trim()) {
+      this.nameInput$.next(val);
+    } else {
+      this.nameTSuggestions = [];
+    }
   }
 
   selectName(name: string): void {
     this.form.patchValue({ name });
     this.showNameDropdown = false;
+    this.nameTSuggestions = [];
   }
 
-  hideNameDropdown(): void {
-    setTimeout(() => { this.showNameDropdown = false; }, 150);
+  hideNameSuggestions(): void {
+    setTimeout(() => {
+      this.showNameDropdown = false;
+      this.nameTSuggestions = [];
+    }, 150);
   }
 
   onCityInput(event: Event): void {
-    const val = (event.target as HTMLInputElement).value.toLowerCase();
-    this.filteredCities = val.length === 0
-      ? [...this.allCities]
-      : this.allCities.filter(c => c.toLowerCase().includes(val));
+    const val = (event.target as HTMLInputElement).value;
+    const lower = val.toLowerCase();
+    this.filteredCities = lower ? this.allCities.filter(c => c.toLowerCase().includes(lower)) : [...this.allCities];
     this.showCityDropdown = this.filteredCities.length > 0;
+
+    if (this.isTamilMode && val.trim()) {
+      this.cityInput$.next(val);
+    } else {
+      this.cityTSuggestions = [];
+    }
   }
 
   showAllCities(): void {
@@ -117,10 +165,14 @@ export class PersonFormComponent implements OnInit, OnChanges {
   selectCity(city: string): void {
     this.form.patchValue({ city });
     this.showCityDropdown = false;
+    this.cityTSuggestions = [];
   }
 
-  hideCityDropdown(): void {
-    setTimeout(() => { this.showCityDropdown = false; }, 150);
+  hideCitySuggestions(): void {
+    setTimeout(() => {
+      this.showCityDropdown = false;
+      this.cityTSuggestions = [];
+    }, 150);
   }
 
   toggleFunction(fnId: number): void {

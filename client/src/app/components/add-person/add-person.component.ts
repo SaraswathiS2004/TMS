@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PeopleService } from '../../services/people.service';
+import { FunctionService } from '../../services/function.service';
 import { People } from '../../models/people.model';
+import { TmsFunction } from '../../models/function.model';
 import { PersonFormComponent } from '../person-form/person-form.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
@@ -15,11 +17,18 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 export class AddPersonComponent implements OnInit {
 
   allPeople: People[] = [];
+  functions: TmsFunction[] = [];
 
-  constructor(private peopleService: PeopleService) {}
+  constructor(
+    private peopleService: PeopleService,
+    private functionService: FunctionService
+  ) {}
 
   ngOnInit(): void {
     this.loadPeople();
+    this.functionService.getAllFunctions().subscribe({
+      next: (fns) => { this.functions = fns; }
+    });
   }
 
   loadPeople(): void {

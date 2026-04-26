@@ -45,6 +45,10 @@
   "peopleList.all": "அனைவரும்",
   "peopleList.notInvited": "அழைக்கப்படாதவர்கள்",
   "peopleList.noResults": "இந்த வடிகட்டலில் அழைப்பாளர்கள் இல்லை.",
+  "peopleList.allInvited": "இந்த நிகழ்வில் அனைவரும் சேர்க்கப்பட்டுவிட்டனர்!",
+  "peopleList.searchPlaceholder": "பெயர் அல்லது நகரத்தால் தேடு...",
+  "peopleList.clearSearch": "தேடலை அழி",
+  "peopleList.searchNoMatch": "உங்கள் தேடலுக்கு பொருந்தும் அழைப்பாளர்கள் இல்லை.",
   "peopleList.expected": "எதிர்பார்க்கப்படும்",
   "peopleList.editPerson": "அழைப்பாளரை திருத்து",
   "peopleList.fullName": "முழு பெயர்",
@@ -98,11 +102,14 @@
   "functions.editError": "புதுப்பிப்பு தவறியது. மீண்டும் முயற்சிக்கவும்.",
   "functions.editFunction": "நிகழ்வை திருத்து",
 
+  "form.tamilSuggestions": "தமிழ்",
+
   "relationType.CLOSE_RELATIVE": "நெருங்கிய",
   "relationType.DISTANCE_RELATIVE": "தொலைவிலான",
   "relationType.FRIENDS": "நண்பர்கள்",
 
   "dashboard.totalInvited": "அழைக்கப்பட்டவர்கள்",
+  "dashboard.pending": "நிலுவையில்",
 
   "common.loading": "ஏற்றுகிறது...",
   "common.close": "நெருங்கிய",

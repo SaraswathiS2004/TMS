@@ -1,11 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, switchMap } from 'rxjs/operators';
 import { PeopleService } from '../../services/people.service';
 import { FunctionService } from '../../services/function.service';
-import { People, RelationType } from '../../models/people.model';
+import { People } from '../../models/people.model';
 import { TmsFunction } from '../../models/function.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { TranslateService } from '../../services/translate.service';
+import { TransliterationService } from '../../services/transliteration.service';
 import { PersonFormComponent } from '../person-form/person-form.component';
 
 @Component({
@@ -15,29 +18,43 @@ import { PersonFormComponent } from '../person-form/person-form.component';
   templateUrl: './people-list.component.html',
   styleUrl: './people-list.component.css'
 })
-export class PeopleListComponent implements OnInit {
+export class PeopleListComponent implements OnInit, OnDestroy {
 
   allPeople: People[] = [];
   functions: TmsFunction[] = [];
   isLoading = true;
 
-  activeFilter: 'ALL' | 'NONE' | number = 'NONE';
+  activeFilter: 'ALL' | number = 'ALL';
+  searchQuery = '';
+  searchTranslitSuggestions: string[] = [];
 
   editPersonId: number | null = null;
-
-  markingStatusPersonId: number | null = null;
-
   deleteConfirmId: number | null = null;
   feedbackMessage = '';
+
+  private searchInput$ = new Subject<string>();
+  private subs = new Subscription();
 
   constructor(
     private peopleService: PeopleService,
     private functionService: FunctionService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private transliterationService: TransliterationService
   ) {}
 
   ngOnInit(): void {
     this.loadAll();
+
+    this.subs.add(
+      this.searchInput$.pipe(
+        debounceTime(300),
+        switchMap(text => this.transliterationService.getSuggestions(text))
+      ).subscribe(items => { this.searchTranslitSuggestions = items; })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
   }
 
   loadAll(): void {
@@ -61,41 +78,47 @@ export class PeopleListComponent implements OnInit {
   }
 
   get filteredPeople(): People[] {
-    if (this.activeFilter === 'ALL') { return this.allPeople; }
-    if (this.activeFilter === 'NONE') { return this.allPeople.filter(p => p.invitedFunctionIds.length === 0); }
-    return this.allPeople.filter(p => p.invitedFunctionIds.includes(this.activeFilter as number));
+    let result: People[];
+    if (this.activeFilter === 'ALL') {
+      result = this.allPeople;
+    } else {
+      // Function tab: show people NOT yet on this function's invitation list
+      result = this.allPeople.filter(p => !p.invitedFunctionIds.includes(this.activeFilter as number));
+    }
+
+    const q = this.searchQuery.trim().toLowerCase();
+    if (q) {
+      result = result.filter(p => {
+        const name = p.name.toLowerCase();
+        const city = p.city.toLowerCase();
+        if (name.includes(q) || city.includes(q)) { return true; }
+        return this.searchTranslitSuggestions.some(s => {
+          const sl = s.toLowerCase();
+          return name.includes(sl) || city.includes(sl);
+        });
+      });
+    }
+
+    return result;
   }
 
-  get isNumberFilter(): boolean {
-    return typeof this.activeFilter === 'number';
+  get isSearchActive(): boolean {
+    return this.searchQuery.trim().length > 0;
   }
 
-  get activeFunctionId(): number {
-    return this.activeFilter as number;
+  onSearch(event: Event): void {
+    const val = (event.target as HTMLInputElement).value;
+    this.searchQuery = val;
+    this.searchTranslitSuggestions = [];
+    if (val.trim()) { this.searchInput$.next(val.trim()); }
   }
 
-  getStatusForFunction(person: People, functionId: number): string {
-    return person.functionStatuses?.[String(functionId)] ?? 'NOT_INVITED';
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.searchTranslitSuggestions = [];
   }
 
-  markInvited(person: People, functionId: number): void {
-    if (!person.id) { return; }
-    this.markingStatusPersonId = person.id;
-    const currentStatus = this.getStatusForFunction(person, functionId);
-    const newStatus = currentStatus === 'INVITED' ? 'NOT_INVITED' : 'INVITED';
-    this.peopleService.updateFunctionStatus(person.id, functionId, newStatus).subscribe({
-      next: (resp) => {
-        if (resp.status === 'SUCCESS') {
-          if (!person.functionStatuses) { person.functionStatuses = {}; }
-          person.functionStatuses[String(functionId)] = newStatus;
-        }
-        this.markingStatusPersonId = null;
-      },
-      error: () => { this.markingStatusPersonId = null; }
-    });
-  }
-
-  setFilter(f: 'ALL' | 'NONE' | number): void {
+  setFilter(f: 'ALL' | number): void {
     this.activeFilter = f;
     this.editPersonId = null;
     this.deleteConfirmId = null;

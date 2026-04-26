@@ -6,10 +6,6 @@
     <i class="bi bi-people"></i>
     {{ 'peopleList.all' | translate }}
   </button>
-  <button class="tab-btn" [class.tab-active]="activeFilter === 'NONE'" (click)="setFilter('NONE')">
-    <i class="bi bi-clock"></i>
-    {{ 'peopleList.notInvited' | translate }}
-  </button>
   <button
     *ngFor="let fn of functions"
     class="tab-btn tab-fn"
@@ -17,8 +13,23 @@
     [style.--fn-color]="fn.color"
     (click)="setFilter(fn.id)"
   >
-    <i class="bi bi-calendar2-check"></i>
+    <i class="bi bi-clock"></i>
     {{ fn.name }}
+  </button>
+</div>
+
+<!-- Search bar -->
+<div class="search-bar">
+  <i class="bi bi-search search-icon"></i>
+  <input
+    class="search-input"
+    type="text"
+    [value]="searchQuery"
+    [placeholder]="'peopleList.searchPlaceholder' | translate"
+    (input)="onSearch($event)"
+  />
+  <button *ngIf="isSearchActive" class="search-clear" (click)="clearSearch()" [title]="'peopleList.clearSearch' | translate">
+    <i class="bi bi-x-circle-fill"></i>
   </button>
 </div>
 
@@ -41,8 +52,10 @@
 
 <!-- Empty state -->
 <div *ngIf="!isLoading && filteredPeople.length === 0" class="empty-state card">
-  <i class="bi bi-person-x empty-icon"></i>
-  <p>{{ 'peopleList.noResults' | translate }}</p>
+  <i class="bi bi-person-check empty-icon"></i>
+  <p *ngIf="isSearchActive">{{ 'peopleList.searchNoMatch' | translate }}</p>
+  <p *ngIf="!isSearchActive && activeFilter === 'ALL'">{{ 'peopleList.noResults' | translate }}</p>
+  <p *ngIf="!isSearchActive && activeFilter !== 'ALL'">{{ 'peopleList.allInvited' | translate }}</p>
 </div>
 
 <!-- People cards grid -->
@@ -75,8 +88,8 @@
       </div>
     </div>
 
-    <!-- Invited functions tags (shown in ALL / NONE views) -->
-    <div class="fn-tags" *ngIf="!isNumberFilter && person.invitedFunctionIds.length > 0">
+    <!-- Functions the person is already on (visible on all tabs) -->
+    <div class="fn-tags" *ngIf="person.invitedFunctionIds.length > 0">
       <span
         *ngFor="let fnId of person.invitedFunctionIds"
         class="fn-tag"
@@ -87,30 +100,6 @@
         <i class="bi bi-check2"></i>
         {{ functionName(fnId) }}
       </span>
-    </div>
-
-    <!-- Per-function invited status (shown when a specific function tab is active) -->
-    <div class="fn-status-section" *ngIf="isNumberFilter">
-      <div class="fn-status-row" [style.border-left-color]="functionColor(activeFunctionId)">
-        <span
-          class="status-badge"
-          [class.status-invited]="getStatusForFunction(person, activeFunctionId) === 'INVITED'"
-          [class.status-pending]="getStatusForFunction(person, activeFunctionId) !== 'INVITED'"
-        >
-          <i class="bi" [ngClass]="getStatusForFunction(person, activeFunctionId) === 'INVITED' ? 'bi-check-circle-fill' : 'bi-clock'"></i>
-          {{ (getStatusForFunction(person, activeFunctionId) === 'INVITED' ? 'peopleList.invited' : 'peopleList.notYetInvited') | translate }}
-        </span>
-        <button
-          class="btn-toggle-status"
-          [class.btn-mark-invited]="getStatusForFunction(person, activeFunctionId) !== 'INVITED'"
-          [class.btn-mark-revoke]="getStatusForFunction(person, activeFunctionId) === 'INVITED'"
-          [disabled]="markingStatusPersonId === person.id"
-          (click)="markInvited(person, activeFunctionId)"
-        >
-          <i class="bi" [ngClass]="getStatusForFunction(person, activeFunctionId) === 'INVITED' ? 'bi-arrow-counterclockwise' : 'bi-send-check'"></i>
-          {{ (getStatusForFunction(person, activeFunctionId) === 'INVITED' ? 'peopleList.revoke' : 'peopleList.markInvited') | translate }}
-        </button>
-      </div>
     </div>
 
     <!-- Delete confirmation -->

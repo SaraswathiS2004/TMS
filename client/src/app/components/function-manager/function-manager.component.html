@@ -16,13 +16,28 @@
   <div class="add-form">
     <div class="field-group">
       <label>{{ 'functions.name' | translate }}</label>
-      <input
-        type="text"
-        [(ngModel)]="newName"
-        [placeholder]="'functions.namePlaceholder' | translate"
-        [class.input-error]="nameError"
-        (input)="nameError = false"
-      />
+      <div class="name-wrap">
+        <input
+          type="text"
+          [ngModel]="newName"
+          [placeholder]="'functions.namePlaceholder' | translate"
+          [class.input-error]="nameError"
+          autocomplete="off"
+          (input)="onNewNameInput($event)"
+          (blur)="hideNewNameSuggestions()"
+        />
+        <ul *ngIf="newNameTSuggestions.length > 0" class="suggestion-list">
+          <li class="suggestion-section">
+            <i class="bi bi-translate"></i>
+            {{ 'form.tamilSuggestions' | translate }}
+          </li>
+          <li
+            *ngFor="let s of newNameTSuggestions"
+            (mousedown)="selectNewName(s)"
+            class="suggestion-item suggestion-translit"
+          >{{ s }}</li>
+        </ul>
+      </div>
       <span *ngIf="nameError" class="field-error">
         <i class="bi bi-exclamation-circle"></i>
         {{ 'functions.nameRequired' | translate }}
@@ -87,12 +102,28 @@
     <!-- Edit inline panel -->
     <div *ngIf="editFunctionId === fn.id" class="edit-overlay">
       <div class="edit-row">
-        <input
-          type="text"
-          class="edit-fn-input"
-          [(ngModel)]="editData.name"
-          [placeholder]="'functions.namePlaceholder' | translate"
-        />
+        <div class="name-wrap" style="flex:1">
+          <input
+            type="text"
+            class="edit-fn-input"
+            [ngModel]="editData.name"
+            [placeholder]="'functions.namePlaceholder' | translate"
+            autocomplete="off"
+            (input)="onEditNameInput($event)"
+            (blur)="hideEditNameSuggestions()"
+          />
+          <ul *ngIf="editNameTSuggestions.length > 0" class="suggestion-list">
+            <li class="suggestion-section">
+              <i class="bi bi-translate"></i>
+              {{ 'form.tamilSuggestions' | translate }}
+            </li>
+            <li
+              *ngFor="let s of editNameTSuggestions"
+              (mousedown)="selectEditName(s)"
+              class="suggestion-item suggestion-translit"
+            >{{ s }}</li>
+          </ul>
+        </div>
         <div class="color-wrap-sm">
           <input type="color" [(ngModel)]="editData.color" class="color-input-sm" />
           <span class="color-dot" [style.background]="editData.color"></span>

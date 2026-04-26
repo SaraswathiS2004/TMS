@@ -45,6 +45,10 @@
   "peopleList.all": "All",
   "peopleList.notInvited": "Not Invited",
   "peopleList.noResults": "No invitees found for this filter.",
+  "peopleList.allInvited": "Everyone has been added to this function's list!",
+  "peopleList.searchPlaceholder": "Search by name or city...",
+  "peopleList.clearSearch": "Clear search",
+  "peopleList.searchNoMatch": "No invitees match your search.",
   "peopleList.expected": "expected",
   "peopleList.editPerson": "Edit Invitee",
   "peopleList.fullName": "Full Name",
@@ -98,11 +102,14 @@
   "functions.editError": "Update failed. Please try again.",
   "functions.editFunction": "Edit Function",
 
+  "form.tamilSuggestions": "Tamil",
+
   "relationType.CLOSE_RELATIVE": "Close Relative",
   "relationType.DISTANCE_RELATIVE": "Distance Relative",
   "relationType.FRIENDS": "Friends",
 
   "dashboard.totalInvited": "Invited",
+  "dashboard.pending": "pending",
 
   "common.loading": "Loading...",
   "common.close": "Close",

@@ -7,7 +7,7 @@
 
 <ng-container *ngIf="!isLoading">
 
-  <!-- Highlight Strip: per-function expected counts -->
+  <!-- Highlight Strip: per-function expected counts + pending -->
   <div *ngIf="functionStats.length > 0; else noFunctions" class="highlight-strip">
 
     <div *ngFor="let stat of functionStats" class="highlight-card" [style.background]="stat.fn.color">
@@ -16,16 +16,9 @@
         <i class="bi bi-people-fill"></i>
         {{ 'dashboard.expectedAt' | translate }} {{ stat.fn.name }}
       </div>
-      <div class="hc-sub">{{ stat.inviteeCount }} {{ 'dashboard.invitees' | translate }}</div>
-    </div>
-
-    <div class="highlight-card hc-pending">
-      <div class="hc-count">{{ notInvitedCount }}</div>
-      <div class="hc-label">
-        <i class="bi bi-clock"></i>
-        {{ 'dashboard.notInvited' | translate }}
+      <div class="hc-sub">
+        {{ stat.inviteeCount }} {{ 'dashboard.invitees' | translate }} &middot; {{ stat.pendingCount }} {{ 'dashboard.pending' | translate }}
       </div>
-      <div class="hc-sub">{{ 'dashboard.outOf' | translate }} {{ totalPeople }} {{ 'dashboard.people' | translate }}</div>
     </div>
 
     <div class="highlight-card hc-total">
@@ -69,12 +62,16 @@
       </div>
     </div>
 
-    <div class="stat-card stat-pending">
-      <i class="bi bi-clock stat-icon"></i>
+    <div
+      *ngFor="let stat of functionStats"
+      class="stat-card stat-pending"
+      [style.border-left-color]="stat.fn.color"
+    >
+      <i class="bi bi-clock stat-icon" [style.color]="stat.fn.color"></i>
       <div class="stat-body">
-        <span class="stat-number">{{ notInvitedCount }}</span>
+        <span class="stat-number">{{ stat.pendingCount }}</span>
         <span class="stat-label">{{ 'dashboard.notInvited' | translate }}</span>
-        <span class="stat-sub">{{ 'dashboard.outOf' | translate }} {{ totalPeople }} {{ 'dashboard.people' | translate }}</span>
+        <span class="stat-sub">{{ stat.fn.name }}</span>
       </div>
     </div>
 

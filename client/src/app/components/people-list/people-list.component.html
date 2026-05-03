@@ -18,6 +18,35 @@
   </button>
 </div>
 
+<!-- Sub-filter chips -->
+<div class="sub-filter-row">
+  <ng-container *ngIf="activeFilter === 'ALL'">
+    <button class="sub-btn" [class.sub-active]="subFilter === 'NONE'" (click)="setSubFilter('NONE')">
+      {{ 'peopleList.all' | translate }}
+    </button>
+    <button class="sub-btn" [class.sub-active]="subFilter === 'INVITED'" (click)="setSubFilter('INVITED')">
+      <i class="bi bi-check-circle"></i> {{ 'peopleList.filterInvited' | translate }}
+    </button>
+    <button class="sub-btn" [class.sub-active]="subFilter === 'YET_TO_INVITE'" (click)="setSubFilter('YET_TO_INVITE')">
+      <i class="bi bi-clock"></i> {{ 'peopleList.filterYetToInvite' | translate }}
+    </button>
+  </ng-container>
+  <ng-container *ngIf="activeFilter !== 'ALL'">
+    <button class="sub-btn" [class.sub-active]="subFilter === 'IN'" (click)="setSubFilter('IN')">
+      <i class="bi bi-person-check"></i> {{ 'peopleList.filterIn' | translate }}
+    </button>
+    <button class="sub-btn" [class.sub-active]="subFilter === 'NOT_IN'" (click)="setSubFilter('NOT_IN')">
+      <i class="bi bi-person-x"></i> {{ 'peopleList.filterNotIn' | translate }}
+    </button>
+    <button class="sub-btn" [class.sub-active]="subFilter === 'INVITED'" (click)="setSubFilter('INVITED')">
+      <i class="bi bi-check-circle"></i> {{ 'peopleList.filterInvited' | translate }}
+    </button>
+    <button class="sub-btn" [class.sub-active]="subFilter === 'YET_TO_INVITE'" (click)="setSubFilter('YET_TO_INVITE')">
+      <i class="bi bi-clock"></i> {{ 'peopleList.filterYetToInvite' | translate }}
+    </button>
+  </ng-container>
+</div>
+
 <!-- Search bar -->
 <div class="search-bar">
   <i class="bi bi-search search-icon"></i>
@@ -53,9 +82,7 @@
 <!-- Empty state -->
 <div *ngIf="!isLoading && filteredPeople.length === 0" class="empty-state card">
   <i class="bi bi-person-check empty-icon"></i>
-  <p *ngIf="isSearchActive">{{ 'peopleList.searchNoMatch' | translate }}</p>
-  <p *ngIf="!isSearchActive && activeFilter === 'ALL'">{{ 'peopleList.noResults' | translate }}</p>
-  <p *ngIf="!isSearchActive && activeFilter !== 'ALL'">{{ 'peopleList.allInvited' | translate }}</p>
+  <p>{{ emptyStateKey | translate }}</p>
 </div>
 
 <!-- People cards grid -->

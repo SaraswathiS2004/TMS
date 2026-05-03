@@ -82,86 +82,141 @@
 
   <div *ngFor="let fn of functions" class="fn-card card">
 
-    <div class="fn-color-bar" [style.background]="fn.color"></div>
+    <!-- Top row (overlays are positioned relative to this) -->
+    <div class="fn-top-row">
+      <div class="fn-color-bar" [style.background]="fn.color"></div>
 
-    <div class="fn-body">
-      <div class="fn-name">{{ fn.name }}</div>
-      <div class="fn-meta">
-        <span class="meta-item">
-          <i class="bi bi-people"></i>
-          {{ invitedCount(fn) }} {{ 'functions.people' | translate }}
-        </span>
-        <span class="meta-divider">·</span>
-        <span class="meta-item meta-invited">
-          <i class="bi bi-check-circle"></i>
-          {{ invitedStatusCount(fn) }} {{ 'peopleList.invited' | translate }}
-        </span>
-      </div>
-    </div>
-
-    <!-- Edit inline panel -->
-    <div *ngIf="editFunctionId === fn.id" class="edit-overlay">
-      <div class="edit-row">
-        <div class="name-wrap" style="flex:1">
-          <input
-            type="text"
-            class="edit-fn-input"
-            [ngModel]="editData.name"
-            [placeholder]="'functions.namePlaceholder' | translate"
-            autocomplete="off"
-            (input)="onEditNameInput($event)"
-            (blur)="hideEditNameSuggestions()"
-          />
-          <ul *ngIf="editNameTSuggestions.length > 0" class="suggestion-list">
-            <li class="suggestion-section">
-              <i class="bi bi-translate"></i>
-              {{ 'form.tamilSuggestions' | translate }}
-            </li>
-            <li
-              *ngFor="let s of editNameTSuggestions"
-              (mousedown)="selectEditName(s)"
-              class="suggestion-item suggestion-translit"
-            >{{ s }}</li>
-          </ul>
-        </div>
-        <div class="color-wrap-sm">
-          <input type="color" [(ngModel)]="editData.color" class="color-input-sm" />
-          <span class="color-dot" [style.background]="editData.color"></span>
+      <div class="fn-body">
+        <div class="fn-name">{{ fn.name }}</div>
+        <div class="fn-meta">
+          <span class="meta-item">
+            <i class="bi bi-people"></i>
+            {{ invitedCount(fn) }} {{ 'functions.people' | translate }}
+          </span>
+          <span class="meta-divider">·</span>
+          <span class="meta-item meta-invited">
+            <i class="bi bi-check-circle"></i>
+            {{ invitedStatusCount(fn) }} {{ 'peopleList.invited' | translate }}
+          </span>
         </div>
       </div>
-      <div class="edit-actions">
-        <button class="btn-save-sm" (click)="saveEditFunction()" [disabled]="isEditSaving">
-          <i class="bi bi-check2"></i>
-          {{ (isEditSaving ? 'functions.saving' : 'functions.save') | translate }}
-        </button>
-        <button class="btn-ghost" (click)="cancelEditFunction()">
-          {{ 'functions.cancel' | translate }}
-        </button>
-      </div>
-    </div>
 
-    <!-- Delete confirmation overlay -->
-    <div *ngIf="deleteConfirmId === fn.id" class="delete-confirm">
-      <p>{{ 'functions.confirmDelete' | translate }}</p>
-      <div class="confirm-actions">
-        <button class="btn-danger" (click)="confirmDelete(fn.id)">
+      <!-- Edit inline panel -->
+      <div *ngIf="editFunctionId === fn.id" class="edit-overlay">
+        <div class="edit-row">
+          <div class="name-wrap" style="flex:1">
+            <input
+              type="text"
+              class="edit-fn-input"
+              [ngModel]="editData.name"
+              [placeholder]="'functions.namePlaceholder' | translate"
+              autocomplete="off"
+              (input)="onEditNameInput($event)"
+              (blur)="hideEditNameSuggestions()"
+            />
+            <ul *ngIf="editNameTSuggestions.length > 0" class="suggestion-list">
+              <li class="suggestion-section">
+                <i class="bi bi-translate"></i>
+                {{ 'form.tamilSuggestions' | translate }}
+              </li>
+              <li
+                *ngFor="let s of editNameTSuggestions"
+                (mousedown)="selectEditName(s)"
+                class="suggestion-item suggestion-translit"
+              >{{ s }}</li>
+            </ul>
+          </div>
+          <div class="color-wrap-sm">
+            <input type="color" [(ngModel)]="editData.color" class="color-input-sm" />
+            <span class="color-dot" [style.background]="editData.color"></span>
+          </div>
+        </div>
+        <div class="edit-actions">
+          <button class="btn-save-sm" (click)="saveEditFunction()" [disabled]="isEditSaving">
+            <i class="bi bi-check2"></i>
+            {{ (isEditSaving ? 'functions.saving' : 'functions.save') | translate }}
+          </button>
+          <button class="btn-ghost" (click)="cancelEditFunction()">
+            {{ 'functions.cancel' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Delete confirmation overlay -->
+      <div *ngIf="deleteConfirmId === fn.id" class="delete-confirm">
+        <p>{{ 'functions.confirmDelete' | translate }}</p>
+        <div class="confirm-actions">
+          <button class="btn-danger" (click)="confirmDelete(fn.id)">
+            <i class="bi bi-trash3"></i>
+            {{ 'functions.yesDelete' | translate }}
+          </button>
+          <button class="btn-ghost" (click)="cancelDelete()">
+            {{ 'functions.cancel' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div *ngIf="editFunctionId !== fn.id && deleteConfirmId !== fn.id" class="fn-actions">
+        <button class="btn-edit-fn" (click)="startEditFunction(fn)" title="Edit">
+          <i class="bi bi-pencil"></i>
+        </button>
+        <button class="btn-delete-fn" (click)="requestDelete(fn.id)" title="Delete">
           <i class="bi bi-trash3"></i>
-          {{ 'functions.yesDelete' | translate }}
         </button>
-        <button class="btn-ghost" (click)="cancelDelete()">
-          {{ 'functions.cancel' | translate }}
+        <button class="btn-expand-fn" (click)="toggleExpand(fn.id)" [title]="expandedFunctionId === fn.id ? 'Collapse' : 'Show Invitees'">
+          <i class="bi" [class.bi-chevron-down]="expandedFunctionId !== fn.id" [class.bi-chevron-up]="expandedFunctionId === fn.id"></i>
         </button>
       </div>
     </div>
 
-    <!-- Action buttons -->
-    <div *ngIf="editFunctionId !== fn.id && deleteConfirmId !== fn.id" class="fn-actions">
-      <button class="btn-edit-fn" (click)="startEditFunction(fn)" title="Edit">
-        <i class="bi bi-pencil"></i>
-      </button>
-      <button class="btn-delete-fn" (click)="requestDelete(fn.id)" title="Delete">
-        <i class="bi bi-trash3"></i>
-      </button>
+    <!-- Expand panel -->
+    <div *ngIf="expandedFunctionId === fn.id" class="fn-expand-panel">
+
+      <!-- Sub-filter chips -->
+      <div class="fn-sub-filters">
+        <button class="sub-btn" [class.sub-active]="getFnSubFilter(fn.id) === 'IN'" (click)="setFnSubFilter(fn.id, 'IN')">
+          <i class="bi bi-person-check"></i> {{ 'peopleList.filterIn' | translate }}
+        </button>
+        <button class="sub-btn" [class.sub-active]="getFnSubFilter(fn.id) === 'NOT_IN'" (click)="setFnSubFilter(fn.id, 'NOT_IN')">
+          <i class="bi bi-person-x"></i> {{ 'peopleList.filterNotIn' | translate }}
+        </button>
+        <button class="sub-btn" [class.sub-active]="getFnSubFilter(fn.id) === 'INVITED'" (click)="setFnSubFilter(fn.id, 'INVITED')">
+          <i class="bi bi-check-circle"></i> {{ 'peopleList.filterInvited' | translate }}
+        </button>
+        <button class="sub-btn" [class.sub-active]="getFnSubFilter(fn.id) === 'YET_TO_INVITE'" (click)="setFnSubFilter(fn.id, 'YET_TO_INVITE')">
+          <i class="bi bi-clock"></i> {{ 'peopleList.filterYetToInvite' | translate }}
+        </button>
+      </div>
+
+      <!-- Empty state -->
+      <p *ngIf="getPeopleForFunction(fn.id).length === 0" class="fn-expand-empty">
+        {{ 'peopleList.noResults' | translate }}
+      </p>
+
+      <!-- Invitee rows -->
+      <div *ngFor="let p of getPeopleForFunction(fn.id)" class="fn-invitee-row">
+        <div class="fn-invitee-info">
+          <span class="fn-invitee-name">{{ p.name }}</span>
+          <span class="fn-invitee-detail">{{ p.city }} · {{ p.numberOfPerson }} {{ 'peopleList.expected' | translate }}</span>
+        </div>
+        <div class="fn-invitee-actions">
+          <span *ngIf="isPersonInvited(p, fn.id)" class="fn-invited-badge">
+            <i class="bi bi-check-circle-fill"></i> {{ 'peopleList.invited' | translate }}
+          </span>
+          <button
+            *ngIf="getFnSubFilter(fn.id) !== 'NOT_IN'"
+            class="fn-status-btn"
+            [class.fn-btn-revoke]="isPersonInvited(p, fn.id)"
+            [disabled]="markingPersonFnKey === p.id + '_' + fn.id"
+            (click)="toggleInviteStatus(p, fn.id)"
+          >
+            <i class="bi" [class.bi-check2]="!isPersonInvited(p, fn.id)" [class.bi-x]="isPersonInvited(p, fn.id)"></i>
+            {{ (isPersonInvited(p, fn.id) ? 'peopleList.revoke' : 'peopleList.markInvited') | translate }}
+          </button>
+        </div>
+      </div>
+
     </div>
 
   </div>

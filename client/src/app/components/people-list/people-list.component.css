@@ -40,6 +40,32 @@
   color: var(--fn-color);
 }
 
+/* Sub-filter chips */
+.sub-filter-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.sub-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 20px;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.sub-btn:hover { border-color: #4f46e5; color: #4f46e5; }
+.sub-active { background: #eef2ff; border-color: #4f46e5; color: #4f46e5; font-weight: 600; }
+
 /* Search bar */
 .search-bar {
   position: relative;

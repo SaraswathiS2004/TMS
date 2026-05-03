@@ -45,6 +45,10 @@ export class FunctionManagerComponent implements OnInit, OnDestroy {
   feedbackMessage = '';
   feedbackType: 'success' | 'error' = 'success';
 
+  expandedFunctionId: number | null = null;
+  fnSubFilters: Record<number, 'IN' | 'NOT_IN' | 'INVITED' | 'YET_TO_INVITE'> = {};
+  markingPersonFnKey: string | null = null;
+
   private newNameInput$ = new Subject<string>();
   private editNameInput$ = new Subject<string>();
   private subs = new Subscription();
@@ -113,7 +117,7 @@ export class FunctionManagerComponent implements OnInit, OnDestroy {
     const val = (event.target as HTMLInputElement).value;
     this.newName = val;
     this.nameError = false;
-    if (this.isTamilMode && val.trim()) {
+    if (val.trim()) {
       this.newNameInput$.next(val);
     } else {
       this.newNameTSuggestions = [];
@@ -132,7 +136,7 @@ export class FunctionManagerComponent implements OnInit, OnDestroy {
   onEditNameInput(event: Event): void {
     const val = (event.target as HTMLInputElement).value;
     this.editData = { ...this.editData, name: val };
-    if (this.isTamilMode && val.trim()) {
+    if (val.trim()) {
       this.editNameInput$.next(val);
     } else {
       this.editNameTSuggestions = [];
@@ -181,11 +185,69 @@ export class FunctionManagerComponent implements OnInit, OnDestroy {
     this.editData = { name: fn.name, color: fn.color, displayOrder: fn.displayOrder };
     this.editNameTSuggestions = [];
     this.deleteConfirmId = null;
+    this.expandedFunctionId = null;
   }
 
   cancelEditFunction(): void {
     this.editFunctionId = null;
     this.editNameTSuggestions = [];
+  }
+
+  toggleExpand(fnId: number): void {
+    if (this.expandedFunctionId === fnId) {
+      this.expandedFunctionId = null;
+    } else {
+      this.expandedFunctionId = fnId;
+      if (!this.fnSubFilters[fnId]) { this.fnSubFilters[fnId] = 'IN'; }
+    }
+  }
+
+  setFnSubFilter(fnId: number, filter: 'IN' | 'NOT_IN' | 'INVITED' | 'YET_TO_INVITE'): void {
+    this.fnSubFilters[fnId] = filter;
+  }
+
+  getFnSubFilter(fnId: number): 'IN' | 'NOT_IN' | 'INVITED' | 'YET_TO_INVITE' {
+    return this.fnSubFilters[fnId] ?? 'IN';
+  }
+
+  getPeopleForFunction(fnId: number): People[] {
+    const filter = this.getFnSubFilter(fnId);
+    const fnIdStr = String(fnId);
+    return this.people.filter(p => {
+      const isIn = p.invitedFunctionIds.includes(fnId);
+      const isInvited = p.functionStatuses?.[fnIdStr] === 'INVITED';
+      if (filter === 'IN') { return isIn; }
+      if (filter === 'NOT_IN') { return !isIn; }
+      if (filter === 'INVITED') { return isIn && isInvited; }
+      if (filter === 'YET_TO_INVITE') { return isIn && !isInvited; }
+      return true;
+    });
+  }
+
+  isPersonInvited(person: People, fnId: number): boolean {
+    return person.functionStatuses?.[String(fnId)] === 'INVITED';
+  }
+
+  toggleInviteStatus(person: People, fnId: number): void {
+    const key = `${person.id}_${fnId}`;
+    if (this.markingPersonFnKey === key) { return; }
+    this.markingPersonFnKey = key;
+    const newStatus = this.isPersonInvited(person, fnId) ? 'NOT_INVITED' : 'INVITED';
+    this.peopleService.updateFunctionStatus(person.id!, fnId, newStatus).subscribe({
+      next: (resp) => {
+        if (resp.status === 'SUCCESS') {
+          const idx = this.people.findIndex(p => p.id === person.id);
+          if (idx !== -1) {
+            this.people[idx] = {
+              ...this.people[idx],
+              functionStatuses: { ...(this.people[idx].functionStatuses ?? {}), [String(fnId)]: newStatus }
+            };
+          }
+        }
+        this.markingPersonFnKey = null;
+      },
+      error: () => { this.markingPersonFnKey = null; }
+    });
   }
 
   saveEditFunction(): void {
@@ -218,6 +280,7 @@ export class FunctionManagerComponent implements OnInit, OnDestroy {
   requestDelete(id: number): void {
     this.deleteConfirmId = id;
     this.editFunctionId = null;
+    this.expandedFunctionId = null;
   }
 
   cancelDelete(): void {

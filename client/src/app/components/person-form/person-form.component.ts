@@ -7,7 +7,6 @@ import { PeopleService } from '../../services/people.service';
 import { People } from '../../models/people.model';
 import { TmsFunction } from '../../models/function.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
-import { TranslateService } from '../../services/translate.service';
 import { TransliterationService } from '../../services/transliteration.service';
 
 @Component({
@@ -52,14 +51,9 @@ export class PersonFormComponent implements OnInit, OnChanges, OnDestroy {
     return !!this.person;
   }
 
-  get isTamilMode(): boolean {
-    return this.translateService.currentLang === 'ta';
-  }
-
   constructor(
     private fb: FormBuilder,
     private peopleService: PeopleService,
-    private translateService: TranslateService,
     private transliterationService: TransliterationService
   ) {
     this.form = this.fb.group({
@@ -124,7 +118,7 @@ export class PersonFormComponent implements OnInit, OnChanges, OnDestroy {
     this.filteredNames = lower ? this.allNames.filter(n => n.toLowerCase().includes(lower)) : [];
     this.showNameDropdown = this.filteredNames.length > 0;
 
-    if (this.isTamilMode && val.trim()) {
+    if (val.trim()) {
       this.nameInput$.next(val);
     } else {
       this.nameTSuggestions = [];
@@ -150,7 +144,7 @@ export class PersonFormComponent implements OnInit, OnChanges, OnDestroy {
     this.filteredCities = lower ? this.allCities.filter(c => c.toLowerCase().includes(lower)) : [...this.allCities];
     this.showCityDropdown = this.filteredCities.length > 0;
 
-    if (this.isTamilMode && val.trim()) {
+    if (val.trim()) {
       this.cityInput$.next(val);
     } else {
       this.cityTSuggestions = [];

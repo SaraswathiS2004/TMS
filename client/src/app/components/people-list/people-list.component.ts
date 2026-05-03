@@ -25,6 +25,7 @@ export class PeopleListComponent implements OnInit, OnDestroy {
   isLoading = true;
 
   activeFilter: 'ALL' | number = 'ALL';
+  subFilter: 'NONE' | 'IN' | 'NOT_IN' | 'INVITED' | 'YET_TO_INVITE' = 'NONE';
   searchQuery = '';
   searchTranslitSuggestions: string[] = [];
 
@@ -78,14 +79,7 @@ export class PeopleListComponent implements OnInit, OnDestroy {
   }
 
   get filteredPeople(): People[] {
-    let result: People[];
-    if (this.activeFilter === 'ALL') {
-      result = this.allPeople;
-    } else {
-      // Function tab: show people NOT yet on this function's invitation list
-      result = this.allPeople.filter(p => !p.invitedFunctionIds.includes(this.activeFilter as number));
-    }
-
+    let result = this.applyFilters(this.allPeople);
     const q = this.searchQuery.trim().toLowerCase();
     if (q) {
       result = result.filter(p => {
@@ -98,8 +92,46 @@ export class PeopleListComponent implements OnInit, OnDestroy {
         });
       });
     }
-
     return result;
+  }
+
+  private applyFilters(people: People[]): People[] {
+    if (this.activeFilter === 'ALL') {
+      if (this.subFilter === 'INVITED') {
+        return people.filter(p => Object.values(p.functionStatuses ?? {}).some(s => s === 'INVITED'));
+      }
+      if (this.subFilter === 'YET_TO_INVITE') {
+        return people.filter(p =>
+          p.invitedFunctionIds.length > 0 &&
+          !Object.values(p.functionStatuses ?? {}).some(s => s === 'INVITED')
+        );
+      }
+      return people;
+    }
+    const fnId = this.activeFilter as number;
+    const fnIdStr = String(fnId);
+    return people.filter(p => {
+      const isIn = p.invitedFunctionIds.includes(fnId);
+      const isInvited = p.functionStatuses?.[fnIdStr] === 'INVITED';
+      if (this.subFilter === 'IN') { return isIn; }
+      if (this.subFilter === 'NOT_IN') { return !isIn; }
+      if (this.subFilter === 'INVITED') { return isIn && isInvited; }
+      if (this.subFilter === 'YET_TO_INVITE') { return isIn && !isInvited; }
+      return true;
+    });
+  }
+
+  get emptyStateKey(): string {
+    if (this.isSearchActive) { return 'peopleList.searchNoMatch'; }
+    if (this.activeFilter === 'ALL') {
+      if (this.subFilter === 'INVITED') { return 'peopleList.emptyAllInvited'; }
+      if (this.subFilter === 'YET_TO_INVITE') { return 'peopleList.emptyAllYetToInvite'; }
+      return 'peopleList.noResults';
+    }
+    if (this.subFilter === 'NOT_IN') { return 'peopleList.emptyFnNotIn'; }
+    if (this.subFilter === 'INVITED') { return 'peopleList.emptyFnInvited'; }
+    if (this.subFilter === 'YET_TO_INVITE') { return 'peopleList.emptyFnYetToInvite'; }
+    return 'peopleList.emptyFnIn';
   }
 
   get isSearchActive(): boolean {
@@ -120,6 +152,13 @@ export class PeopleListComponent implements OnInit, OnDestroy {
 
   setFilter(f: 'ALL' | number): void {
     this.activeFilter = f;
+    this.subFilter = f === 'ALL' ? 'NONE' : 'IN';
+    this.editPersonId = null;
+    this.deleteConfirmId = null;
+  }
+
+  setSubFilter(sf: 'NONE' | 'IN' | 'NOT_IN' | 'INVITED' | 'YET_TO_INVITE'): void {
+    this.subFilter = sf;
     this.editPersonId = null;
     this.deleteConfirmId = null;
   }

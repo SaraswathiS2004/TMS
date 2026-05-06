@@ -4,8 +4,12 @@
   padding: 0;
 }
 
+input, textarea, select, button {
+  font-family: inherit;
+}
+
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Segoe UI', 'Noto Sans Tamil', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #f0f4f8;
   color: #2d3748;
   min-height: 100vh;

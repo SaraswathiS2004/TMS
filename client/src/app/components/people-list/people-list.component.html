@@ -6,10 +6,6 @@
     <i class="bi bi-people"></i>
     {{ 'peopleList.all' | translate }}
   </button>
-  <button class="tab-btn" [class.tab-active]="activeFilter === 'NONE'" (click)="setFilter('NONE')">
-    <i class="bi bi-clock"></i>
-    {{ 'peopleList.notInvited' | translate }}
-  </button>
   <button
     *ngFor="let fn of functions"
     class="tab-btn tab-fn"
@@ -17,8 +13,52 @@
     [style.--fn-color]="fn.color"
     (click)="setFilter(fn.id)"
   >
-    <i class="bi bi-calendar2-check"></i>
+    <i class="bi bi-clock"></i>
     {{ fn.name }}
+  </button>
+</div>
+
+<!-- Sub-filter chips -->
+<div class="sub-filter-row">
+  <ng-container *ngIf="activeFilter === 'ALL'">
+    <button class="sub-btn" [class.sub-active]="subFilter === 'NONE'" (click)="setSubFilter('NONE')">
+      {{ 'peopleList.all' | translate }}
+    </button>
+    <button class="sub-btn" [class.sub-active]="subFilter === 'INVITED'" (click)="setSubFilter('INVITED')">
+      <i class="bi bi-check-circle"></i> {{ 'peopleList.filterInvited' | translate }}
+    </button>
+    <button class="sub-btn" [class.sub-active]="subFilter === 'YET_TO_INVITE'" (click)="setSubFilter('YET_TO_INVITE')">
+      <i class="bi bi-clock"></i> {{ 'peopleList.filterYetToInvite' | translate }}
+    </button>
+  </ng-container>
+  <ng-container *ngIf="activeFilter !== 'ALL'">
+    <button class="sub-btn" [class.sub-active]="subFilter === 'IN'" (click)="setSubFilter('IN')">
+      <i class="bi bi-person-check"></i> {{ 'peopleList.filterIn' | translate }}
+    </button>
+    <button class="sub-btn" [class.sub-active]="subFilter === 'NOT_IN'" (click)="setSubFilter('NOT_IN')">
+      <i class="bi bi-person-x"></i> {{ 'peopleList.filterNotIn' | translate }}
+    </button>
+    <button class="sub-btn" [class.sub-active]="subFilter === 'INVITED'" (click)="setSubFilter('INVITED')">
+      <i class="bi bi-check-circle"></i> {{ 'peopleList.filterInvited' | translate }}
+    </button>
+    <button class="sub-btn" [class.sub-active]="subFilter === 'YET_TO_INVITE'" (click)="setSubFilter('YET_TO_INVITE')">
+      <i class="bi bi-clock"></i> {{ 'peopleList.filterYetToInvite' | translate }}
+    </button>
+  </ng-container>
+</div>
+
+<!-- Search bar -->
+<div class="search-bar">
+  <i class="bi bi-search search-icon"></i>
+  <input
+    class="search-input"
+    type="text"
+    [value]="searchQuery"
+    [placeholder]="'peopleList.searchPlaceholder' | translate"
+    (input)="onSearch($event)"
+  />
+  <button *ngIf="isSearchActive" class="search-clear" (click)="clearSearch()" [title]="'peopleList.clearSearch' | translate">
+    <i class="bi bi-x-circle-fill"></i>
   </button>
 </div>
 
@@ -41,8 +81,8 @@
 
 <!-- Empty state -->
 <div *ngIf="!isLoading && filteredPeople.length === 0" class="empty-state card">
-  <i class="bi bi-person-x empty-icon"></i>
-  <p>{{ 'peopleList.noResults' | translate }}</p>
+  <i class="bi bi-person-check empty-icon"></i>
+  <p>{{ emptyStateKey | translate }}</p>
 </div>
 
 <!-- People cards grid -->
@@ -55,7 +95,7 @@
       <div>
         <h3 class="person-name">{{ person.name }}</h3>
         <span class="badge" [ngClass]="relationBadgeClass(person.relationType)">
-          {{ person.relationType }}
+          {{ ('relationType.' + person.relationType) | translate }}
         </span>
       </div>
       <button class="btn-delete" (click)="requestDelete(person.id!)" title="Delete">
@@ -75,8 +115,8 @@
       </div>
     </div>
 
-    <!-- Invited functions tags (shown in ALL / NONE views) -->
-    <div class="fn-tags" *ngIf="!isNumberFilter && person.invitedFunctionIds.length > 0">
+    <!-- Functions the person is already on (visible on all tabs) -->
+    <div class="fn-tags" *ngIf="person.invitedFunctionIds.length > 0">
       <span
         *ngFor="let fnId of person.invitedFunctionIds"
         class="fn-tag"
@@ -87,30 +127,6 @@
         <i class="bi bi-check2"></i>
         {{ functionName(fnId) }}
       </span>
-    </div>
-
-    <!-- Per-function invited status (shown when a specific function tab is active) -->
-    <div class="fn-status-section" *ngIf="isNumberFilter">
-      <div class="fn-status-row" [style.border-left-color]="functionColor(activeFunctionId)">
-        <span
-          class="status-badge"
-          [class.status-invited]="getStatusForFunction(person, activeFunctionId) === 'INVITED'"
-          [class.status-pending]="getStatusForFunction(person, activeFunctionId) !== 'INVITED'"
-        >
-          <i class="bi" [ngClass]="getStatusForFunction(person, activeFunctionId) === 'INVITED' ? 'bi-check-circle-fill' : 'bi-clock'"></i>
-          {{ (getStatusForFunction(person, activeFunctionId) === 'INVITED' ? 'peopleList.invited' : 'peopleList.notYetInvited') | translate }}
-        </span>
-        <button
-          class="btn-toggle-status"
-          [class.btn-mark-invited]="getStatusForFunction(person, activeFunctionId) !== 'INVITED'"
-          [class.btn-mark-revoke]="getStatusForFunction(person, activeFunctionId) === 'INVITED'"
-          [disabled]="markingStatusPersonId === person.id"
-          (click)="markInvited(person, activeFunctionId)"
-        >
-          <i class="bi" [ngClass]="getStatusForFunction(person, activeFunctionId) === 'INVITED' ? 'bi-arrow-counterclockwise' : 'bi-send-check'"></i>
-          {{ (getStatusForFunction(person, activeFunctionId) === 'INVITED' ? 'peopleList.revoke' : 'peopleList.markInvited') | translate }}
-        </button>
-      </div>
     </div>
 
     <!-- Delete confirmation -->
@@ -125,69 +141,20 @@
       </div>
     </div>
 
-    <!-- Full edit panel -->
+    <!-- Edit panel (shared form component) -->
     <div *ngIf="editPersonId === person.id" class="edit-panel">
       <div class="edit-section-title">
         <i class="bi bi-pencil-square"></i>
         {{ 'peopleList.editPerson' | translate }}
       </div>
-
-      <div class="edit-field">
-        <label class="edit-label">{{ 'peopleList.fullName' | translate }}</label>
-        <input type="text" class="edit-input" [(ngModel)]="editData.name" />
-      </div>
-
-      <div class="edit-field">
-        <label class="edit-label">{{ 'peopleList.city' | translate }}</label>
-        <input type="text" class="edit-input" [(ngModel)]="editData.city" [attr.list]="'cities-' + person.id" />
-        <datalist [attr.id]="'cities-' + person.id">
-          <option *ngFor="let c of existingCities" [value]="c"></option>
-        </datalist>
-      </div>
-
-      <div class="edit-field">
-        <label class="edit-label">{{ 'peopleList.expectedAttendees' | translate }}</label>
-        <input type="number" class="edit-input edit-input-number" [(ngModel)]="editData.numberOfPerson" min="1" />
-      </div>
-
-      <div class="edit-field">
-        <label class="edit-label">{{ 'peopleList.relationType' | translate }}</label>
-        <select class="edit-select" [(ngModel)]="editData.relationType">
-          <option value="CLOSE">{{ 'addPerson.close' | translate }}</option>
-          <option value="DISTANCE">{{ 'addPerson.distance' | translate }}</option>
-          <option value="FRIENDS">{{ 'addPerson.friends' | translate }}</option>
-        </select>
-      </div>
-
-      <div class="edit-field">
-        <label class="edit-label">{{ 'peopleList.invitedFunctions' | translate }}</label>
-        <div class="edit-fn-list">
-          <label
-            *ngFor="let fn of functions"
-            class="fn-checkbox-label"
-            [style.--fn-color]="fn.color"
-          >
-            <input
-              type="checkbox"
-              [checked]="editData.invitedFunctionIds.includes(fn.id)"
-              (change)="toggleEditFunction(fn.id)"
-            />
-            <span class="fn-check-dot" [style.background]="fn.color"></span>
-            {{ fn.name }}
-          </label>
-          <p *ngIf="functions.length === 0" class="no-fns-hint">
-            {{ 'peopleList.noFunctionsSetup' | translate }}
-          </p>
-        </div>
-      </div>
-
-      <div class="edit-actions">
-        <button class="btn-save-inv" (click)="savePersonEdit()" [disabled]="isSaving">
-          <i class="bi bi-check2"></i>
-          {{ (isSaving ? 'peopleList.saving' : 'peopleList.savePerson') | translate }}
-        </button>
-        <button class="btn-ghost" (click)="cancelEditPerson()">{{ 'peopleList.cancel' | translate }}</button>
-      </div>
+      <app-person-form
+        [person]="person"
+        [allPeople]="allPeople"
+        [functions]="functions"
+        [inline]="true"
+        (saved)="onPersonSaved()"
+        (cancelled)="cancelEditPerson()"
+      ></app-person-form>
     </div>
 
     <!-- Card Footer -->

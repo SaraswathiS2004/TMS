@@ -1,53 +1,61 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, switchMap } from 'rxjs/operators';
 import { PeopleService } from '../../services/people.service';
 import { FunctionService } from '../../services/function.service';
-import { People, RelationType } from '../../models/people.model';
+import { People } from '../../models/people.model';
 import { TmsFunction } from '../../models/function.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { TranslateService } from '../../services/translate.service';
-
-interface EditData {
-  name: string;
-  city: string;
-  numberOfPerson: number;
-  relationType: RelationType;
-  invitedFunctionIds: number[];
-}
+import { TransliterationService } from '../../services/transliteration.service';
+import { PersonFormComponent } from '../person-form/person-form.component';
 
 @Component({
   selector: 'app-people-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe],
+  imports: [CommonModule, TranslatePipe, PersonFormComponent],
   templateUrl: './people-list.component.html',
   styleUrl: './people-list.component.css'
 })
-export class PeopleListComponent implements OnInit {
+export class PeopleListComponent implements OnInit, OnDestroy {
 
   allPeople: People[] = [];
   functions: TmsFunction[] = [];
   isLoading = true;
 
-  activeFilter: 'ALL' | 'NONE' | number = 'NONE';
+  activeFilter: 'ALL' | number = 'ALL';
+  subFilter: 'NONE' | 'IN' | 'NOT_IN' | 'INVITED' | 'YET_TO_INVITE' = 'NONE';
+  searchQuery = '';
+  searchTranslitSuggestions: string[] = [];
 
   editPersonId: number | null = null;
-  editData: EditData = { name: '', city: '', numberOfPerson: 1, relationType: 'CLOSE_RELATIVE', invitedFunctionIds: [] };
-  isSaving = false;
-
-  markingStatusPersonId: number | null = null;
-
   deleteConfirmId: number | null = null;
   feedbackMessage = '';
+
+  private searchInput$ = new Subject<string>();
+  private subs = new Subscription();
 
   constructor(
     private peopleService: PeopleService,
     private functionService: FunctionService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private transliterationService: TransliterationService
   ) {}
 
   ngOnInit(): void {
     this.loadAll();
+
+    this.subs.add(
+      this.searchInput$.pipe(
+        debounceTime(300),
+        switchMap(text => this.transliterationService.getSuggestions(text))
+      ).subscribe(items => { this.searchTranslitSuggestions = items; })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
   }
 
   loadAll(): void {
@@ -71,46 +79,86 @@ export class PeopleListComponent implements OnInit {
   }
 
   get filteredPeople(): People[] {
-    if (this.activeFilter === 'ALL') { return this.allPeople; }
-    if (this.activeFilter === 'NONE') { return this.allPeople.filter(p => p.invitedFunctionIds.length === 0); }
-    return this.allPeople.filter(p => p.invitedFunctionIds.includes(this.activeFilter as number));
+    let result = this.applyFilters(this.allPeople);
+    const q = this.searchQuery.trim().toLowerCase();
+    if (q) {
+      result = result.filter(p => {
+        const name = p.name.toLowerCase();
+        const city = p.city.toLowerCase();
+        if (name.includes(q) || city.includes(q)) { return true; }
+        return this.searchTranslitSuggestions.some(s => {
+          const sl = s.toLowerCase();
+          return name.includes(sl) || city.includes(sl);
+        });
+      });
+    }
+    return result;
   }
 
-  get isNumberFilter(): boolean {
-    return typeof this.activeFilter === 'number';
-  }
-
-  get activeFunctionId(): number {
-    return this.activeFilter as number;
-  }
-
-  getStatusForFunction(person: People, functionId: number): string {
-    return person.functionStatuses?.[String(functionId)] ?? 'NOT_INVITED';
-  }
-
-  markInvited(person: People, functionId: number): void {
-    if (!person.id) { return; }
-    this.markingStatusPersonId = person.id;
-    const currentStatus = this.getStatusForFunction(person, functionId);
-    const newStatus = currentStatus === 'INVITED' ? 'NOT_INVITED' : 'INVITED';
-    this.peopleService.updateFunctionStatus(person.id, functionId, newStatus).subscribe({
-      next: (resp) => {
-        if (resp.status === 'SUCCESS') {
-          if (!person.functionStatuses) { person.functionStatuses = {}; }
-          person.functionStatuses[String(functionId)] = newStatus;
-        }
-        this.markingStatusPersonId = null;
-      },
-      error: () => { this.markingStatusPersonId = null; }
+  private applyFilters(people: People[]): People[] {
+    if (this.activeFilter === 'ALL') {
+      if (this.subFilter === 'INVITED') {
+        return people.filter(p => Object.values(p.functionStatuses ?? {}).some(s => s === 'INVITED'));
+      }
+      if (this.subFilter === 'YET_TO_INVITE') {
+        return people.filter(p =>
+          p.invitedFunctionIds.length > 0 &&
+          !Object.values(p.functionStatuses ?? {}).some(s => s === 'INVITED')
+        );
+      }
+      return people;
+    }
+    const fnId = this.activeFilter as number;
+    const fnIdStr = String(fnId);
+    return people.filter(p => {
+      const isIn = p.invitedFunctionIds.includes(fnId);
+      const isInvited = p.functionStatuses?.[fnIdStr] === 'INVITED';
+      if (this.subFilter === 'IN') { return isIn; }
+      if (this.subFilter === 'NOT_IN') { return !isIn; }
+      if (this.subFilter === 'INVITED') { return isIn && isInvited; }
+      if (this.subFilter === 'YET_TO_INVITE') { return isIn && !isInvited; }
+      return true;
     });
   }
 
-  get existingCities(): string[] {
-    return [...new Set(this.allPeople.map(p => p.city).filter(c => !!c))];
+  get emptyStateKey(): string {
+    if (this.isSearchActive) { return 'peopleList.searchNoMatch'; }
+    if (this.activeFilter === 'ALL') {
+      if (this.subFilter === 'INVITED') { return 'peopleList.emptyAllInvited'; }
+      if (this.subFilter === 'YET_TO_INVITE') { return 'peopleList.emptyAllYetToInvite'; }
+      return 'peopleList.noResults';
+    }
+    if (this.subFilter === 'NOT_IN') { return 'peopleList.emptyFnNotIn'; }
+    if (this.subFilter === 'INVITED') { return 'peopleList.emptyFnInvited'; }
+    if (this.subFilter === 'YET_TO_INVITE') { return 'peopleList.emptyFnYetToInvite'; }
+    return 'peopleList.emptyFnIn';
   }
 
-  setFilter(f: 'ALL' | 'NONE' | number): void {
+  get isSearchActive(): boolean {
+    return this.searchQuery.trim().length > 0;
+  }
+
+  onSearch(event: Event): void {
+    const val = (event.target as HTMLInputElement).value;
+    this.searchQuery = val;
+    this.searchTranslitSuggestions = [];
+    if (val.trim()) { this.searchInput$.next(val.trim()); }
+  }
+
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.searchTranslitSuggestions = [];
+  }
+
+  setFilter(f: 'ALL' | number): void {
     this.activeFilter = f;
+    this.subFilter = f === 'ALL' ? 'NONE' : 'IN';
+    this.editPersonId = null;
+    this.deleteConfirmId = null;
+  }
+
+  setSubFilter(sf: 'NONE' | 'IN' | 'NOT_IN' | 'INVITED' | 'YET_TO_INVITE'): void {
+    this.subFilter = sf;
     this.editPersonId = null;
     this.deleteConfirmId = null;
   }
@@ -125,13 +173,6 @@ export class PeopleListComponent implements OnInit {
 
   startEditPerson(person: People): void {
     this.editPersonId = person.id!;
-    this.editData = {
-      name: person.name,
-      city: person.city,
-      numberOfPerson: person.numberOfPerson,
-      relationType: person.relationType,
-      invitedFunctionIds: [...person.invitedFunctionIds]
-    };
     this.deleteConfirmId = null;
   }
 
@@ -139,44 +180,10 @@ export class PeopleListComponent implements OnInit {
     this.editPersonId = null;
   }
 
-  toggleEditFunction(fnId: number): void {
-    if (this.editData.invitedFunctionIds.includes(fnId)) {
-      this.editData.invitedFunctionIds = this.editData.invitedFunctionIds.filter(id => id !== fnId);
-    } else {
-      this.editData.invitedFunctionIds = [...this.editData.invitedFunctionIds, fnId];
-    }
-  }
-
-  savePersonEdit(): void {
-    if (!this.editPersonId) { return; }
-    this.isSaving = true;
-    const person: People = {
-      id: this.editPersonId,
-      name: this.editData.name,
-      city: this.editData.city,
-      numberOfPerson: this.editData.numberOfPerson,
-      relationType: this.editData.relationType,
-      invitedFunctionIds: this.editData.invitedFunctionIds
-    };
-    this.peopleService.updatePerson(person).subscribe({
-      next: (resp) => {
-        if (resp.status === 'SUCCESS') {
-          this.feedbackMessage = this.translateService.translate('peopleList.savePersonSuccess');
-          this.loadAll();
-          setTimeout(() => { this.feedbackMessage = ''; }, 3000);
-        } else {
-          this.feedbackMessage = this.translateService.translate('peopleList.updateFailed');
-          setTimeout(() => { this.feedbackMessage = ''; }, 3000);
-        }
-        this.isSaving = false;
-        this.editPersonId = null;
-      },
-      error: () => {
-        this.feedbackMessage = this.translateService.translate('peopleList.updateFailed');
-        this.isSaving = false;
-        setTimeout(() => { this.feedbackMessage = ''; }, 3000);
-      }
-    });
+  onPersonSaved(): void {
+    this.feedbackMessage = this.translateService.translate('peopleList.savePersonSuccess');
+    this.loadAll();
+    setTimeout(() => { this.feedbackMessage = ''; }, 3000);
   }
 
   requestDelete(id: number): void {

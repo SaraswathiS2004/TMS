@@ -42,3 +42,4 @@ client/node/
 client/node_modules/
 client/dist/
 client/.angular/
+/bin/

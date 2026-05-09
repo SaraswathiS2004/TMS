@@ -13,7 +13,7 @@ public class TmsDB {
         Class.forName("com.mysql.cj.jdbc.Driver");
         String url = "jdbc:mysql://localhost:3306/Tms";
         String user = "root";
-        String password = "Sarah@2004";
+        String password = "";
         con = DriverManager.getConnection(url, user, password);
         SchemaInit.init(con);
     }

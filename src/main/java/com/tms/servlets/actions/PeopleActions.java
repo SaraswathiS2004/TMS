@@ -4,6 +4,8 @@ import com.tms.data.dto.People;
 import com.tms.data.dto.RelationType;
 import com.tms.data.respository.TmsDB;
 import com.tms.servlets.message.Message;
+import com.tms.sheet.impl.InvitationsTable;
+import com.tms.sheet.impl.PersonFunctionsTable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -78,6 +80,8 @@ public class PeopleActions {
                 }
                 message.setMessage("Successfully Added!");
                 message.setStatus(Message.Status.SUCCESS);
+                new InvitationsTable().triggerSync();
+                new PersonFunctionsTable().triggerSync();
             } else {
                 message.setMessage("Could not add person.");
                 message.setStatus(Message.Status.FAIL);
@@ -138,6 +142,8 @@ public class PeopleActions {
             }
             message.setMessage("Updated successfully.");
             message.setStatus(Message.Status.SUCCESS);
+            new InvitationsTable().triggerSync();
+            new PersonFunctionsTable().triggerSync();
         } catch (Exception e) {
             System.out.println(e);
             message.setStatus(Message.Status.FAIL);
@@ -159,6 +165,7 @@ public class PeopleActions {
             }
             message.setMessage("Updated successfully.");
             message.setStatus(Message.Status.SUCCESS);
+            new PersonFunctionsTable().triggerSync();
         } catch (Exception e) {
             System.out.println(e);
             message.setStatus(Message.Status.FAIL);
@@ -175,6 +182,8 @@ public class PeopleActions {
             if (rows > 0) {
                 message.setMessage("Person deleted successfully.");
                 message.setStatus(Message.Status.SUCCESS);
+                new InvitationsTable().triggerSync();
+                new PersonFunctionsTable().triggerSync();
             } else {
                 message.setMessage("Person not found.");
                 message.setStatus(Message.Status.FAIL);
@@ -199,6 +208,7 @@ public class PeopleActions {
             if (rows > 0) {
                 message.setMessage("Status updated.");
                 message.setStatus(Message.Status.SUCCESS);
+                new PersonFunctionsTable().triggerSync();
             } else {
                 message.setMessage("Record not found.");
                 message.setStatus(Message.Status.FAIL);

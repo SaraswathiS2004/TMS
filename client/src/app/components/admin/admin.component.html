@@ -1,0 +1,156 @@
+<div class="admin-page">
+  <h1 class="page-title">Admin Settings</h1>
+
+  <!-- Sheet Configuration -->
+  <div class="card section">
+    <h2 class="section-title">
+      <i class="bi bi-file-earmark-spreadsheet"></i>
+      Google Sheet Configuration
+    </h2>
+
+    <div class="field-group">
+      <label class="field-label">Credentials File</label>
+      <input
+        class="field-input"
+        type="text"
+        [(ngModel)]="credentialsFileName"
+        placeholder="google-credentials.json"
+      />
+      <span class="field-hint">File name inside WEB-INF/classes/</span>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Sheet Action</label>
+      <div class="radio-group">
+        <label class="radio-option">
+          <input type="radio" name="setupAction" value="create" [(ngModel)]="setupAction" />
+          Create new spreadsheet
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="setupAction" value="link" [(ngModel)]="setupAction" />
+          Link existing spreadsheet
+        </label>
+      </div>
+    </div>
+
+    <div class="field-group" *ngIf="setupAction === 'create'">
+      <label class="field-label">Spreadsheet Title</label>
+      <input
+        class="field-input"
+        type="text"
+        [(ngModel)]="spreadsheetTitle"
+        placeholder="TMS Backup"
+      />
+    </div>
+
+    <div class="field-group" *ngIf="setupAction === 'link'">
+      <label class="field-label">Spreadsheet ID</label>
+      <input
+        class="field-input"
+        type="text"
+        [(ngModel)]="spreadsheetIdInput"
+        placeholder="Paste spreadsheet ID from the URL"
+      />
+    </div>
+
+    <button class="btn-primary" (click)="onSetup()" [disabled]="loading">
+      <i class="bi bi-cloud-arrow-up"></i>
+      {{ loading ? 'Connecting...' : (setupAction === 'create' ? 'Create & Link' : 'Link Sheet') }}
+    </button>
+
+    <div class="msg-success" *ngIf="setupMessage">
+      <i class="bi bi-check-circle-fill"></i> {{ setupMessage }}
+    </div>
+    <div class="msg-error" *ngIf="setupError">
+      <i class="bi bi-exclamation-circle-fill"></i> {{ setupError }}
+    </div>
+
+    <div class="current-sheet" *ngIf="status?.configured">
+      <i class="bi bi-link-45deg"></i>
+      Currently linked:
+      <a [href]="status!.spreadsheetUrl!" target="_blank" rel="noopener">
+        {{ status!.spreadsheetId }}
+        <i class="bi bi-box-arrow-up-right"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- Sync Status -->
+  <div class="card section">
+    <div class="section-header-row">
+      <h2 class="section-title">
+        <i class="bi bi-arrow-repeat"></i>
+        Sync Status
+      </h2>
+      <button class="btn-secondary" (click)="onSyncNow()" [disabled]="!status?.configured">
+        <i class="bi bi-cloud-arrow-up"></i> Sync Now
+      </button>
+    </div>
+
+    <div class="not-configured" *ngIf="!status?.configured">
+      Sheet not configured. Set up a sheet above to enable sync.
+    </div>
+
+    <div class="table-status-list" *ngIf="status?.configured">
+      <div
+        class="table-status-row"
+        *ngFor="let name of tableNames()"
+        [class.status-success]="status!.tableStatuses[name].success"
+        [class.status-fail]="!status!.tableStatuses[name].success"
+      >
+        <i class="bi" [ngClass]="status!.tableStatuses[name].success ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+        <span class="table-name">{{ name }}</span>
+        <span class="sync-time">{{ formatTime(status!.tableStatuses[name].timestamp) }}</span>
+        <span class="sync-error" *ngIf="!status!.tableStatuses[name].success">
+          {{ status!.tableStatuses[name].error }}
+        </span>
+      </div>
+      <div class="table-status-row no-sync" *ngIf="tableNames().length === 0">
+        No sync performed yet. Click "Sync Now" to start.
+      </div>
+    </div>
+  </div>
+
+  <!-- Restore from Sheet -->
+  <div class="card section">
+    <h2 class="section-title">
+      <i class="bi bi-cloud-arrow-down"></i>
+      Restore Database from Sheet
+    </h2>
+    <p class="restore-hint">
+      Reads all rows from each sheet tab and upserts them into the database.
+      Existing records are updated; new ones are inserted. Nothing is deleted.
+    </p>
+
+    <div class="not-configured" *ngIf="!status?.configured">
+      Sheet not configured. Set up a sheet above first.
+    </div>
+
+    <div *ngIf="status?.configured">
+      <div class="confirm-box" *ngIf="showRestoreConfirm">
+        <span>Repopulate database from sheet. Continue?</span>
+        <div class="confirm-actions">
+          <button class="btn-danger" (click)="onRestore()">Yes, Restore</button>
+          <button class="btn-secondary" (click)="onRestoreCancel()">Cancel</button>
+        </div>
+      </div>
+
+      <button
+        class="btn-warning"
+        (click)="onRestoreConfirm()"
+        [disabled]="loading || showRestoreConfirm"
+        *ngIf="!showRestoreConfirm"
+      >
+        <i class="bi bi-cloud-arrow-down"></i>
+        {{ loading ? 'Restoring...' : 'Restore from Sheet' }}
+      </button>
+
+      <div class="msg-success" *ngIf="restoreMessage">
+        <i class="bi bi-check-circle-fill"></i> {{ restoreMessage }}
+      </div>
+      <div class="msg-error" *ngIf="restoreError">
+        <i class="bi bi-exclamation-circle-fill"></i> {{ restoreError }}
+      </div>
+    </div>
+  </div>
+</div>

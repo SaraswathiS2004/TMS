@@ -96,21 +96,33 @@ public class AdminServlet extends HttpServlet {
         }
         try {
             GoogleSheetService sheetService = GoogleSheetService.getInstance();
+            System.out.println("[Restore] credentialsPath=" + config.getCredentialsPath());
+            System.out.println("[Restore] spreadsheetId=" + config.getSpreadsheetId());
             sheetService.ensureInitialized(config.getCredentialsPath());
+            System.out.println("[Restore] GoogleSheetService initialized OK");
 
             // Restore in FK-safe order: Functions → Invitations → Person_Functions
             DBTable[] tables = { new FunctionsTable(), new InvitationsTable(), new PersonFunctionsTable() };
             try (Connection conn = TmsDB.openConnection()) {
+                System.out.println("[Restore] DB connection opened: " + conn);
                 for (DBTable table : tables) {
+                    System.out.println("[Restore] Reading sheet tab: " + table.getTableName());
                     List<List<Object>> rows = sheetService.readTableRows(
                         config.getSpreadsheetId(), table.getTableName());
+                    System.out.println("[Restore] Rows read for " + table.getTableName() + ": " + rows.size());
+                    if (!rows.isEmpty()) {
+                        System.out.println("[Restore] First row sample: " + rows.get(0));
+                    }
                     table.upsertRows(conn, rows);
+                    System.out.println("[Restore] upsertRows done for " + table.getTableName());
                 }
             }
+            System.out.println("[Restore] All tables restored successfully.");
             writeJson(response, HttpServletResponse.SC_OK,
                 "{\"status\":\"SUCCESS\",\"message\":\"Database repopulated from sheet.\"}");
         } catch (Exception e) {
             System.err.println("[AdminServlet] Restore error: " + e);
+            e.printStackTrace();
             writeJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                 "{\"status\":\"FAIL\",\"message\":" + MAPPER.writeValueAsString(e.getMessage()) + "}");
         }

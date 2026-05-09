@@ -55,8 +55,10 @@ public class InvitationsTable extends AbstractDBTable {
             " ON DUPLICATE KEY UPDATE" +
             "  NAME=VALUES(NAME), CITY=VALUES(CITY), RELATION_TYPE=VALUES(RELATION_TYPE)," +
             "  NUMBER_OF_PEOPLE_WILL_COME=VALUES(NUMBER_OF_PEOPLE_WILL_COME), INVITED_STATUS=VALUES(INVITED_STATUS)";
+        System.out.println("[InvitationsTable] upsertRows called with " + rows.size() + " rows");
         PreparedStatement pre = conn.prepareStatement(sql);
         for (List<Object> row : rows) {
+            System.out.println("[InvitationsTable] Binding row: " + row);
             pre.setInt(1, Integer.parseInt(String.valueOf(row.get(0))));
             pre.setString(2, String.valueOf(row.get(1)));
             pre.setString(3, String.valueOf(row.get(2)));
@@ -65,6 +67,8 @@ public class InvitationsTable extends AbstractDBTable {
             pre.setString(6, String.valueOf(row.get(5)));
             pre.addBatch();
         }
-        pre.executeBatch();
+        int[] results = pre.executeBatch();
+        System.out.println("[InvitationsTable] executeBatch results length: " + results.length);
+        System.out.println("[InvitationsTable] autoCommit=" + conn.getAutoCommit());
     }
 }

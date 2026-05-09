@@ -45,13 +45,17 @@ public class PersonFunctionsTable extends AbstractDBTable {
         String sql =
             "INSERT INTO Person_Functions (PERSON_ID, FUNCTION_ID, INVITED_STATUS) VALUES (?, ?, ?)" +
             " ON DUPLICATE KEY UPDATE INVITED_STATUS=VALUES(INVITED_STATUS)";
+        System.out.println("[PersonFunctionsTable] upsertRows called with " + rows.size() + " rows");
         PreparedStatement pre = conn.prepareStatement(sql);
         for (List<Object> row : rows) {
+            System.out.println("[PersonFunctionsTable] Binding row: " + row);
             pre.setInt(1, Integer.parseInt(String.valueOf(row.get(0))));
             pre.setInt(2, Integer.parseInt(String.valueOf(row.get(1))));
             pre.setString(3, String.valueOf(row.get(2)));
             pre.addBatch();
         }
-        pre.executeBatch();
+        int[] results = pre.executeBatch();
+        System.out.println("[PersonFunctionsTable] executeBatch results length: " + results.length);
+        System.out.println("[PersonFunctionsTable] autoCommit=" + conn.getAutoCommit());
     }
 }

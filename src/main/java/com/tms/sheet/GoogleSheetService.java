@@ -93,13 +93,17 @@ public class GoogleSheetService {
     }
 
     public List<List<Object>> readTableRows(String spreadsheetId, String sheetName) throws IOException {
+        System.out.println("[GoogleSheetService] readTableRows: spreadsheetId=" + spreadsheetId + ", sheetName=" + sheetName);
         ValueRange response = sheetsService.spreadsheets().values()
             .get(spreadsheetId, sheetName)
             .execute();
         List<List<Object>> values = response.getValues();
+        System.out.println("[GoogleSheetService] raw values from sheet: " + (values == null ? "null" : values.size() + " rows (including header)"));
         if (values == null || values.size() <= 1) {
+            System.out.println("[GoogleSheetService] No data rows found (null or header-only). Returning empty.");
             return Collections.emptyList();
         }
+        System.out.println("[GoogleSheetService] Returning " + (values.size() - 1) + " data rows.");
         return values.subList(1, values.size());
     }
 }

@@ -46,14 +46,18 @@ public class FunctionsTable extends AbstractDBTable {
         String sql =
             "INSERT INTO Functions (ID, NAME, COLOR, DISPLAY_ORDER) VALUES (?, ?, ?, ?)" +
             " ON DUPLICATE KEY UPDATE NAME=VALUES(NAME), COLOR=VALUES(COLOR), DISPLAY_ORDER=VALUES(DISPLAY_ORDER)";
+        System.out.println("[FunctionsTable] upsertRows called with " + rows.size() + " rows");
         PreparedStatement pre = conn.prepareStatement(sql);
         for (List<Object> row : rows) {
+            System.out.println("[FunctionsTable] Binding row: " + row);
             pre.setInt(1, Integer.parseInt(String.valueOf(row.get(0))));
             pre.setString(2, String.valueOf(row.get(1)));
             pre.setString(3, String.valueOf(row.get(2)));
             pre.setInt(4, Integer.parseInt(String.valueOf(row.get(3))));
             pre.addBatch();
         }
-        pre.executeBatch();
+        int[] results = pre.executeBatch();
+        System.out.println("[FunctionsTable] executeBatch results length: " + results.length);
+        System.out.println("[FunctionsTable] autoCommit=" + conn.getAutoCommit());
     }
 }

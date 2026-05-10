@@ -41,6 +41,11 @@ public class AdminServlet extends HttpServlet {
         } else if ("/restore-from-sheet".equals(pathInfo)) {
             handleRestore(response);
         } else if ("/sync-now".equals(pathInfo)) {
+            if(ServerMode.isReadOnly()) {
+                writeJson(response, HttpServletResponse.SC_FORBIDDEN,
+                    "{\"status\":\"FAIL\",\"message\":\"Server is in read-only mode. Sync is disabled.\"}");
+                return;
+            }
             SheetSyncManager.getInstance().queueSyncAll();
             writeJson(response, HttpServletResponse.SC_OK,
                 "{\"status\":\"SUCCESS\",\"message\":\"Sync queued.\"}");

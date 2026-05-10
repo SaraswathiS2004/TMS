@@ -19,6 +19,10 @@ public class ServerMode {
         }
     }
 
+    public static boolean isReadOnly() {
+       return getCurrent() == Mode.READ_ONLY;
+    }
+
     public static void setCurrent(Mode mode) {
         ConfigRegistry.get("sheet").set(KEY, mode.name());
     }

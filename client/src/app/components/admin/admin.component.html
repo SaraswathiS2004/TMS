@@ -1,6 +1,48 @@
 <div class="admin-page">
   <h1 class="page-title">Admin Settings</h1>
 
+  <!-- Setup Mode -->
+  <div class="card section">
+    <h2 class="section-title">
+      <i class="bi bi-hdd-network"></i>
+      Setup Mode
+    </h2>
+
+    <div class="field-group">
+      <label class="field-label">Mode</label>
+      <div class="radio-group">
+        <label class="radio-option">
+          <input type="radio" name="serverMode" value="READ_WRITE" [(ngModel)]="serverMode" />
+          Primary
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="serverMode" value="READ_ONLY" [(ngModel)]="serverMode" />
+          Read Only
+        </label>
+      </div>
+      <span class="field-hint">
+        <ng-container *ngIf="serverMode === 'READ_WRITE'">
+          Primary — full access to add, edit, and delete records.
+        </ng-container>
+        <ng-container *ngIf="serverMode === 'READ_ONLY'">
+          Read Only — viewing data only; all write operations are disabled.
+        </ng-container>
+      </span>
+    </div>
+
+    <button class="btn-primary" (click)="onSetMode()">
+      <i class="bi bi-floppy"></i>
+      Save Mode
+    </button>
+
+    <div class="msg-success" *ngIf="modeMessage">
+      <i class="bi bi-check-circle-fill"></i> {{ modeMessage }}
+    </div>
+    <div class="msg-error" *ngIf="modeError">
+      <i class="bi bi-exclamation-circle-fill"></i> {{ modeError }}
+    </div>
+  </div>
+
   <!-- Sheet Configuration -->
   <div class="card section">
     <h2 class="section-title">
@@ -22,10 +64,10 @@
     <div class="field-group">
       <label class="field-label">Sheet Action</label>
       <div class="radio-group">
-        <label class="radio-option">
-          <input type="radio" name="setupAction" value="create" [(ngModel)]="setupAction" />
-          Create new spreadsheet
-        </label>
+<!--        <label class="radio-option">-->
+<!--          <input type="radio" name="setupAction" value="create" [(ngModel)]="setupAction" />-->
+<!--          Create new spreadsheet-->
+<!--        </label>-->
         <label class="radio-option">
           <input type="radio" name="setupAction" value="link" [(ngModel)]="setupAction" />
           Link existing spreadsheet
@@ -44,12 +86,12 @@
     </div>
 
     <div class="field-group" *ngIf="setupAction === 'link'">
-      <label class="field-label">Spreadsheet ID</label>
+      <label class="field-label">Spreadsheet Link</label>
       <input
         class="field-input"
         type="text"
         [(ngModel)]="spreadsheetIdInput"
-        placeholder="Paste spreadsheet ID from the URL"
+        placeholder="Paste spreadsheet Link or ID here"
       />
     </div>
 

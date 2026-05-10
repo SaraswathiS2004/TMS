@@ -16,6 +16,7 @@ export interface SheetSyncStatus {
   lastSyncError: string | null;
   lastSyncTimestamp: number;
   tableStatuses: { [tableName: string]: TableSyncInfo };
+  serverMode: 'READ_WRITE' | 'READ_ONLY' | null;
 }
 
 export interface AdminApiMessage {
@@ -51,5 +52,9 @@ export class AdminService {
 
   syncNow(): Observable<AdminApiMessage> {
     return this.http.post<AdminApiMessage>(`${this.baseUrl}/sync-now`, {});
+  }
+
+  setServerMode(mode: 'READ_WRITE' | 'READ_ONLY'): Observable<AdminApiMessage> {
+    return this.http.post<AdminApiMessage>(`${this.baseUrl}/set-mode`, { mode });
   }
 }

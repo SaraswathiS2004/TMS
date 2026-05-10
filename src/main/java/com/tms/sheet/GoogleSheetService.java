@@ -80,6 +80,12 @@ public class GoogleSheetService {
         List<List<Object>> allValues = new ArrayList<>();
         allValues.add(new ArrayList<>(table.getColumnHeaders()));
         allValues.addAll(table.fetchAllRows(conn));
+        if(allValues.size() <= 1) {
+            System.out.println("[GoogleSheetService] No data rows to sync for table " + sheetName + ". Only header will be written. Hence skipped.");
+            return;
+        } else {
+            System.out.println("[GoogleSheetService] Syncing " + (allValues.size() - 1) + " data rows for table " + sheetName);
+        }
 
         sheetsService.spreadsheets().values()
             .clear(spreadsheetId, sheetName, new ClearValuesRequest())

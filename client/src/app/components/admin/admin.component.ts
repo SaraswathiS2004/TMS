@@ -18,6 +18,10 @@ export class AdminComponent implements OnInit, OnDestroy {
   spreadsheetTitle = 'TMS Backup';
   spreadsheetIdInput = '';
 
+  serverMode: 'READ_WRITE' | 'READ_ONLY' = 'READ_WRITE';
+  modeMessage = '';
+  modeError = '';
+
   loading = false;
   setupMessage = '';
   setupError = '';
@@ -40,8 +44,30 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   loadStatus(): void {
     this.adminService.getSheetStatus().subscribe({
-      next: (s) => { this.status = s; },
+      next: (s) => {
+        this.status = s;
+        if (s.serverMode) {
+          this.serverMode = s.serverMode;
+        }
+      },
       error: () => {}
+    });
+  }
+
+  onSetMode(): void {
+    this.modeMessage = '';
+    this.modeError = '';
+    this.adminService.setServerMode(this.serverMode).subscribe({
+      next: (res) => {
+        if (res.status === 'SUCCESS') {
+          this.modeMessage = `Mode set to ${this.serverMode === 'READ_WRITE' ? 'Primary' : 'Read Only'}.`;
+        } else {
+          this.modeError = res.message;
+        }
+      },
+      error: (err) => {
+        this.modeError = err.error?.message || 'Failed to update mode.';
+      }
     });
   }
 
@@ -54,7 +80,13 @@ export class AdminComponent implements OnInit, OnDestroy {
     if (this.setupAction === 'create') {
       payload.title = this.spreadsheetTitle;
     } else {
-      payload.spreadsheetId = this.spreadsheetIdInput;
+      const extractedId = this.extractSpreadsheetId(this.spreadsheetIdInput);
+      if (!extractedId) {
+        this.loading = false;
+        this.setupError = 'Invalid spreadsheet link or ID. Please paste a valid Google Sheets URL or ID.';
+        return;
+      }
+      payload.spreadsheetId = extractedId;
     }
 
     this.adminService.setupSheet(payload).subscribe({
@@ -120,5 +152,32 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   tableNames(): string[] {
     return this.status?.tableStatuses ? Object.keys(this.status.tableStatuses) : [];
+  }
+
+  /**
+   * Extracts the spreadsheet ID from a Google Sheets URL, or returns the
+   * trimmed input if it already looks like a raw ID.
+   *
+   * Supported URL shapes:
+   *   https://docs.google.com/spreadsheets/d/<ID>/edit#gid=0
+   *   https://docs.google.com/spreadsheets/d/<ID>/edit?usp=sharing
+   *   https://docs.google.com/spreadsheets/d/<ID>
+   *
+   * Returns null when no valid ID can be extracted.
+   */
+  private extractSpreadsheetId(input: string): string | null {
+    if (!input) { return null; }
+    const trimmed = input.trim();
+    if (!trimmed) { return null; }
+
+    // Match /d/<ID> in any Google Sheets URL.
+    const urlMatch = trimmed.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+    if (urlMatch && urlMatch[1]) {
+      return urlMatch[1];
+    }
+
+    // Fallback: input is not a recognizable URL — assume it's already an ID
+    // and return it unchanged.
+    return trimmed;
   }
 }

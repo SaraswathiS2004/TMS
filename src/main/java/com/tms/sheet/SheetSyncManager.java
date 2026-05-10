@@ -38,6 +38,10 @@ public class SheetSyncManager {
     }
 
     public void queueSync(DBTable table) {
+        if(ServerMode.isReadOnly()) {
+            System.out.println("[SheetSync] Server is in read-only mode, skipping sync for " + table.getTableName());
+            return;
+        }
         SheetConfig config = SheetConfig.getInstance();
         if (!config.isConfigured()) {
             return;

@@ -4,6 +4,7 @@ import { AddPersonComponent } from './components/add-person/add-person.component
 import { PeopleListComponent } from './components/people-list/people-list.component';
 import { CityGroupComponent } from './components/city-group/city-group.component';
 import { FunctionManagerComponent } from './components/function-manager/function-manager.component';
+import { AdminComponent } from './components/admin/admin.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -11,5 +12,6 @@ export const routes: Routes = [
   { path: 'add', component: AddPersonComponent },
   { path: 'list', component: PeopleListComponent },
   { path: 'city-group', component: CityGroupComponent },
-  { path: 'functions', component: FunctionManagerComponent }
+  { path: 'functions', component: FunctionManagerComponent },
+  { path: 'admin', component: AdminComponent }
 ];

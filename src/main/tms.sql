@@ -49,20 +49,20 @@ CREATE TABLE IF NOT EXISTS Person_Functions (
     CONSTRAINT fk_pf_function FOREIGN KEY (FUNCTION_ID) REFERENCES Functions(ID)   ON DELETE CASCADE
 );
 
--- =============================================================
--- Sample seed data (optional — remove before production use)
--- =============================================================
+-- -- =============================================================
+-- -- Sample seed data (optional — remove before production use)
+-- -- =============================================================
 
--- Seed functions
-INSERT INTO Functions (NAME, COLOR, DISPLAY_ORDER) VALUES
-    ('Engagement', '#7c3aed', 1),
-    ('Marriage',   '#dc2626', 2);
+-- -- Seed functions
+-- INSERT INTO Functions (NAME, COLOR, DISPLAY_ORDER) VALUES
+--     ('Engagement', '#7c3aed', 1),
+--     ('Marriage',   '#dc2626', 2);
 
--- Seed invitees
-INSERT INTO Invitations (NAME, CITY, RELATION_TYPE, NUMBER_OF_PEOPLE_WILL_COME, INVITED_STATUS) VALUES
-    ('Raman',     'Tirunelveli', 'CLOSE',    4, 'NOT_INVITED'),
-    ('Murugan',   'Madurai',     'DISTANCE', 2, 'NOT_INVITED'),
-    ('Priya',     'Chennai',     'FRIENDS',  3, 'NOT_INVITED');
+-- -- Seed invitees
+-- INSERT INTO Invitations (NAME, CITY, RELATION_TYPE, NUMBER_OF_PEOPLE_WILL_COME, INVITED_STATUS) VALUES
+--     ('Raman',     'Tirunelveli', 'CLOSE',    4, 'NOT_INVITED'),
+--     ('Murugan',   'Madurai',     'DISTANCE', 2, 'NOT_INVITED'),
+--     ('Priya',     'Chennai',     'FRIENDS',  3, 'NOT_INVITED');
 
 -- =============================================================
 -- Useful queries for reference

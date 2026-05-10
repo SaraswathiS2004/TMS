@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p /home/ram-20131/temp/TMS-ramalingam.s/src/main/java/com/tms/sheet/impl)",
+      "Bash(mkdir -p /home/ram-20131/temp/TMS-ramalingam.s/client/src/app/components/admin)"
+    ]
+  }
+}

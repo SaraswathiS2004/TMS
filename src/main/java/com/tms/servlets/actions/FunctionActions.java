@@ -3,6 +3,8 @@ package com.tms.servlets.actions;
 import com.tms.data.dto.Function;
 import com.tms.data.respository.TmsDB;
 import com.tms.servlets.message.Message;
+import com.tms.sheet.impl.FunctionsTable;
+import com.tms.sheet.impl.PersonFunctionsTable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -48,6 +50,7 @@ public class FunctionActions {
             if (rows > 0) {
                 message.setMessage("Function added successfully.");
                 message.setStatus(Message.Status.SUCCESS);
+                new FunctionsTable().triggerSync();
             } else {
                 message.setMessage("Could not add function.");
                 message.setStatus(Message.Status.FAIL);
@@ -73,6 +76,7 @@ public class FunctionActions {
             if (rows > 0) {
                 message.setMessage("Function updated.");
                 message.setStatus(Message.Status.SUCCESS);
+                new FunctionsTable().triggerSync();
             } else {
                 message.setMessage("Function not found.");
                 message.setStatus(Message.Status.FAIL);
@@ -93,6 +97,8 @@ public class FunctionActions {
             if (rows > 0) {
                 message.setMessage("Function deleted.");
                 message.setStatus(Message.Status.SUCCESS);
+                new FunctionsTable().triggerSync();
+                new PersonFunctionsTable().triggerSync();
             } else {
                 message.setMessage("Function not found.");
                 message.setStatus(Message.Status.FAIL);

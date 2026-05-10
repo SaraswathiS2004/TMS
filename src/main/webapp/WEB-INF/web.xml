@@ -2,6 +2,22 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
+    <!-- configM: sheet config properties file -->
+    <context-param>
+        <param-name>configwatch.files</param-name>
+        <param-value>sheet=WEB-INF/classes/sheet-config.properties</param-value>
+    </context-param>
+
+    <!-- ① configM listener — must come before AppContextListener -->
+    <listener>
+        <listener-class>com.configwatch.web.ConfigWatchServletListener</listener-class>
+    </listener>
+
+    <!-- ② TMS app listener -->
+    <listener>
+        <listener-class>com.tms.AppContextListener</listener-class>
+    </listener>
+
     <filter>
         <filter-name>CorsFilter</filter-name>
         <filter-class>com.tms.servlets.CorsFilter</filter-class>
@@ -9,6 +25,16 @@
     <filter-mapping>
         <filter-name>CorsFilter</filter-name>
         <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- Blocks non-GET requests when server is in READ_ONLY mode -->
+    <filter>
+        <filter-name>ServerModeFilter</filter-name>
+        <filter-class>com.tms.servlets.ServerModeFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>ServerModeFilter</filter-name>
+        <url-pattern>/api/*</url-pattern>
     </filter-mapping>
 
     <servlet>
@@ -36,6 +62,15 @@
     <servlet-mapping>
         <servlet-name>PersonFunctionServlet</servlet-name>
         <url-pattern>/api/person-function</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>AdminServlet</servlet-name>
+        <servlet-class>com.tms.servlets.AdminServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminServlet</servlet-name>
+        <url-pattern>/api/admin/*</url-pattern>
     </servlet-mapping>
 
 </web-app>

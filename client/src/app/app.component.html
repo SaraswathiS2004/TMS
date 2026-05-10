@@ -41,11 +41,23 @@
     </div>
   </div>
 
-  <button class="lang-toggle" (click)="toggleLanguage()" [title]="'common.language' | translate">
-    <i class="bi bi-translate"></i>
-    <span>{{ isTamil ? 'English' : 'தமிழ்' }}</span>
-  </button>
+  <div class="nav-actions">
+    <a routerLink="/admin" class="admin-link" title="Admin Settings">
+      <i class="bi bi-gear-fill"></i>
+      <span class="sync-dot sync-fail" *ngIf="showSyncWarning" title="Sheet sync failed"></span>
+    </a>
+    <button class="lang-toggle" (click)="toggleLanguage()" [title]="'common.language' | translate">
+      <i class="bi bi-translate"></i>
+      <span>{{ isTamil ? 'English' : 'தமிழ்' }}</span>
+    </button>
+  </div>
 </nav>
+
+<div class="sync-warning-banner" *ngIf="showSyncWarning">
+  <i class="bi bi-exclamation-triangle-fill"></i>
+  Google Sheets sync failed: {{ syncStatus?.lastSyncError }}
+  <a routerLink="/admin">Check Admin Settings</a>
+</div>
 
 <main class="main-content">
   <router-outlet></router-outlet>

@@ -10,9 +10,9 @@ public class AppContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         String classesDir = sce.getServletContext().getRealPath("/WEB-INF/classes");
-        SheetConfig.init(classesDir);
+        SheetConfig.setClassesDir(classesDir);
         SheetSyncManager.getInstance().init();
-        System.out.println("[AppContextListener] SheetConfig loaded. Configured: " +
+        System.out.println("[AppContextListener] Started. Sheet configured: " +
             SheetConfig.getInstance().isConfigured());
     }
 

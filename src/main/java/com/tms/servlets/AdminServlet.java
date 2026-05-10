@@ -6,6 +6,7 @@ import com.tms.data.respository.TmsDB;
 import com.tms.sheet.DBTable;
 import com.tms.sheet.GoogleSheetService;
 import com.tms.sheet.SheetConfig;
+import com.tms.sheet.ServerMode;
 import com.tms.sheet.SheetSyncManager;
 import com.tms.sheet.impl.FunctionsTable;
 import com.tms.sheet.impl.InvitationsTable;
@@ -25,8 +26,11 @@ public class AdminServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        writeJson(response, HttpServletResponse.SC_OK,
-            MAPPER.writeValueAsString(SheetSyncManager.getInstance().getStatus()));
+        String statusJson = MAPPER.writeValueAsString(SheetSyncManager.getInstance().getStatus());
+        // Inject serverMode into the response JSON
+        String withMode = statusJson.substring(0, statusJson.length() - 1)
+            + ",\"serverMode\":\"" + ServerMode.getCurrent().name() + "\"}";
+        writeJson(response, HttpServletResponse.SC_OK, withMode);
     }
 
     @Override
@@ -40,9 +44,25 @@ public class AdminServlet extends HttpServlet {
             SheetSyncManager.getInstance().queueSyncAll();
             writeJson(response, HttpServletResponse.SC_OK,
                 "{\"status\":\"SUCCESS\",\"message\":\"Sync queued.\"}");
+        } else if ("/set-mode".equals(pathInfo)) {
+            handleSetMode(request, response);
         } else {
             writeJson(response, HttpServletResponse.SC_NOT_FOUND,
                 "{\"status\":\"FAIL\",\"message\":\"Unknown endpoint.\"}");
+        }
+    }
+
+    private void handleSetMode(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        JsonNode body = MAPPER.readTree(request.getReader());
+        String modeStr = body.path("mode").asText();
+        try {
+            ServerMode.Mode mode = ServerMode.Mode.valueOf(modeStr);
+            ServerMode.setCurrent(mode);
+            writeJson(response, HttpServletResponse.SC_OK,
+                "{\"status\":\"SUCCESS\",\"serverMode\":\"" + mode.name() + "\"}");
+        } catch (IllegalArgumentException e) {
+            writeJson(response, HttpServletResponse.SC_BAD_REQUEST,
+                "{\"status\":\"FAIL\",\"message\":\"Invalid mode. Use READ_WRITE or READ_ONLY.\"}");
         }
     }
 

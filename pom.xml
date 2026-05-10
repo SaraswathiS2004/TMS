@@ -8,7 +8,7 @@
     <artifactId>tms</artifactId>
     <version>1.0-SNAPSHOT</version>
     <build>
-        <finalName>Tms</finalName>
+        <finalName>tms</finalName>
         <plugins>
             <plugin>
                 <groupId>com.github.eirslett</groupId>
@@ -41,7 +41,7 @@
                         </goals>
                         <phase>generate-resources</phase>
                         <configuration>
-                            <arguments>run build -- --base-href /Tms/</arguments>
+                            <arguments>run build -- --base-href /tms/</arguments>
                         </configuration>
                     </execution>
                 </executions>

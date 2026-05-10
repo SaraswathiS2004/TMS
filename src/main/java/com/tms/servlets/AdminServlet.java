@@ -1,3 +1,12 @@
+
+
+
+
+
+
+
+
+
 package com.tms.servlets;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -74,7 +83,6 @@ public class AdminServlet extends HttpServlet {
             config.setSpreadsheetId(spreadsheetId);
             config.save();
             SheetSyncManager.getInstance().init();
-            SheetSyncManager.getInstance().queueSyncAll();
 
             writeJson(response, HttpServletResponse.SC_OK,
                 "{\"status\":\"SUCCESS\"" +

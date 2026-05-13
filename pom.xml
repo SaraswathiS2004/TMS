@@ -122,7 +122,7 @@
         <dependency>
             <groupId>com.ormx</groupId>
             <artifactId>ormx-core</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
 
         <!-- configm, mysql, hikari, flyway, google-sheets, google-auth are all bundled inside ormx-core -->

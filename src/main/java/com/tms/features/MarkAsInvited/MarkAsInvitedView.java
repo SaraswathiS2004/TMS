@@ -3,29 +3,23 @@ package com.tms.features.MarkAsInvited;
 import com.tms.data.dto.InvitedStatus;
 import com.tms.features.input.Input;
 
-import java.sql.SQLException;
 import java.util.Scanner;
 
 public class MarkAsInvitedView {
 
-    private MarkAsInvitedModel invitedModel;
+    private final MarkAsInvitedModel invitedModel = new MarkAsInvitedModel(this);
 
-    public MarkAsInvitedView(){
-        this.invitedModel = new MarkAsInvitedModel(this);
-    }
-
-    public void init() throws SQLException, ClassNotFoundException {
+    public void init() {
         Scanner scan = Input.getInstance();
         System.out.println("Enter the Id Of People");
         int id = scan.nextInt();
         System.out.println("Enter The Type Of Invited");
         System.out.println("Example : MARRIAGE_INVITED , ENGAGEMENT_INVITED , BOTH_INVITED");
         InvitedStatus invitedStatus = InvitedStatus.valueOf(scan.next().toUpperCase());
-
-        invitedModel.setData(id , invitedStatus);
+        invitedModel.setData(id, invitedStatus);
     }
 
-    public void showMessage(String message){
+    public void showMessage(String message) {
         System.out.println(message);
     }
 }

@@ -1,11 +1,8 @@
 package com.tms.data.dto;
 
-import com.tms.data.respository.TmsDB;
+import com.ormx.OrmX;
+import com.tms.db.InvitationsTable;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -23,40 +20,23 @@ public class People {
     // key: functionId (as string for JSON compat), value: "INVITED" | "NOT_INVITED"
     private Map<String, String> functionStatuses = new LinkedHashMap<>();
 
-    private Connection conn;
-
-    public People() throws SQLException, ClassNotFoundException {
-        conn = TmsDB.getInstance().getConnection();
-    }
-
-    public People(ResultSet resultSet) throws SQLException, ClassNotFoundException {
-        this();
-        setId(resultSet.getInt("ID"));
-        setName(resultSet.getString("NAME"));
-        setCity(resultSet.getString("CITY"));
-        setNumberOfPerson(resultSet.getInt("NUMBER_OF_PEOPLE_WILL_COME"));
-        setInvitedStatus(InvitedStatus.valueOf(resultSet.getString("INVITED_STATUS")));
-        setRelationType(RelationType.valueOf(resultSet.getString("RELATION_TYPE")));
-    }
+    public People() {}
 
     // storeData kept for CLI backward compatibility
-    public String storeData() throws SQLException {
+    public String storeData() {
         try {
-            PreparedStatement pre = conn.prepareStatement(
-                "INSERT INTO Invitations (NAME, CITY, RELATION_TYPE, NUMBER_OF_PEOPLE_WILL_COME, INVITED_STATUS) " +
-                "VALUES (?, ?, ?, ?, ?)"
-            );
-            pre.setString(1, name);
-            pre.setString(2, city);
-            pre.setString(3, relationType.toString());
-            pre.setInt(4, numberOfPerson);
-            pre.setString(5, invitedStatus.toString());
-            int rowsAffected = pre.executeUpdate();
-            return rowsAffected > 0 ? "Successfully Added!" : "Cannot add person";
+            OrmX.insert(InvitationsTable.TABLE_NAME)
+                .set(InvitationsTable.NAME, name)
+                .set(InvitationsTable.CITY, city)
+                .set(InvitationsTable.RELATION_TYPE, relationType.toString())
+                .set(InvitationsTable.NUMBER_OF_PEOPLE_WILL_COME, numberOfPerson)
+                .set(InvitationsTable.INVITED_STATUS, invitedStatus.toString())
+                .execute();
+            return "Successfully Added!";
         } catch (Exception e) {
             System.out.println(e);
+            return "Cannot add person";
         }
-        return "";
     }
 
     public InvitedStatus getInvitedStatus() { return invitedStatus; }

@@ -2,7 +2,12 @@
     <servers>
         <!-- Read configM from GitHub Packages -->
         <server>
-            <id>github-configM</id>
+            <id>github-configm</id>
+            <username>${env.GITHUB_ACTOR}</username>
+            <password>${env.PACKAGES_TOKEN}</password>
+        </server>
+        <server>
+            <id>github-orm</id>
             <username>${env.GITHUB_ACTOR}</username>
             <password>${env.PACKAGES_TOKEN}</password>
         </server>

@@ -1,19 +1,15 @@
 package com.tms.features.peopleAdded;
 
-import com.tms.data.dto.InvitedStatus;
-import com.tms.data.dto.People;
 import com.tms.data.dto.RelationType;
 import com.tms.features.input.Input;
 
-import java.sql.SQLException;
 import java.util.Scanner;
 
 public class PeoplesAddedView {
-    private PeopleAddedModel peopleAddedModel;
-    public PeoplesAddedView(){
-        this.peopleAddedModel = new PeopleAddedModel(this);
-    }
-    public void init() throws SQLException, ClassNotFoundException {
+
+    private final PeopleAddedModel peopleAddedModel = new PeopleAddedModel(this);
+
+    public void init() {
         Scanner scan = Input.getInstance();
         System.out.println("Enter the Name");
         String name = scan.next();
@@ -25,11 +21,10 @@ public class PeoplesAddedView {
         System.out.println("Example :");
         System.out.println("CLOSE , DISTANCE , FRIENDS");
         RelationType type = RelationType.valueOf(scan.next().toUpperCase());
-
-        peopleAddedModel.setData(name , city , numberOfCount , type);
-
+        peopleAddedModel.setData(name, city, numberOfCount, type);
     }
-    public void showMessage(String message){
+
+    public void showMessage(String message) {
         System.out.println(message);
     }
 }

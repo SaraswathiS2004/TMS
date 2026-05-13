@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema database="Tms">
+
+    <!-- Functions must be created before Invitations and Person_Functions (FK deps) -->
+    <table name="Functions" sync="true">
+        <column name="ID"            type="INT"          primaryKey="true" autoIncrement="true"/>
+        <column name="NAME"          type="VARCHAR(100)"  notNull="true"/>
+        <column name="COLOR"         type="VARCHAR(30)"   notNull="true" default="#4f46e5"/>
+        <column name="DISPLAY_ORDER" type="INT"           notNull="true" default="0"/>
+    </table>
+
+    <table name="Invitations" sync="true">
+        <column name="ID"                         type="INT"          primaryKey="true" autoIncrement="true"/>
+        <column name="NAME"                       type="VARCHAR(100)"  notNull="true"/>
+        <column name="CITY"                       type="VARCHAR(100)"  notNull="true" default=""/>
+        <column name="RELATION_TYPE"              type="VARCHAR(20)"   notNull="true" default="CLOSE"/>
+        <column name="NUMBER_OF_PEOPLE_WILL_COME" type="INT"           notNull="true" default="1"/>
+        <column name="INVITED_STATUS"             type="VARCHAR(30)"   notNull="true" default="NOT_INVITED"/>
+    </table>
+
+    <!-- Composite-PK join table: each person ↔ function entry tracks per-function status -->
+    <table name="Person_Functions" sync="true">
+        <column name="PERSON_ID"     type="INT"          notNull="true"/>
+        <column name="FUNCTION_ID"   type="INT"          notNull="true"/>
+        <column name="INVITED_STATUS" type="VARCHAR(30)"  notNull="true" default="NOT_INVITED"/>
+        <primaryKey columns="PERSON_ID,FUNCTION_ID"/>
+        <foreignKey column="PERSON_ID"   references="Invitations.ID" onDelete="CASCADE"/>
+        <foreignKey column="FUNCTION_ID" references="Functions.ID"   onDelete="CASCADE"/>
+    </table>
+
+</schema>

@@ -1,56 +1,27 @@
 package com.tms.features.list.allpeople;
 
-import com.tms.data.respository.TmsDB;
+import com.ormx.OrmX;
+import com.ormx.db.query.Condition;
+import com.tms.db.InvitationsTable;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 
 class AllPeopleModel {
 
-    private AllPeopleView allPeopleView;
-
-    private Connection conn;
-    public AllPeopleModel(AllPeopleView allPeopleView) throws SQLException, ClassNotFoundException {
-        this.allPeopleView = allPeopleView;
-        conn = TmsDB.getInstance().getConnection();
+    public List<Map<String, Object>> displayAllPeople() {
+        return OrmX.select(InvitationsTable.TABLE_NAME).fetchRaw();
     }
 
-    public ResultSet DisplayAllPeople() throws SQLException {
-        try {
-            PreparedStatement pre = conn.prepareStatement("SELECT * FROM Invitations");
-            ResultSet set = pre.executeQuery();
-            return set;
-        }
-        catch (Exception e){
-            System.out.println(e);
-        }
-        return null;
+    public List<Map<String, Object>> getPeopleById(String id) {
+        return OrmX.select(InvitationsTable.TABLE_NAME)
+            .where(Condition.eq(InvitationsTable.ID, Integer.parseInt(id)))
+            .fetchRaw();
     }
 
-    public ResultSet getPeopleById(String id) throws SQLException{
-        try {
-            PreparedStatement pre = conn.prepareStatement("SELECT * FROM Invitations WHERE ID = ?");
-            pre.setInt(1, Integer.parseInt(id));
-            ResultSet set = pre.executeQuery();
-            return set;
-        }
-        catch (Exception e){
-            System.out.println(e);
-        }
-        return null;
-    }
-    public ResultSet getPeopleByType(String inviteType) throws SQLException{
-        try {
-            PreparedStatement pre = conn.prepareStatement("SELECT * FROM Invitations WHERE  INVITED_STATUS = ?");
-            pre.setString(1 , inviteType);
-            ResultSet set = pre.executeQuery();
-            return set;
-        }
-        catch (Exception e){
-            System.out.println(e);
-        }
-        return null;
+    public List<Map<String, Object>> getPeopleByType(String inviteType) {
+        return OrmX.select(InvitationsTable.TABLE_NAME)
+            .where(Condition.eq(InvitationsTable.INVITED_STATUS, inviteType))
+            .fetchRaw();
     }
 }

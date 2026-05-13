@@ -108,8 +108,12 @@
 
     <repositories>
         <repository>
-            <id>github-rams</id>
+            <id>github-configm</id>
             <url>https://maven.pkg.github.com/RamS-Dot-Dev/configM</url>
+        </repository>
+         <repository>
+            <id>github-orm</id>
+            <url>https://maven.pkg.github.com/RamS-Dot-Dev/ORM</url>
         </repository>
     </repositories>
 

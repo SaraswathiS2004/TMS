@@ -111,10 +111,6 @@
             <id>github-rams</id>
             <url>https://maven.pkg.github.com/RamS-Dot-Dev/configM</url>
         </repository>
-        <repository>
-            <id>github-rams</id>
-            <url>https://maven.pkg.github.com/RamS-Dot-Dev/ORM</url>
-        </repository>
     </repositories>
 
     <dependencies>

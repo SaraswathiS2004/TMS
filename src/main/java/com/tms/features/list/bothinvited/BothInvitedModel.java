@@ -1,33 +1,17 @@
 package com.tms.features.list.bothinvited;
 
-import com.tms.data.respository.TmsDB;
-import com.tms.features.list.engagementinvited.EngagementInvitedView;
+import com.ormx.OrmX;
+import com.ormx.db.query.Condition;
+import com.tms.db.InvitationsTable;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 
 class BothInvitedModel {
 
-    private BothInvitedView bothInvitedView;
-
-    private Connection conn;
-    public BothInvitedModel(BothInvitedView bothInvitedView) throws SQLException, ClassNotFoundException {
-        this.bothInvitedView = bothInvitedView;
-        conn = TmsDB.getInstance().getConnection();
-    }
-
-    public ResultSet DisplayAllPeople() throws SQLException {
-        try {
-            PreparedStatement pre = conn.prepareStatement("SELECT * FROM Invitations WHERE INVITED_STATUS = ?");
-            pre.setString(1 , "BOTH_INVITED");
-            ResultSet set = pre.executeQuery();
-            return set;
-        }
-        catch (Exception e){
-            System.out.println(e);
-        }
-        return null;
+    public List<Map<String, Object>> displayAllPeople() {
+        return OrmX.select(InvitationsTable.TABLE_NAME)
+            .where(Condition.eq(InvitationsTable.INVITED_STATUS, "BOTH_INVITED"))
+            .fetchRaw();
     }
 }

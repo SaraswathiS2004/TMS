@@ -1,32 +1,17 @@
 package com.tms.features.list.engagementinvited;
 
-import com.tms.data.respository.TmsDB;
-import com.tms.features.list.marriageinvited.MarriageInvitedView;
+import com.ormx.OrmX;
+import com.ormx.db.query.Condition;
+import com.tms.db.InvitationsTable;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 
 class EngagementInvitedModel {
-    private EngagementInvitedView engagementInvitedView;
 
-    private Connection conn;
-    public EngagementInvitedModel(EngagementInvitedView engagementInvitedView) throws SQLException, ClassNotFoundException {
-        this.engagementInvitedView = engagementInvitedView;
-        conn = TmsDB.getInstance().getConnection();
-    }
-
-    public ResultSet DisplayAllPeople() throws SQLException {
-        try {
-            PreparedStatement pre = conn.prepareStatement("SELECT * FROM Invitations WHERE INVITED_STATUS = ?");
-            pre.setString(1 , "ENGAGEMENT_INVITED");
-            ResultSet set = pre.executeQuery();
-            return set;
-        }
-        catch (Exception e){
-            System.out.println(e);
-        }
-        return null;
+    public List<Map<String, Object>> displayAllPeople() {
+        return OrmX.select(InvitationsTable.TABLE_NAME)
+            .where(Condition.eq(InvitationsTable.INVITED_STATUS, "ENGAGEMENT_INVITED"))
+            .fetchRaw();
     }
 }

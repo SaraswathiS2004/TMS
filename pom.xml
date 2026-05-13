@@ -67,7 +67,7 @@
             <plugin>
                 <groupId>com.ormx</groupId>
                 <artifactId>ormx-maven-plugin</artifactId>
-                <version>1.0.0</version>
+                <version>1.0.1</version>
                 <configuration>
                     <schemaFile>src/main/resources/db-schema.xml</schemaFile>
                     <outputPackage>com.tms.db</outputPackage>
@@ -105,6 +105,12 @@
             <url>https://maven.pkg.github.com/SaraswathiS2004/TMS</url>
         </repository>
     </distributionManagement>
+ <pluginRepositories>
+      <pluginRepository>
+          <id>github-orm</id>
+          <url>https://maven.pkg.github.com/RamS-Dot-Dev/ORM</url>
+      </pluginRepository>
+  </pluginRepositories>
 
     <repositories>
         <repository>

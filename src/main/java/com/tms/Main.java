@@ -15,7 +15,8 @@ import java.util.Scanner;
 
 public class Main {
 
-    private static final String DB_URL  = "jdbc:mysql://localhost:3306/Tms";
+    private static final String DB_HOST = "localhost";
+    private static final String DB_PORT = "3306";
     private static final String DB_USER = "root";
     private static final String DB_PASS = "";
 
@@ -52,6 +53,9 @@ public class Main {
         try (InputStream schema = Main.class.getResourceAsStream("/db-schema.xml")) {
             if (schema != null) { SchemaRegistry.getInstance().load(schema); }
         }
-        ConnectionManager.init(DB_URL, DB_USER, DB_PASS);
+        String dbName  = SchemaRegistry.getInstance().getDatabaseName();
+        String jdbcUrl = "jdbc:mysql://" + DB_HOST + ":" + DB_PORT + "/" + dbName
+            + "?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+        ConnectionManager.init(jdbcUrl, DB_USER, DB_PASS);
     }
 }

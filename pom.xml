@@ -67,7 +67,7 @@
             <plugin>
                 <groupId>com.ormx</groupId>
                 <artifactId>ormx-maven-plugin</artifactId>
-                <version>1.0.3</version>
+                <version>1.0.4</version>
                 <configuration>
                     <schemaFile>src/main/resources/db-schema.xml</schemaFile>
                     <outputPackage>com.tms.db</outputPackage>
@@ -128,7 +128,7 @@
         <dependency>
             <groupId>com.ormx</groupId>
             <artifactId>ormx-core</artifactId>
-            <version>1.0.3</version>
+            <version>1.0.4</version>
         </dependency>
 
         <!-- configm, mysql, hikari, flyway, google-sheets, google-auth are all bundled inside ormx-core -->

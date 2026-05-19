@@ -6,8 +6,8 @@ import com.tms.data.dto.InvitedStatus;
 import com.tms.data.dto.People;
 import com.tms.data.dto.PeopleInvited;
 import com.tms.data.dto.RelationType;
-import com.tms.db.InvitationsTable;
-import com.tms.db.PersonFunctionsTable;
+import com.tms.db.Invitations;
+import com.tms.db.Person_Functions;
 import com.tms.servlets.message.Message;
 
 import java.util.ArrayList;
@@ -22,12 +22,12 @@ public class PeopleActions {
     public Message addPeople(People people) {
         Message message = new Message();
         try {
-            long newId = OrmX.insert(InvitationsTable.TABLE_NAME)
-                .set(InvitationsTable.NAME, people.getName())
-                .set(InvitationsTable.CITY, people.getCity())
-                .set(InvitationsTable.RELATION_TYPE, people.getRelationType().toString())
-                .set(InvitationsTable.NUMBER_OF_PEOPLE_WILL_COME, people.getNumberOfPerson())
-                .set(InvitationsTable.INVITED_STATUS, "NOT_INVITED")
+            long newId = OrmX.insert(Invitations.TABLE_NAME)
+                .set(Invitations.NAME, people.getName())
+                .set(Invitations.CITY, people.getCity())
+                .set(Invitations.RELATION_TYPE, people.getRelationType().toString())
+                .set(Invitations.NUMBER_OF_PEOPLE_WILL_COME, people.getNumberOfPerson())
+                .set(Invitations.INVITED_STATUS, "NOT_INVITED")
                 .execute();
 
             if (people.getInvitedFunctionIds() != null) {
@@ -58,16 +58,16 @@ public class PeopleActions {
         Message message = new Message();
         try {
             if (people.getName() != null && !people.getName().isEmpty()) {
-                OrmX.update(InvitationsTable.TABLE_NAME)
-                    .set(InvitationsTable.NAME, people.getName())
-                    .set(InvitationsTable.CITY, people.getCity())
-                    .set(InvitationsTable.RELATION_TYPE, people.getRelationType().toString())
-                    .set(InvitationsTable.NUMBER_OF_PEOPLE_WILL_COME, people.getNumberOfPerson())
-                    .where(Condition.eq(InvitationsTable.ID, people.getId()))
+                OrmX.update(Invitations.TABLE_NAME)
+                    .set(Invitations.NAME, people.getName())
+                    .set(Invitations.CITY, people.getCity())
+                    .set(Invitations.RELATION_TYPE, people.getRelationType().toString())
+                    .set(Invitations.NUMBER_OF_PEOPLE_WILL_COME, people.getNumberOfPerson())
+                    .where(Condition.eq(Invitations.ID, people.getId()))
                     .execute();
             }
-            OrmX.delete(PersonFunctionsTable.TABLE_NAME)
-                .where(Condition.eq(PersonFunctionsTable.PERSON_ID, people.getId()))
+            OrmX.delete(Person_Functions.TABLE_NAME)
+                .where(Condition.eq(Person_Functions.PERSON_ID, people.getId()))
                 .execute();
             if (people.getInvitedFunctionIds() != null) {
                 insertFunctionAssociations(people.getId(), people.getInvitedFunctionIds());
@@ -84,8 +84,8 @@ public class PeopleActions {
     public Message updateFunctionInvitations(int personId, List<Integer> functionIds) {
         Message message = new Message();
         try {
-            OrmX.delete(PersonFunctionsTable.TABLE_NAME)
-                .where(Condition.eq(PersonFunctionsTable.PERSON_ID, personId))
+            OrmX.delete(Person_Functions.TABLE_NAME)
+                .where(Condition.eq(Person_Functions.PERSON_ID, personId))
                 .execute();
             if (functionIds != null) {
                 insertFunctionAssociations(personId, functionIds);
@@ -102,8 +102,8 @@ public class PeopleActions {
     public Message deletePeople(int id) {
         Message message = new Message();
         try {
-            int rows = OrmX.delete(InvitationsTable.TABLE_NAME)
-                .where(Condition.eq(InvitationsTable.ID, id))
+            int rows = OrmX.delete(Invitations.TABLE_NAME)
+                .where(Condition.eq(Invitations.ID, id))
                 .execute();
             if (rows > 0) {
                 message.setMessage("Person deleted successfully.");
@@ -122,10 +122,10 @@ public class PeopleActions {
     public Message updateFunctionStatus(int personId, int functionId, String status) {
         Message message = new Message();
         try {
-            int rows = OrmX.update(PersonFunctionsTable.TABLE_NAME)
-                .set(PersonFunctionsTable.INVITED_STATUS, status)
-                .where(Condition.eq(PersonFunctionsTable.PERSON_ID, personId)
-                    .and(Condition.eq(PersonFunctionsTable.FUNCTION_ID, functionId)))
+            int rows = OrmX.update(Person_Functions.TABLE_NAME)
+                .set(Person_Functions.INVITED_STATUS, status)
+                .where(Condition.eq(Person_Functions.PERSON_ID, personId)
+                    .and(Condition.eq(Person_Functions.FUNCTION_ID, functionId)))
                 .execute();
             if (rows > 0) {
                 message.setMessage("Status updated.");
@@ -155,67 +155,67 @@ public class PeopleActions {
     }
 
     private ArrayList<People> listById(int id) {
-        List<Map<String, Object>> invRows = OrmX.select(InvitationsTable.TABLE_NAME)
-            .where(Condition.eq(InvitationsTable.ID, id))
+        List<Map<String, Object>> invRows = OrmX.select(Invitations.TABLE_NAME)
+            .where(Condition.eq(Invitations.ID, id))
             .fetchRaw();
-        List<Map<String, Object>> pfRows = OrmX.select(PersonFunctionsTable.TABLE_NAME)
-            .where(Condition.eq(PersonFunctionsTable.PERSON_ID, id))
+        List<Map<String, Object>> pfRows = OrmX.select(Person_Functions.TABLE_NAME)
+            .where(Condition.eq(Person_Functions.PERSON_ID, id))
             .fetchRaw();
         return mergeAndBuild(invRows, pfRows);
     }
 
     private ArrayList<People> listByFunction(int functionId) {
-        List<Map<String, Object>> pfForFn = OrmX.select(PersonFunctionsTable.TABLE_NAME)
-            .where(Condition.eq(PersonFunctionsTable.FUNCTION_ID, functionId))
+        List<Map<String, Object>> pfForFn = OrmX.select(Person_Functions.TABLE_NAME)
+            .where(Condition.eq(Person_Functions.FUNCTION_ID, functionId))
             .fetchRaw();
         if (pfForFn.isEmpty()) {
             return new ArrayList<>();
         }
         List<Integer> personIds = pfForFn.stream()
-            .map(r -> ((Number) r.get(PersonFunctionsTable.PERSON_ID)).intValue())
+            .map(r -> ((Number) r.get(Person_Functions.PERSON_ID)).intValue())
             .collect(Collectors.toList());
-        List<Map<String, Object>> invRows = new ArrayList<>(OrmX.select(InvitationsTable.TABLE_NAME)
-            .where(Condition.in(InvitationsTable.ID, personIds))
+        List<Map<String, Object>> invRows = new ArrayList<>(OrmX.select(Invitations.TABLE_NAME)
+            .where(Condition.in(Invitations.ID, personIds))
             .fetchRaw());
-        invRows.sort((a, b) -> ((String) a.get(InvitationsTable.NAME))
-            .compareToIgnoreCase((String) b.get(InvitationsTable.NAME)));
-        List<Map<String, Object>> allPfRows = OrmX.select(PersonFunctionsTable.TABLE_NAME)
-            .where(Condition.in(PersonFunctionsTable.PERSON_ID, personIds))
+        invRows.sort((a, b) -> ((String) a.get(Invitations.NAME))
+            .compareToIgnoreCase((String) b.get(Invitations.NAME)));
+        List<Map<String, Object>> allPfRows = OrmX.select(Person_Functions.TABLE_NAME)
+            .where(Condition.in(Person_Functions.PERSON_ID, personIds))
             .fetchRaw();
         return mergeAndBuild(invRows, allPfRows);
     }
 
     private ArrayList<People> listWithNoFunction() {
-        List<Map<String, Object>> allInvRows = OrmX.select(InvitationsTable.TABLE_NAME).fetchRaw();
-        List<Map<String, Object>> allPfRows = OrmX.select(PersonFunctionsTable.TABLE_NAME).fetchRaw();
+        List<Map<String, Object>> allInvRows = OrmX.select(Invitations.TABLE_NAME).fetchRaw();
+        List<Map<String, Object>> allPfRows = OrmX.select(Person_Functions.TABLE_NAME).fetchRaw();
         Set<Integer> assignedPersonIds = allPfRows.stream()
-            .map(r -> ((Number) r.get(PersonFunctionsTable.PERSON_ID)).intValue())
+            .map(r -> ((Number) r.get(Person_Functions.PERSON_ID)).intValue())
             .collect(Collectors.toSet());
         List<Map<String, Object>> unassigned = new ArrayList<>(allInvRows.stream()
-            .filter(r -> !assignedPersonIds.contains(((Number) r.get(InvitationsTable.ID)).intValue()))
+            .filter(r -> !assignedPersonIds.contains(((Number) r.get(Invitations.ID)).intValue()))
             .collect(Collectors.toList()));
-        unassigned.sort((a, b) -> ((String) a.get(InvitationsTable.NAME))
-            .compareToIgnoreCase((String) b.get(InvitationsTable.NAME)));
+        unassigned.sort((a, b) -> ((String) a.get(Invitations.NAME))
+            .compareToIgnoreCase((String) b.get(Invitations.NAME)));
         return mergeAndBuild(unassigned, List.of());
     }
 
     private ArrayList<People> listAll() {
-        List<Map<String, Object>> invRows = new ArrayList<>(OrmX.select(InvitationsTable.TABLE_NAME).fetchRaw());
-        invRows.sort((a, b) -> ((String) a.get(InvitationsTable.NAME))
-            .compareToIgnoreCase((String) b.get(InvitationsTable.NAME)));
-        List<Map<String, Object>> pfRows = OrmX.select(PersonFunctionsTable.TABLE_NAME).fetchRaw();
+        List<Map<String, Object>> invRows = new ArrayList<>(OrmX.select(Invitations.TABLE_NAME).fetchRaw());
+        invRows.sort((a, b) -> ((String) a.get(Invitations.NAME))
+            .compareToIgnoreCase((String) b.get(Invitations.NAME)));
+        List<Map<String, Object>> pfRows = OrmX.select(Person_Functions.TABLE_NAME).fetchRaw();
         return mergeAndBuild(invRows, pfRows);
     }
 
     private ArrayList<People> mergeAndBuild(List<Map<String, Object>> invRows, List<Map<String, Object>> pfRows) {
         Map<Integer, List<Map<String, Object>>> pfByPerson = new LinkedHashMap<>();
         for (Map<String, Object> pf : pfRows) {
-            int personId = ((Number) pf.get(PersonFunctionsTable.PERSON_ID)).intValue();
+            int personId = ((Number) pf.get(Person_Functions.PERSON_ID)).intValue();
             pfByPerson.computeIfAbsent(personId, k -> new ArrayList<>()).add(pf);
         }
         ArrayList<People> result = new ArrayList<>();
         for (Map<String, Object> inv : invRows) {
-            int personId = ((Number) inv.get(InvitationsTable.ID)).intValue();
+            int personId = ((Number) inv.get(Invitations.ID)).intValue();
             result.add(buildPeople(inv, pfByPerson.getOrDefault(personId, List.of())));
         }
         return result;
@@ -223,17 +223,17 @@ public class PeopleActions {
 
     private People buildPeople(Map<String, Object> inv, List<Map<String, Object>> pfRows) {
         People p = new People();
-        p.setId(((Number) inv.get(InvitationsTable.ID)).intValue());
-        p.setName((String) inv.get(InvitationsTable.NAME));
-        p.setCity((String) inv.get(InvitationsTable.CITY));
-        p.setNumberOfPerson(((Number) inv.get(InvitationsTable.NUMBER_OF_PEOPLE_WILL_COME)).intValue());
-        p.setRelationType(RelationType.valueOf((String) inv.get(InvitationsTable.RELATION_TYPE)));
+        p.setId(((Number) inv.get(Invitations.ID)).intValue());
+        p.setName((String) inv.get(Invitations.NAME));
+        p.setCity((String) inv.get(Invitations.CITY));
+        p.setNumberOfPerson(((Number) inv.get(Invitations.NUMBER_OF_PEOPLE_WILL_COME)).intValue());
+        p.setRelationType(RelationType.valueOf((String) inv.get(Invitations.RELATION_TYPE)));
         if (!pfRows.isEmpty()) {
             List<Integer> ids = new ArrayList<>();
             Map<String, String> statuses = new LinkedHashMap<>();
             for (Map<String, Object> pf : pfRows) {
-                int fnId = ((Number) pf.get(PersonFunctionsTable.FUNCTION_ID)).intValue();
-                String fnStatus = (String) pf.get(PersonFunctionsTable.INVITED_STATUS);
+                int fnId = ((Number) pf.get(Person_Functions.FUNCTION_ID)).intValue();
+                String fnStatus = (String) pf.get(Person_Functions.INVITED_STATUS);
                 ids.add(fnId);
                 statuses.put(String.valueOf(fnId), fnStatus);
             }
@@ -245,15 +245,15 @@ public class PeopleActions {
 
     private void insertFunctionAssociations(int personId, List<Integer> functionIds) {
         for (int functionId : functionIds) {
-            List<Map<String, Object>> existing = OrmX.select(PersonFunctionsTable.TABLE_NAME)
-                .where(Condition.eq(PersonFunctionsTable.PERSON_ID, personId)
-                    .and(Condition.eq(PersonFunctionsTable.FUNCTION_ID, functionId)))
+            List<Map<String, Object>> existing = OrmX.select(Person_Functions.TABLE_NAME)
+                .where(Condition.eq(Person_Functions.PERSON_ID, personId)
+                    .and(Condition.eq(Person_Functions.FUNCTION_ID, functionId)))
                 .fetchRaw();
             if (existing.isEmpty()) {
-                OrmX.insert(PersonFunctionsTable.TABLE_NAME)
-                    .set(PersonFunctionsTable.PERSON_ID, personId)
-                    .set(PersonFunctionsTable.FUNCTION_ID, functionId)
-                    .set(PersonFunctionsTable.INVITED_STATUS, "NOT_INVITED")
+                OrmX.insert(Person_Functions.TABLE_NAME)
+                    .set(Person_Functions.PERSON_ID, personId)
+                    .set(Person_Functions.FUNCTION_ID, functionId)
+                    .set(Person_Functions.INVITED_STATUS, "NOT_INVITED")
                     .execute();
             }
         }

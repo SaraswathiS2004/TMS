@@ -1,7 +1,7 @@
 package com.tms.data.dto;
 
 import com.ormx.OrmX;
-import com.tms.db.InvitationsTable;
+import com.tms.db.Invitations;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -25,12 +25,12 @@ public class People {
     // storeData kept for CLI backward compatibility
     public String storeData() {
         try {
-            OrmX.insert(InvitationsTable.TABLE_NAME)
-                .set(InvitationsTable.NAME, name)
-                .set(InvitationsTable.CITY, city)
-                .set(InvitationsTable.RELATION_TYPE, relationType.toString())
-                .set(InvitationsTable.NUMBER_OF_PEOPLE_WILL_COME, numberOfPerson)
-                .set(InvitationsTable.INVITED_STATUS, invitedStatus.toString())
+            OrmX.insert(Invitations.TABLE_NAME)
+                .set(Invitations.NAME, name)
+                .set(Invitations.CITY, city)
+                .set(Invitations.RELATION_TYPE, relationType.toString())
+                .set(Invitations.NUMBER_OF_PEOPLE_WILL_COME, numberOfPerson)
+                .set(Invitations.INVITED_STATUS, invitedStatus.toString())
                 .execute();
             return "Successfully Added!";
         } catch (Exception e) {

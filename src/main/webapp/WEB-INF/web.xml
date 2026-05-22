@@ -17,6 +17,17 @@
         <url-pattern>*</url-pattern>
     </filter-mapping>
 
+<!--  Redirects all requests to the authx wizard until an admin user exists.
+            Runs AFTER OrmSetupFilter so the OrmX wizard takes priority. -->
+    <filter>
+        <filter-name>AuthSetupFilter</filter-name>
+        <filter-class>com.authx.web.AuthSetupFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AuthSetupFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
     <!-- Serves the OrmX first-run setup wizard UI -->
     <servlet>
         <servlet-name>OrmSetupServlet</servlet-name>
@@ -26,6 +37,17 @@
         <servlet-name>OrmSetupServlet</servlet-name>
         <url-pattern>/orm-setup/*</url-pattern>
     </servlet-mapping>
+
+         <!-- Auth setup wizard UI (admin credential setup on first boot) -->
+    <servlet>
+        <servlet-name>AuthSetupServlet</servlet-name>
+        <servlet-class>com.authx.web.AuthSetupServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AuthSetupServlet</servlet-name>
+        <url-pattern>/authx-setup/*</url-pattern>
+    </servlet-mapping>
+
 
     <filter>
         <filter-name>CorsFilter</filter-name>

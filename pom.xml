@@ -131,7 +131,7 @@
          <dependency>
                <groupId>com.authx</groupId>
                <artifactId>authx-core</artifactId>
-               <version>1.0.2</version>
+               <version>1.0.3</version>
          </dependency>
         <!-- ORM-X: connection pooling, query builders, schema migration -->
         <dependency>

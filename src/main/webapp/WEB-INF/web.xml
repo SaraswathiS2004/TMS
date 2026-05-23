@@ -1,7 +1,11 @@
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
-
+ <!-- 1. Registers authx ADMIN_USERS schema + OrmContext ready listener that checks
+            if an admin already exists and marks AuthContext as configured. -->
+    <listener>
+        <listener-class>com.authx.web.AuthSetupListener</listener-class>
+    </listener>
     <!-- OrmX bootstrap — connects to DB, runs schema migration, manages sheet sync -->
     <listener>
         <listener-class>com.ormx.web.OrmSetupListener</listener-class>

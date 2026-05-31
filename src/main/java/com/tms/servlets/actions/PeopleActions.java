@@ -66,9 +66,6 @@ public class PeopleActions {
                     .where(Condition.eq(Invitations.ID, people.getId()))
                     .execute();
             }
-            OrmX.delete(Person_Functions.TABLE_NAME)
-                .where(Condition.eq(Person_Functions.PERSON_ID, people.getId()))
-                .execute();
             if (people.getInvitedFunctionIds() != null) {
                 insertFunctionAssociations(people.getId(), people.getInvitedFunctionIds());
             }
@@ -84,9 +81,7 @@ public class PeopleActions {
     public Message updateFunctionInvitations(int personId, List<Integer> functionIds) {
         Message message = new Message();
         try {
-            OrmX.delete(Person_Functions.TABLE_NAME)
-                .where(Condition.eq(Person_Functions.PERSON_ID, personId))
-                .execute();
+           
             if (functionIds != null) {
                 insertFunctionAssociations(personId, functionIds);
             }

@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subject, Subscription } from 'rxjs';
+import { Subject, Subscription, forkJoin } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { PeopleService } from '../../services/people.service';
 import { FunctionService } from '../../services/function.service';
@@ -33,6 +33,11 @@ export class PeopleListComponent implements OnInit, OnDestroy {
   deleteConfirmId: number | null = null;
   feedbackMessage = '';
 
+  // Quick "mark as invited" popup state
+  quickMarkPersonId: number | null = null;
+  quickMarkSelectedIds: number[] = [];
+  isQuickMarking = false;
+
   private searchInput$ = new Subject<string>();
   private subs = new Subscription();
 
@@ -62,6 +67,7 @@ export class PeopleListComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.editPersonId = null;
     this.deleteConfirmId = null;
+    this.quickMarkPersonId = null;
 
     this.functionService.getAllFunctions().subscribe({
       next: (fns) => {
@@ -155,12 +161,14 @@ export class PeopleListComponent implements OnInit, OnDestroy {
     this.subFilter = f === 'ALL' ? 'NONE' : 'IN';
     this.editPersonId = null;
     this.deleteConfirmId = null;
+    this.quickMarkPersonId = null;
   }
 
   setSubFilter(sf: 'NONE' | 'IN' | 'NOT_IN' | 'INVITED' | 'YET_TO_INVITE'): void {
     this.subFilter = sf;
     this.editPersonId = null;
     this.deleteConfirmId = null;
+    this.quickMarkPersonId = null;
   }
 
   functionName(id: number): string {
@@ -174,10 +182,76 @@ export class PeopleListComponent implements OnInit, OnDestroy {
   startEditPerson(person: People): void {
     this.editPersonId = person.id!;
     this.deleteConfirmId = null;
+    this.quickMarkPersonId = null;
   }
 
   cancelEditPerson(): void {
     this.editPersonId = null;
+  }
+
+  /** Functions the person is on but not yet marked as invited — the ones a quick-mark can act on. */
+  pendingFunctions(person: People): TmsFunction[] {
+    return this.functions.filter(fn =>
+      person.invitedFunctionIds.includes(fn.id) &&
+      person.functionStatuses?.[String(fn.id)] !== 'INVITED'
+    );
+  }
+
+  hasPendingFunctions(person: People): boolean {
+    return this.pendingFunctions(person).length > 0;
+  }
+
+  startQuickMark(person: People): void {
+    this.quickMarkPersonId = person.id!;
+    this.editPersonId = null;
+    this.deleteConfirmId = null;
+    // Pre-select the function currently being browsed, if the person still needs it.
+    const pendingIds = this.pendingFunctions(person).map(fn => fn.id);
+    this.quickMarkSelectedIds =
+      typeof this.activeFilter === 'number' && pendingIds.includes(this.activeFilter)
+        ? [this.activeFilter]
+        : [];
+  }
+
+  cancelQuickMark(): void {
+    this.quickMarkPersonId = null;
+    this.quickMarkSelectedIds = [];
+  }
+
+  isQuickMarkSelected(fnId: number): boolean {
+    return this.quickMarkSelectedIds.includes(fnId);
+  }
+
+  toggleQuickMarkFn(fnId: number): void {
+    if (this.quickMarkSelectedIds.includes(fnId)) {
+      this.quickMarkSelectedIds = this.quickMarkSelectedIds.filter(id => id !== fnId);
+    } else {
+      this.quickMarkSelectedIds = [...this.quickMarkSelectedIds, fnId];
+    }
+  }
+
+  confirmQuickMark(person: People): void {
+    if (this.quickMarkSelectedIds.length === 0 || this.isQuickMarking) { return; }
+    this.isQuickMarking = true;
+    const calls = this.quickMarkSelectedIds.map(fnId =>
+      this.peopleService.updateFunctionStatus(person.id!, fnId, 'INVITED')
+    );
+    forkJoin(calls).subscribe({
+      next: (responses) => {
+        this.isQuickMarking = false;
+        const allOk = responses.every(r => r.status === 'SUCCESS');
+        this.feedbackMessage = allOk
+          ? `${person.name} ${this.translateService.translate('peopleList.quickMarkDone')}`
+          : this.translateService.translate('peopleList.updateFailed');
+        this.loadAll();
+        setTimeout(() => { this.feedbackMessage = ''; }, 3000);
+      },
+      error: () => {
+        this.isQuickMarking = false;
+        this.feedbackMessage = this.translateService.translate('peopleList.updateFailed');
+        setTimeout(() => { this.feedbackMessage = ''; }, 3000);
+      }
+    });
   }
 
   onPersonSaved(): void {
@@ -189,6 +263,7 @@ export class PeopleListComponent implements OnInit, OnDestroy {
   requestDelete(id: number): void {
     this.deleteConfirmId = id;
     this.editPersonId = null;
+    this.quickMarkPersonId = null;
   }
 
   cancelDelete(): void {

@@ -213,15 +213,18 @@ export class FunctionManagerComponent implements OnInit, OnDestroy {
   getPeopleForFunction(fnId: number): People[] {
     const filter = this.getFnSubFilter(fnId);
     const fnIdStr = String(fnId);
-    return this.people.filter(p => {
-      const isIn = p.invitedFunctionIds.includes(fnId);
-      const isInvited = p.functionStatuses?.[fnIdStr] === 'INVITED';
-      if (filter === 'IN') { return isIn; }
-      if (filter === 'NOT_IN') { return !isIn; }
-      if (filter === 'INVITED') { return isIn && isInvited; }
-      if (filter === 'YET_TO_INVITE') { return isIn && !isInvited; }
-      return true;
-    });
+    return this.people
+      .filter(p => {
+        const isIn = p.invitedFunctionIds.includes(fnId);
+        const isInvited = p.functionStatuses?.[fnIdStr] === 'INVITED';
+        if (filter === 'IN') { return isIn; }
+        if (filter === 'NOT_IN') { return !isIn; }
+        if (filter === 'INVITED') { return isIn && isInvited; }
+        if (filter === 'YET_TO_INVITE') { return isIn && !isInvited; }
+        return true;
+      })
+      // Not-invited first; sort is stable so the existing name order is kept within each group.
+      .sort((a, b) => Number(this.isPersonInvited(a, fnId)) - Number(this.isPersonInvited(b, fnId)));
   }
 
   isPersonInvited(person: People, fnId: number): boolean {

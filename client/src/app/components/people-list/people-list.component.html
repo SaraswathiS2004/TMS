@@ -141,6 +141,38 @@
       </div>
     </div>
 
+    <!-- Quick mark-as-invited panel -->
+    <div *ngIf="quickMarkPersonId === person.id" class="quick-mark-panel">
+      <div class="edit-section-title">
+        <i class="bi bi-check2-circle"></i>
+        {{ 'peopleList.quickMarkTitle' | translate }}
+      </div>
+      <div class="quick-mark-fns">
+        <button
+          *ngFor="let fn of pendingFunctions(person)"
+          type="button"
+          class="quick-fn-chip"
+          [class.quick-fn-selected]="isQuickMarkSelected(fn.id)"
+          [style.--fn-color]="fn.color"
+          (click)="toggleQuickMarkFn(fn.id)"
+        >
+          <i class="bi" [ngClass]="isQuickMarkSelected(fn.id) ? 'bi-check-square-fill' : 'bi-square'"></i>
+          {{ fn.name }}
+        </button>
+      </div>
+      <div class="confirm-actions">
+        <button
+          class="btn-invite"
+          [disabled]="quickMarkSelectedIds.length === 0 || isQuickMarking"
+          (click)="confirmQuickMark(person)"
+        >
+          <i class="bi bi-check2"></i>
+          {{ (isQuickMarking ? 'peopleList.saving' : 'peopleList.quickMarkConfirm') | translate }}
+        </button>
+        <button class="btn-ghost" (click)="cancelQuickMark()">{{ 'peopleList.cancel' | translate }}</button>
+      </div>
+    </div>
+
     <!-- Edit panel (shared form component) -->
     <div *ngIf="editPersonId === person.id" class="edit-panel">
       <div class="edit-section-title">
@@ -158,7 +190,18 @@
     </div>
 
     <!-- Card Footer -->
-    <div class="card-footer" *ngIf="editPersonId !== person.id && deleteConfirmId !== person.id">
+    <div
+      class="card-footer"
+      *ngIf="editPersonId !== person.id && deleteConfirmId !== person.id && quickMarkPersonId !== person.id"
+    >
+      <button
+        *ngIf="hasPendingFunctions(person)"
+        class="btn-invite btn-quick-mark"
+        (click)="startQuickMark(person)"
+      >
+        <i class="bi bi-check2-circle"></i>
+        {{ 'peopleList.markInvited' | translate }}
+      </button>
       <button class="btn-invite" (click)="startEditPerson(person)">
         <i class="bi bi-pencil-square"></i>
         {{ 'peopleList.editInvitations' | translate }}

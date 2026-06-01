@@ -274,8 +274,58 @@
   margin-bottom: 12px;
 }
 
+/* Quick mark-as-invited panel */
+.quick-mark-panel {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.quick-mark-fns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.quick-fn-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1.5px solid #cbd5e1;
+  background: #fff;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.quick-fn-chip:hover { border-color: var(--fn-color); }
+
+.quick-fn-selected {
+  background: var(--fn-color);
+  border-color: var(--fn-color);
+  color: #fff;
+}
+
+.quick-fn-chip i { font-size: 13px; }
+
 /* Card footer */
-.card-footer { margin-top: 2px; }
+.card-footer { margin-top: 2px; display: flex; flex-wrap: wrap; gap: 8px; }
+
+.btn-quick-mark {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #a7f3d0;
+}
+
+.btn-quick-mark:hover { background: #d1fae5; }
 
 .btn-invite {
   display: inline-flex;

@@ -67,7 +67,7 @@ public class PeopleActions {
                     .execute();
             }
             if (people.getInvitedFunctionIds() != null) {
-                insertFunctionAssociations(people.getId(), people.getInvitedFunctionIds());
+                syncFunctionAssociations(people.getId(), people.getInvitedFunctionIds());
             }
             message.setMessage("Updated successfully.");
             message.setStatus(Message.Status.SUCCESS);
@@ -245,12 +245,58 @@ public class PeopleActions {
                     .and(Condition.eq(Person_Functions.FUNCTION_ID, functionId)))
                 .fetchRaw();
             if (existing.isEmpty()) {
-                OrmX.insert(Person_Functions.TABLE_NAME)
-                    .set(Person_Functions.PERSON_ID, personId)
-                    .set(Person_Functions.FUNCTION_ID, functionId)
-                    .set(Person_Functions.INVITED_STATUS, "NOT_INVITED")
-                    .execute();
+                addOrResurrectAssociation(personId, functionId);
             }
+        }
+    }
+
+    /**
+     * Reconciles a person's function associations with the requested set: removes the
+     * associations that were unchecked and adds the newly checked ones. Without this an
+     * unchecked function would linger in the DB because only inserts were performed before.
+     */
+    private void syncFunctionAssociations(int personId, List<Integer> functionIds) {
+        Set<Integer> existingIds = OrmX.select(Person_Functions.TABLE_NAME)
+            .where(Condition.eq(Person_Functions.PERSON_ID, personId))
+            .fetchRaw().stream()
+            .map(r -> ((Number) r.get(Person_Functions.FUNCTION_ID)).intValue())
+            .collect(Collectors.toSet());
+
+        List<Integer> toRemove = existingIds.stream()
+            .filter(id -> !functionIds.contains(id))
+            .collect(Collectors.toList());
+        if (!toRemove.isEmpty()) {
+            OrmX.delete(Person_Functions.TABLE_NAME)
+                .where(Condition.eq(Person_Functions.PERSON_ID, personId)
+                    .and(Condition.in(Person_Functions.FUNCTION_ID, toRemove)))
+                .execute();
+        }
+
+        for (int functionId : functionIds) {
+            if (!existingIds.contains(functionId)) {
+                addOrResurrectAssociation(personId, functionId);
+            }
+        }
+    }
+
+    /**
+     * Adds an association, reviving a previously soft-deleted row for the same pair instead of
+     * inserting a duplicate. Person_Functions is a sync table, so removals are soft deletes
+     * (is_deleted=1) that keep the composite-PK row in place.
+     */
+    private void addOrResurrectAssociation(int personId, int functionId) {
+        int resurrected = OrmX.update(Person_Functions.TABLE_NAME)
+            .set("is_deleted", 0)
+            .set(Person_Functions.INVITED_STATUS, "NOT_INVITED")
+            .where(Condition.eq(Person_Functions.PERSON_ID, personId)
+                .and(Condition.eq(Person_Functions.FUNCTION_ID, functionId)))
+            .execute();
+        if (resurrected == 0) {
+            OrmX.insert(Person_Functions.TABLE_NAME)
+                .set(Person_Functions.PERSON_ID, personId)
+                .set(Person_Functions.FUNCTION_ID, functionId)
+                .set(Person_Functions.INVITED_STATUS, "NOT_INVITED")
+                .execute();
         }
     }
 }

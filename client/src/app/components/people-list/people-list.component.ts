@@ -4,7 +4,7 @@ import { Subject, Subscription, forkJoin } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { PeopleService } from '../../services/people.service';
 import { FunctionService } from '../../services/function.service';
-import { People, effectivePersonCount } from '../../models/people.model';
+import { People, InvitationPerson } from '../../models/people.model';
 import { TmsFunction } from '../../models/function.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { TranslateService } from '../../services/translate.service';
@@ -37,6 +37,9 @@ export class PeopleListComponent implements OnInit, OnDestroy {
   quickMarkPersonId: number | null = null;
   quickMarkSelectedIds: number[] = [];
   isQuickMarking = false;
+
+  // In-flight per-person function toggles, keyed `${personId}_${fnId}`
+  private togglingPersonFnKeys = new Set<string>();
 
   private searchInput$ = new Subject<string>();
   private subs = new Subscription();
@@ -294,13 +297,37 @@ export class PeopleListComponent implements OnInit, OnDestroy {
     return map[relation] ?? '';
   }
 
-  effectiveCount(person: People): number {
-    return effectivePersonCount(person);
+  // Per-individual-person, per-function invited marking (mobile-friendly inline toggles)
+  isPersonFnInvited(guest: InvitationPerson, fnId: number): boolean {
+    return guest.functionStatuses?.[String(fnId)] === 'INVITED';
   }
 
-  namePersonsSummary(person: People): string {
-    return (person.persons ?? [])
-      .map(p => p.note ? `${p.name} (${p.note})` : p.name)
-      .join(', ');
+  isTogglingPersonFn(guest: InvitationPerson, fnId: number): boolean {
+    return this.togglingPersonFnKeys.has(`${guest.id}_${fnId}`);
+  }
+
+  togglePersonFn(guest: InvitationPerson, fnId: number): void {
+    if (!guest.id) { return; }
+    const key = `${guest.id}_${fnId}`;
+    if (this.togglingPersonFnKeys.has(key)) { return; }
+
+    const previous = guest.functionStatuses?.[String(fnId)] ?? 'NOT_INVITED';
+    const newStatus = previous === 'INVITED' ? 'NOT_INVITED' : 'INVITED';
+    // Optimistic update
+    guest.functionStatuses = { ...(guest.functionStatuses ?? {}), [String(fnId)]: newStatus };
+    this.togglingPersonFnKeys.add(key);
+
+    this.peopleService.updatePersonInvitedStatus(guest.id, fnId, newStatus).subscribe({
+      next: (resp) => {
+        if (resp.status !== 'SUCCESS') {
+          guest.functionStatuses = { ...(guest.functionStatuses ?? {}), [String(fnId)]: previous };
+        }
+        this.togglingPersonFnKeys.delete(key);
+      },
+      error: () => {
+        guest.functionStatuses = { ...(guest.functionStatuses ?? {}), [String(fnId)]: previous };
+        this.togglingPersonFnKeys.delete(key);
+      }
+    });
   }
 }

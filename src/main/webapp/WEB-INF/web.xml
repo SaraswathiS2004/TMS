@@ -89,4 +89,13 @@
         <url-pattern>/api/person-function</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>InvitationPersonFunctionServlet</servlet-name>
+        <servlet-class>com.tms.servlets.InvitationPersonFunctionServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>InvitationPersonFunctionServlet</servlet-name>
+        <url-pattern>/api/invitation-person-function</url-pattern>
+    </servlet-mapping>
+
 </web-app>

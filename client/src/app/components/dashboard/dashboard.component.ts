@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FunctionService } from '../../services/function.service';
 import { PeopleService } from '../../services/people.service';
 import { TmsFunction } from '../../models/function.model';
-import { People, effectivePersonCount } from '../../models/people.model';
+import { People } from '../../models/people.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
 interface FunctionStat {
@@ -48,7 +48,7 @@ export class DashboardComponent implements OnInit {
                 total: inFunction.length,
                 invited,
                 yetToInvite: inFunction.length - invited,
-                expectedCount: inFunction.reduce((sum, p) => sum + effectivePersonCount(p), 0)
+                expectedCount: inFunction.reduce((sum, p) => sum + p.numberOfPerson, 0)
               };
             });
             this.isLoading = false;
@@ -71,7 +71,7 @@ export class DashboardComponent implements OnInit {
   }
 
   get totalExpected(): number {
-    return this.people.reduce((sum, p) => sum + effectivePersonCount(p), 0);
+    return this.people.reduce((sum, p) => sum + p.numberOfPerson, 0);
   }
 
   invitedPercent(stat: FunctionStat): number {

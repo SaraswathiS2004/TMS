@@ -2,6 +2,7 @@ package com.tms.sheet;
 
 import com.tms.data.respository.TmsDB;
 import com.tms.sheet.impl.FunctionsTable;
+import com.tms.sheet.impl.InvitationPersonFunctionsTable;
 import com.tms.sheet.impl.InvitationPersonsTable;
 import com.tms.sheet.impl.InvitationsTable;
 import com.tms.sheet.impl.PersonFunctionsTable;
@@ -55,6 +56,7 @@ public class SheetSyncManager {
         queueSync(new InvitationsTable());
         queueSync(new PersonFunctionsTable());
         queueSync(new InvitationPersonsTable());
+        queueSync(new InvitationPersonFunctionsTable());
     }
 
     public SheetSyncStatus getStatus() {

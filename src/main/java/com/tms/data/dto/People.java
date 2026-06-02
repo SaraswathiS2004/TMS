@@ -72,12 +72,4 @@ public class People {
 
     public List<InvitationPerson> getPersons() { return persons; }
     public void setPersons(List<InvitationPerson> persons) { this.persons = persons; }
-
-    /**
-     * Effective number of people expected to attend: the larger of the manually entered
-     * expected count and the number of named persons added to the invitation.
-     */
-    public int getEffectiveCount() {
-        return Math.max(numberOfPerson, persons != null ? persons.size() : 0);
-    }
 }

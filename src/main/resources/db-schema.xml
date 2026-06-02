@@ -37,4 +37,14 @@
         <foreignKey column="FUNCTION_ID" references="Functions.ID"   onDelete="CASCADE"/>
     </table>
 
+    <!-- Per individual-person, per-function invited status -->
+    <table name="Invitation_Person_Functions" sync="true">
+        <column name="INVITATION_PERSON_ID" type="INT"          notNull="true"/>
+        <column name="FUNCTION_ID"          type="INT"          notNull="true"/>
+        <column name="INVITED_STATUS"       type="VARCHAR(30)"  notNull="true" default="NOT_INVITED"/>
+        <primaryKey columns="INVITATION_PERSON_ID,FUNCTION_ID"/>
+        <foreignKey column="INVITATION_PERSON_ID" references="Invitation_Persons.ID" onDelete="CASCADE"/>
+        <foreignKey column="FUNCTION_ID"          references="Functions.ID"          onDelete="CASCADE"/>
+    </table>
+
 </schema>

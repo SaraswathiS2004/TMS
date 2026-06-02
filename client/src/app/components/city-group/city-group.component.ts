@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PeopleService } from '../../services/people.service';
 import { FunctionService } from '../../services/function.service';
-import { People, effectivePersonCount } from '../../models/people.model';
+import { People } from '../../models/people.model';
 import { TmsFunction } from '../../models/function.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
@@ -63,11 +63,7 @@ export class CityGroupComponent implements OnInit {
   }
 
   totalExpected(group: CityGroup): number {
-    return group.people.reduce((sum, p) => sum + effectivePersonCount(p), 0);
-  }
-
-  effectiveCount(person: People): number {
-    return effectivePersonCount(person);
+    return group.people.reduce((sum, p) => sum + p.numberOfPerson, 0);
   }
 
   notInvitedCount(group: CityGroup): number {

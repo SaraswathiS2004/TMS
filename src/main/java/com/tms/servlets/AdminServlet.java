@@ -9,6 +9,7 @@ import com.tms.sheet.SheetConfig;
 import com.tms.sheet.ServerMode;
 import com.tms.sheet.SheetSyncManager;
 import com.tms.sheet.impl.FunctionsTable;
+import com.tms.sheet.impl.InvitationPersonFunctionsTable;
 import com.tms.sheet.impl.InvitationPersonsTable;
 import com.tms.sheet.impl.InvitationsTable;
 import com.tms.sheet.impl.PersonFunctionsTable;
@@ -126,9 +127,10 @@ public class AdminServlet extends HttpServlet {
             sheetService.ensureInitialized(config.getCredentialsPath());
             System.out.println("[Restore] GoogleSheetService initialized OK");
 
-            // Restore in FK-safe order: Functions → Invitations → Person_Functions → Invitation_Persons
+            // Restore in FK-safe order: Functions → Invitations → Person_Functions → Invitation_Persons → Invitation_Person_Functions
             DBTable[] tables = { new FunctionsTable(), new InvitationsTable(),
-                                 new PersonFunctionsTable(), new InvitationPersonsTable() };
+                                 new PersonFunctionsTable(), new InvitationPersonsTable(),
+                                 new InvitationPersonFunctionsTable() };
             try (Connection conn = TmsDB.openConnection()) {
                 System.out.println("[Restore] DB connection opened: " + conn);
                 for (DBTable table : tables) {

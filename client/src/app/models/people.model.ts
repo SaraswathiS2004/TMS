@@ -4,6 +4,8 @@ export interface InvitationPerson {
   id?: number;
   name: string;
   note?: string;
+  // per-function invited status for this individual person (functionId as string → "INVITED" | "NOT_INVITED")
+  functionStatuses?: { [fnId: string]: string };
 }
 
 export interface People {
@@ -17,19 +19,9 @@ export interface People {
   functionStatuses?: { [fnId: string]: string };
   // named persons (guests) listed under this invitation
   persons?: InvitationPerson[];
-  // server-computed convenience field = max(numberOfPerson, persons.length)
-  effectiveCount?: number;
 }
 
 export interface ApiMessage {
   status: 'SUCCESS' | 'FAIL';
   message: string;
-}
-
-/**
- * People expected to attend: the larger of the manually entered count and the number
- * of named persons added to the invitation. Use this everywhere a count is shown/summed.
- */
-export function effectivePersonCount(p: People): number {
-  return Math.max(p.numberOfPerson ?? 0, p.persons?.length ?? 0);
 }

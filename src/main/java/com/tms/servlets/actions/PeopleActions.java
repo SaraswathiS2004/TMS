@@ -7,6 +7,7 @@ import com.tms.data.dto.InvitedStatus;
 import com.tms.data.dto.People;
 import com.tms.data.dto.PeopleInvited;
 import com.tms.data.dto.RelationType;
+import com.tms.db.Invitation_Person_Functions;
 import com.tms.db.Invitation_Persons;
 import com.tms.db.Invitations;
 import com.tms.db.Person_Functions;
@@ -321,15 +322,68 @@ public class PeopleActions {
         List<Map<String, Object>> rows = OrmX.select(Invitation_Persons.TABLE_NAME)
             .where(Condition.in(Invitation_Persons.INVITATION_ID, invitationIds))
             .fetchRaw();
+        Map<Integer, InvitationPerson> personById = new LinkedHashMap<>();
         for (Map<String, Object> row : rows) {
             int invitationId = ((Number) row.get(Invitation_Persons.INVITATION_ID)).intValue();
+            int personId = ((Number) row.get(Invitation_Persons.ID)).intValue();
             InvitationPerson person = new InvitationPerson();
-            person.setId(((Number) row.get(Invitation_Persons.ID)).intValue());
+            person.setId(personId);
             person.setName((String) row.get(Invitation_Persons.NAME));
             person.setNote((String) row.get(Invitation_Persons.NOTE));
             byInvitation.computeIfAbsent(invitationId, k -> new ArrayList<>()).add(person);
+            personById.put(personId, person);
         }
+        attachPersonFunctionStatuses(personById);
         return byInvitation;
+    }
+
+    /** Loads each person's per-function invited status into their functionStatuses map. */
+    private void attachPersonFunctionStatuses(Map<Integer, InvitationPerson> personById) {
+        if (personById.isEmpty()) {
+            return;
+        }
+        List<Map<String, Object>> rows = OrmX.select(Invitation_Person_Functions.TABLE_NAME)
+            .where(Condition.in(Invitation_Person_Functions.INVITATION_PERSON_ID,
+                new ArrayList<>(personById.keySet())))
+            .fetchRaw();
+        for (Map<String, Object> row : rows) {
+            int personId = ((Number) row.get(Invitation_Person_Functions.INVITATION_PERSON_ID)).intValue();
+            InvitationPerson person = personById.get(personId);
+            if (person == null) {
+                continue;
+            }
+            int functionId = ((Number) row.get(Invitation_Person_Functions.FUNCTION_ID)).intValue();
+            String status = (String) row.get(Invitation_Person_Functions.INVITED_STATUS);
+            person.getFunctionStatuses().put(String.valueOf(functionId), status);
+        }
+    }
+
+    /**
+     * Marks an individual person invited (or not) for a function. The (person, function) row is
+     * created on first use, then toggled thereafter.
+     */
+    public Message updatePersonInvitedStatus(int invitationPersonId, int functionId, String status) {
+        Message message = new Message();
+        try {
+            int updated = OrmX.update(Invitation_Person_Functions.TABLE_NAME)
+                .set(Invitation_Person_Functions.INVITED_STATUS, status)
+                .where(Condition.eq(Invitation_Person_Functions.INVITATION_PERSON_ID, invitationPersonId)
+                    .and(Condition.eq(Invitation_Person_Functions.FUNCTION_ID, functionId)))
+                .execute();
+            if (updated == 0) {
+                OrmX.insert(Invitation_Person_Functions.TABLE_NAME)
+                    .set(Invitation_Person_Functions.INVITATION_PERSON_ID, invitationPersonId)
+                    .set(Invitation_Person_Functions.FUNCTION_ID, functionId)
+                    .set(Invitation_Person_Functions.INVITED_STATUS, status)
+                    .execute();
+            }
+            message.setMessage("Status updated.");
+            message.setStatus(Message.Status.SUCCESS);
+        } catch (Exception e) {
+            System.out.println(e);
+            message.setStatus(Message.Status.FAIL);
+        }
+        return message;
     }
 
     private void insertPersons(int invitationId, List<InvitationPerson> persons) {

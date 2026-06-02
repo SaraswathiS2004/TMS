@@ -111,11 +111,32 @@
       </div>
       <div class="info-row">
         <i class="bi bi-people info-icon"></i>
-        <span>{{ effectiveCount(person) }} {{ 'peopleList.expected' | translate }}</span>
+        <span>{{ person.numberOfPerson }} {{ 'peopleList.expected' | translate }}</span>
       </div>
-      <div class="info-row" *ngIf="person.persons && person.persons.length > 0">
-        <i class="bi bi-person-lines-fill info-icon"></i>
-        <span>{{ namePersonsSummary(person) }}</span>
+    </div>
+
+    <!-- Individual persons: per-function invited marking (mobile-friendly) -->
+    <div class="guest-persons" *ngIf="person.persons && person.persons.length > 0">
+      <div class="guest-person" *ngFor="let guest of person.persons">
+        <div class="gp-head">
+          <i class="bi bi-person"></i>
+          <span class="gp-name">{{ guest.name }}</span>
+          <span class="gp-note" *ngIf="guest.note">· {{ guest.note }}</span>
+        </div>
+        <div class="gp-fns" *ngIf="person.invitedFunctionIds.length > 0">
+          <button
+            *ngFor="let fnId of person.invitedFunctionIds"
+            type="button"
+            class="gp-fn-chip"
+            [class.gp-fn-invited]="isPersonFnInvited(guest, fnId)"
+            [style.--fn-color]="functionColor(fnId)"
+            [disabled]="isTogglingPersonFn(guest, fnId)"
+            (click)="togglePersonFn(guest, fnId)"
+          >
+            <i class="bi" [ngClass]="isPersonFnInvited(guest, fnId) ? 'bi-check-circle-fill' : 'bi-circle'"></i>
+            {{ functionName(fnId) }}
+          </button>
+        </div>
       </div>
     </div>
 

@@ -73,7 +73,7 @@ JAVA_HOME=/path/to/jdk17 mvn clean package -DskipTests
 JAVA_HOME=/path/to/jdk17 mvn clean package -DskipTests -P skipFrontend
 ```
 
-The WAR is output to `target/Tms.war`.
+The WAR is output to `target/tms.war`.
 
 ---
 

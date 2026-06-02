@@ -10,6 +10,9 @@
 
   "dashboard.title": "முகப்பு",
   "dashboard.totalPeople": "மொத்த அழைப்பாளர்கள்",
+  "dashboard.perFunctionTitle": "நிகழ்வு வாரியாக",
+  "dashboard.total": "மொத்தம்",
+  "dashboard.expectedAttendees": "வர எதிர்பார்ப்பு",
   "dashboard.notInvited": "அழைக்க வேண்டியவர்கள்",
   "dashboard.totalExpected": "மொத்த எதிர்பார்ப்பு",
   "dashboard.expectedAt": "எதிர்பார்ப்பு:",

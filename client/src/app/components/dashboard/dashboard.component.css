@@ -1,56 +1,9 @@
-/* ── Highlight Strip ─────────────────────────────── */
-.highlight-strip {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
-  margin-bottom: 32px;
-}
-
-.highlight-card {
-  border-radius: 16px;
-  padding: 24px 20px;
-  color: #ffffff;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.14);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.highlight-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2);
-}
-
-.hc-count {
-  font-size: 48px;
-  font-weight: 900;
-  line-height: 1;
-}
-
-.hc-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.hc-sub {
-  font-size: 12px;
-  opacity: 0.82;
-}
-
-.hc-pending { background: linear-gradient(135deg, #d97706, #b45309); }
-.hc-total   { background: linear-gradient(135deg, #0f766e, #0d9488); }
-
 /* ── No Functions Banner ─────────────────────────── */
 .no-functions-banner {
   display: flex;
   align-items: center;
   gap: 20px;
   padding: 24px;
-  margin-bottom: 28px;
   background: #fefce8;
   border: 1px solid #fef08a;
 }
@@ -73,7 +26,7 @@
   color: #92400e;
 }
 
-/* ── Summary Stats Row ───────────────────────────── */
+/* ── Overview Stats Row ──────────────────────────── */
 .stats-row {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -97,8 +50,8 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
-.stat-invited { border-left-color: #16a34a; }
-.stat-pending { border-left-color: #f59e0b; }
+.stat-invited  { border-left-color: #16a34a; }
+.stat-expected { border-left-color: #0d9488; }
 
 .stat-icon {
   font-size: 28px;
@@ -107,8 +60,8 @@
   margin-top: 2px;
 }
 
-.stat-invited .stat-icon { color: #16a34a; }
-.stat-pending .stat-icon { color: #f59e0b; }
+.stat-invited  .stat-icon { color: #16a34a; }
+.stat-expected .stat-icon { color: #0d9488; }
 
 .stat-body {
   display: flex;
@@ -133,6 +86,117 @@
   font-size: 12px;
   color: #94a3b8;
   margin-top: 2px;
+}
+
+/* ── Section Title ───────────────────────────────── */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #334155;
+  margin: 30px 0 16px;
+}
+
+.section-title i { color: #6366f1; }
+
+/* ── Per-function Widgets ────────────────────────── */
+.fn-widget-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.fn-widget {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+  border-top: 4px solid var(--fn-color);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.fn-widget:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.fnw-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fnw-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--fn-color);
+  flex-shrink: 0;
+}
+
+.fnw-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.fnw-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  text-align: center;
+}
+
+.fnw-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 4px;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.fnw-num {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1;
+  color: #1e293b;
+}
+
+.fnw-lbl {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.fnw-invited .fnw-num { color: #16a34a; }
+.fnw-pending .fnw-num { color: #f59e0b; }
+
+.fnw-progress {
+  height: 7px;
+  border-radius: 99px;
+  background: #eef2f7;
+  overflow: hidden;
+}
+
+.fnw-progress-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: var(--fn-color);
+  transition: width 0.3s ease;
+}
+
+.fnw-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #94a3b8;
 }
 
 /* Loading */

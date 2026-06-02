@@ -10,6 +10,9 @@
 
   "dashboard.title": "Dashboard",
   "dashboard.totalPeople": "Total Invitees",
+  "dashboard.perFunctionTitle": "By Function",
+  "dashboard.total": "Total",
+  "dashboard.expectedAttendees": "expected to attend",
   "dashboard.notInvited": "Yet to Invite",
   "dashboard.totalExpected": "Total Expected",
   "dashboard.expectedAt": "Expected at",

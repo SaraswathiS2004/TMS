@@ -8,8 +8,9 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 
 interface FunctionStat {
   fn: TmsFunction;
-  inviteeCount: number;
-  pendingCount: number;
+  total: number;        // invitees added to this function
+  invited: number;      // of those, already marked INVITED
+  yetToInvite: number;  // of those, still to invite
   expectedCount: number;
 }
 
@@ -40,12 +41,14 @@ export class DashboardComponent implements OnInit {
           next: (people) => {
             this.people = people;
             this.functionStats = fns.map(fn => {
-              const invited = people.filter(p => p.invitedFunctionIds.includes(fn.id));
+              const inFunction = people.filter(p => p.invitedFunctionIds.includes(fn.id));
+              const invited = inFunction.filter(p => p.functionStatuses?.[String(fn.id)] === 'INVITED').length;
               return {
                 fn,
-                inviteeCount: invited.length,
-                pendingCount: people.length - invited.length,
-                expectedCount: invited.reduce((sum, p) => sum + p.numberOfPerson, 0)
+                total: inFunction.length,
+                invited,
+                yetToInvite: inFunction.length - invited,
+                expectedCount: inFunction.reduce((sum, p) => sum + p.numberOfPerson, 0)
               };
             });
             this.isLoading = false;
@@ -62,10 +65,16 @@ export class DashboardComponent implements OnInit {
   }
 
   get totalInvited(): number {
-    return this.people.filter(p => p.invitedFunctionIds.length > 0).length;
+    return this.people.filter(p =>
+      Object.values(p.functionStatuses ?? {}).some(s => s === 'INVITED')
+    ).length;
   }
 
   get totalExpected(): number {
     return this.people.reduce((sum, p) => sum + p.numberOfPerson, 0);
+  }
+
+  invitedPercent(stat: FunctionStat): number {
+    return stat.total === 0 ? 0 : Math.round((stat.invited / stat.total) * 100);
   }
 }

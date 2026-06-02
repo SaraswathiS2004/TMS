@@ -43,6 +43,12 @@
   "addPerson.cityRequired": "City is required.",
   "addPerson.numberRequired": "This field is required.",
   "addPerson.numberMin": "Must be at least 1.",
+  "addPerson.personsLabel": "Persons in this invitation",
+  "addPerson.personsHint": "Optionally list the individual people. If you add more than the expected count above, the number added is used as the expected count everywhere.",
+  "addPerson.personNamePlaceholder": "Person name",
+  "addPerson.personNotePlaceholder": "Note (optional)",
+  "addPerson.addPerson": "Add Person",
+  "addPerson.removePerson": "Remove",
 
   "peopleList.title": "Invitee List",
   "peopleList.all": "All",

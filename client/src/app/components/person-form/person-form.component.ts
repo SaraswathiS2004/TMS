@@ -1,10 +1,10 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { PeopleService } from '../../services/people.service';
-import { People } from '../../models/people.model';
+import { People, InvitationPerson } from '../../models/people.model';
 import { TmsFunction } from '../../models/function.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { TransliterationService } from '../../services/transliteration.service';
@@ -60,8 +60,25 @@ export class PersonFormComponent implements OnInit, OnChanges, OnDestroy {
       name:           ['', [Validators.required, Validators.minLength(2)]],
       city:           ['', Validators.required],
       numberOfPerson: [1,  [Validators.required, Validators.min(1)]],
-      relationType:   ['CLOSE_RELATIVE', Validators.required]
+      relationType:   ['CLOSE_RELATIVE', Validators.required],
+      persons:        this.fb.array([])
     });
+  }
+
+  get personsArray(): FormArray {
+    return this.form.get('persons') as FormArray;
+  }
+
+  addPersonRow(person?: InvitationPerson): void {
+    this.personsArray.push(this.fb.group({
+      id:   [person?.id ?? null],
+      name: [person?.name ?? ''],
+      note: [person?.note ?? '']
+    }));
+  }
+
+  removePersonRow(index: number): void {
+    this.personsArray.removeAt(index);
   }
 
   ngOnInit(): void {
@@ -105,6 +122,10 @@ export class PersonFormComponent implements OnInit, OnChanges, OnDestroy {
       relationType:   this.person!.relationType
     });
     this.selectedFunctionIds = [...(this.person!.invitedFunctionIds ?? [])];
+    this.personsArray.clear();
+    for (const person of this.person!.persons ?? []) {
+      this.addPersonRow(person);
+    }
   }
 
   hasError(field: string, error: string): boolean {
@@ -186,7 +207,15 @@ export class PersonFormComponent implements OnInit, OnChanges, OnDestroy {
     this.successMessage = '';
     this.errorMessage = '';
 
-    const payload: People = { ...this.form.value, invitedFunctionIds: this.selectedFunctionIds };
+    const persons: InvitationPerson[] = this.personsArray.value
+      .map((row: { id: number | null; name: string; note: string }) => ({
+        id: row.id ?? undefined,
+        name: (row.name ?? '').trim(),
+        note: (row.note ?? '').trim()
+      }))
+      .filter((p: InvitationPerson) => p.name.length > 0);
+
+    const payload: People = { ...this.form.value, invitedFunctionIds: this.selectedFunctionIds, persons };
 
     if (this.isEditMode) {
       payload.id = this.person!.id;
@@ -212,6 +241,7 @@ export class PersonFormComponent implements OnInit, OnChanges, OnDestroy {
             this.successMessage = 'addPerson.success';
             this.form.reset({ numberOfPerson: 1, relationType: 'CLOSE_RELATIVE' });
             this.selectedFunctionIds = [];
+            this.personsArray.clear();
             this.saved.emit();
           } else {
             this.errorMessage = 'addPerson.serverError';

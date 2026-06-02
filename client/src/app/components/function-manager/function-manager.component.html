@@ -198,7 +198,7 @@
       <div *ngFor="let p of getPeopleForFunction(fn.id)" class="fn-invitee-row">
         <div class="fn-invitee-info">
           <span class="fn-invitee-name">{{ p.name }}</span>
-          <span class="fn-invitee-detail">{{ p.city }} · {{ p.numberOfPerson }} {{ 'peopleList.expected' | translate }}</span>
+          <span class="fn-invitee-detail">{{ p.city }} · {{ effectiveCount(p) }} {{ 'peopleList.expected' | translate }}</span>
         </div>
         <div class="fn-invitee-actions">
           <span *ngIf="isPersonInvited(p, fn.id)" class="fn-invited-badge">

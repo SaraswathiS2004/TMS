@@ -19,6 +19,9 @@ public class People {
     private List<Integer> invitedFunctionIds = new ArrayList<>();
     // key: functionId (as string for JSON compat), value: "INVITED" | "NOT_INVITED"
     private Map<String, String> functionStatuses = new LinkedHashMap<>();
+    // named persons (guests) listed under this invitation.
+    // null means "not provided" (partial update) — distinct from an empty list ("remove all").
+    private List<InvitationPerson> persons;
 
     public People() {}
 
@@ -65,5 +68,16 @@ public class People {
     public Map<String, String> getFunctionStatuses() { return functionStatuses; }
     public void setFunctionStatuses(Map<String, String> functionStatuses) {
         this.functionStatuses = functionStatuses != null ? functionStatuses : new LinkedHashMap<>();
+    }
+
+    public List<InvitationPerson> getPersons() { return persons; }
+    public void setPersons(List<InvitationPerson> persons) { this.persons = persons; }
+
+    /**
+     * Effective number of people expected to attend: the larger of the manually entered
+     * expected count and the number of named persons added to the invitation.
+     */
+    public int getEffectiveCount() {
+        return Math.max(numberOfPerson, persons != null ? persons.size() : 0);
     }
 }

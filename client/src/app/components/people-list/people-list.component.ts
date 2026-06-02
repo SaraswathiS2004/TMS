@@ -4,7 +4,7 @@ import { Subject, Subscription, forkJoin } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { PeopleService } from '../../services/people.service';
 import { FunctionService } from '../../services/function.service';
-import { People } from '../../models/people.model';
+import { People, effectivePersonCount } from '../../models/people.model';
 import { TmsFunction } from '../../models/function.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { TranslateService } from '../../services/translate.service';
@@ -292,5 +292,15 @@ export class PeopleListComponent implements OnInit, OnDestroy {
       CLOSE_RELATIVE: 'badge-close', DISTANCE_RELATIVE: 'badge-distance', FRIENDS: 'badge-friends'
     };
     return map[relation] ?? '';
+  }
+
+  effectiveCount(person: People): number {
+    return effectivePersonCount(person);
+  }
+
+  namePersonsSummary(person: People): string {
+    return (person.persons ?? [])
+      .map(p => p.note ? `${p.name} (${p.note})` : p.name)
+      .join(', ');
   }
 }

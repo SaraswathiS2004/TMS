@@ -113,6 +113,50 @@
     </span>
   </div>
 
+  <!-- Named persons in this invitation -->
+  <div class="form-group">
+    <label>{{ 'addPerson.personsLabel' | translate }}</label>
+    <p class="field-hint">{{ 'addPerson.personsHint' | translate }}</p>
+
+    <div formArrayName="persons" class="persons-list">
+      <div
+        *ngFor="let row of personsArray.controls; let i = index"
+        [formGroupName]="i"
+        class="person-row"
+      >
+        <div class="input-with-icon person-name">
+          <i class="bi bi-person-fill field-icon"></i>
+          <input
+            type="text"
+            formControlName="name"
+            [placeholder]="'addPerson.personNamePlaceholder' | translate"
+            autocomplete="off"
+          />
+        </div>
+        <input
+          type="text"
+          formControlName="note"
+          class="person-note"
+          [placeholder]="'addPerson.personNotePlaceholder' | translate"
+          autocomplete="off"
+        />
+        <button
+          type="button"
+          class="btn-remove-person"
+          (click)="removePersonRow(i)"
+          [title]="'addPerson.removePerson' | translate"
+        >
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+    </div>
+
+    <button type="button" class="btn-add-person" (click)="addPersonRow()">
+      <i class="bi bi-plus-lg"></i>
+      {{ 'addPerson.addPerson' | translate }}
+    </button>
+  </div>
+
   <!-- Relation Type -->
   <div class="form-group">
     <label for="pf-relationType">{{ 'addPerson.relationType' | translate }}</label>

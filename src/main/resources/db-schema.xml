@@ -18,6 +18,15 @@
         <column name="INVITED_STATUS"             type="VARCHAR(30)"   notNull="true" default="NOT_INVITED"/>
     </table>
 
+    <!-- Named persons (guests) listed under an invitation -->
+    <table name="Invitation_Persons" sync="true">
+        <column name="ID"            type="INT"          primaryKey="true" autoIncrement="true"/>
+        <column name="INVITATION_ID" type="INT"          notNull="true"/>
+        <column name="NAME"          type="VARCHAR(100)" notNull="true"/>
+        <column name="NOTE"          type="VARCHAR(255)" notNull="true" default=""/>
+        <foreignKey column="INVITATION_ID" references="Invitations.ID" onDelete="CASCADE"/>
+    </table>
+
     <!-- Composite-PK join table: each person ↔ function entry tracks per-function status -->
     <table name="Person_Functions" sync="true">
         <column name="PERSON_ID"     type="INT"          notNull="true"/>

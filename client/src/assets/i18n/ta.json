@@ -43,6 +43,12 @@
   "addPerson.cityRequired": "நகரம் தேவை.",
   "addPerson.numberRequired": "இந்த புலம் தேவை.",
   "addPerson.numberMin": "குறைந்தபட்சம் 1 வேண்டும்.",
+  "addPerson.personsLabel": "இந்த அழைப்பில் உள்ளவர்கள்",
+  "addPerson.personsHint": "தனிநபர்களை விருப்பப்படி பட்டியலிடவும். மேலே உள்ள எதிர்பார்க்கப்படும் எண்ணிக்கையை விட அதிகமாக சேர்த்தால், சேர்க்கப்பட்ட எண்ணிக்கையே எல்லா இடங்களிலும் எதிர்பார்ப்பாக கணக்கிடப்படும்.",
+  "addPerson.personNamePlaceholder": "நபரின் பெயர்",
+  "addPerson.personNotePlaceholder": "குறிப்பு (விருப்பம்)",
+  "addPerson.addPerson": "நபரைச் சேர்",
+  "addPerson.removePerson": "நீக்கு",
 
   "peopleList.title": "அழைப்பாளர் பட்டியல்",
   "peopleList.all": "அனைவரும்",

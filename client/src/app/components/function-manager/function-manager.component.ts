@@ -6,7 +6,7 @@ import { debounceTime, switchMap } from 'rxjs/operators';
 import { FunctionService } from '../../services/function.service';
 import { PeopleService } from '../../services/people.service';
 import { TmsFunction } from '../../models/function.model';
-import { People } from '../../models/people.model';
+import { People, effectivePersonCount } from '../../models/people.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { TranslateService } from '../../services/translate.service';
 import { TransliterationService } from '../../services/transliteration.service';
@@ -229,6 +229,10 @@ export class FunctionManagerComponent implements OnInit, OnDestroy {
 
   isPersonInvited(person: People, fnId: number): boolean {
     return person.functionStatuses?.[String(fnId)] === 'INVITED';
+  }
+
+  effectiveCount(person: People): number {
+    return effectivePersonCount(person);
   }
 
   toggleInviteStatus(person: People, fnId: number): void {

@@ -12,7 +12,7 @@ import java.util.List;
 
 public class FunctionsTable extends AbstractDBTable {
 
-    private static final List<String> HEADERS = List.of("ID", "NAME", "COLOR", "DISPLAY_ORDER");
+    private static final List<String> HEADERS = List.of("ID", "NAME", "COLOR", "DISPLAY_ORDER", "EVENT_DATE");
 
     @Override
     public String getTableName() {
@@ -27,15 +27,17 @@ public class FunctionsTable extends AbstractDBTable {
     @Override
     public List<List<Object>> fetchAllRows(Connection conn) throws SQLException {
         ResultSet rs = conn.prepareStatement(
-            "SELECT ID, NAME, COLOR, DISPLAY_ORDER FROM Functions ORDER BY ID"
+            "SELECT ID, NAME, COLOR, DISPLAY_ORDER, EVENT_DATE FROM Functions ORDER BY ID"
         ).executeQuery();
         List<List<Object>> rows = new ArrayList<>();
         while (rs.next()) {
+            String eventDate = rs.getString("EVENT_DATE");
             rows.add(Arrays.asList(
                 rs.getInt("ID"),
                 rs.getString("NAME"),
                 rs.getString("COLOR"),
-                rs.getInt("DISPLAY_ORDER")
+                rs.getInt("DISPLAY_ORDER"),
+                eventDate == null ? "" : eventDate
             ));
         }
         return rows;
@@ -44,8 +46,9 @@ public class FunctionsTable extends AbstractDBTable {
     @Override
     public void upsertRows(Connection conn, List<List<Object>> rows) throws SQLException {
         String sql =
-            "INSERT INTO Functions (ID, NAME, COLOR, DISPLAY_ORDER) VALUES (?, ?, ?, ?)" +
-            " ON DUPLICATE KEY UPDATE NAME=VALUES(NAME), COLOR=VALUES(COLOR), DISPLAY_ORDER=VALUES(DISPLAY_ORDER)";
+            "INSERT INTO Functions (ID, NAME, COLOR, DISPLAY_ORDER, EVENT_DATE) VALUES (?, ?, ?, ?, ?)" +
+            " ON DUPLICATE KEY UPDATE NAME=VALUES(NAME), COLOR=VALUES(COLOR)," +
+            " DISPLAY_ORDER=VALUES(DISPLAY_ORDER), EVENT_DATE=VALUES(EVENT_DATE)";
         System.out.println("[FunctionsTable] upsertRows called with " + rows.size() + " rows");
         PreparedStatement pre = conn.prepareStatement(sql);
         for (List<Object> row : rows) {
@@ -54,6 +57,12 @@ public class FunctionsTable extends AbstractDBTable {
             pre.setString(2, String.valueOf(row.get(1)));
             pre.setString(3, String.valueOf(row.get(2)));
             pre.setInt(4, Integer.parseInt(String.valueOf(row.get(3))));
+            String eventDate = row.size() > 4 ? String.valueOf(row.get(4)).trim() : "";
+            if (eventDate.isEmpty() || "null".equalsIgnoreCase(eventDate)) {
+                pre.setNull(5, java.sql.Types.VARCHAR);
+            } else {
+                pre.setString(5, eventDate);
+            }
             pre.addBatch();
         }
         int[] results = pre.executeBatch();

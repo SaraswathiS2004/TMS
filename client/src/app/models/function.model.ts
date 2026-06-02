@@ -3,4 +3,5 @@ export interface TmsFunction {
   name: string;
   color: string;
   displayOrder: number;
+  eventDate?: string | null;  // ISO yyyy-MM-dd
 }

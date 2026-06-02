@@ -1,9 +1,11 @@
 package com.tms.sheet;
 
 import com.tms.data.respository.TmsDB;
+import com.tms.sheet.impl.BudgetItemSplitsTable;
+import com.tms.sheet.impl.BudgetItemsTable;
 import com.tms.sheet.impl.FunctionsTable;
-import com.tms.sheet.impl.InvitationPersonFunctionsTable;
-import com.tms.sheet.impl.InvitationPersonsTable;
+import com.tms.sheet.impl.GuestGroupsTable;
+import com.tms.sheet.impl.IncomeItemsTable;
 import com.tms.sheet.impl.InvitationsTable;
 import com.tms.sheet.impl.PersonFunctionsTable;
 
@@ -53,10 +55,12 @@ public class SheetSyncManager {
 
     public void queueSyncAll() {
         queueSync(new FunctionsTable());
+        queueSync(new GuestGroupsTable());
         queueSync(new InvitationsTable());
         queueSync(new PersonFunctionsTable());
-        queueSync(new InvitationPersonsTable());
-        queueSync(new InvitationPersonFunctionsTable());
+        queueSync(new BudgetItemsTable());
+        queueSync(new BudgetItemSplitsTable());
+        queueSync(new IncomeItemsTable());
     }
 
     public SheetSyncStatus getStatus() {

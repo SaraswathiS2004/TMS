@@ -6,6 +6,7 @@ public class Function {
     private String name;
     private String color;
     private int displayOrder;
+    private String eventDate; // ISO yyyy-MM-dd, nullable
 
     public Function() {}
 
@@ -20,4 +21,7 @@ public class Function {
 
     public int getDisplayOrder() { return displayOrder; }
     public void setDisplayOrder(int displayOrder) { this.displayOrder = displayOrder; }
+
+    public String getEventDate() { return eventDate; }
+    public void setEventDate(String eventDate) { this.eventDate = eventDate; }
 }

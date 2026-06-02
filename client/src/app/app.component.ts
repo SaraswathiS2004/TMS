@@ -14,7 +14,8 @@ import { AdminService, SheetSyncStatus } from './services/admin.service';
 })
 export class AppComponent implements OnInit, OnDestroy {
 
-  showInvMenu = false;
+  showGuestMenu = false;
+  showBudgetMenu = false;
   syncStatus: SheetSyncStatus | null = null;
 
   private syncPollInterval: any;
@@ -44,15 +45,26 @@ export class AppComponent implements OnInit, OnDestroy {
     return !!(this.syncStatus?.configured && !this.syncStatus.lastSyncSuccess);
   }
 
-  toggleInvMenu(): void {
-    this.showInvMenu = !this.showInvMenu;
+  toggleGuestMenu(): void {
+    this.showGuestMenu = !this.showGuestMenu;
+    this.showBudgetMenu = false;
+  }
+
+  toggleBudgetMenu(): void {
+    this.showBudgetMenu = !this.showBudgetMenu;
+    this.showGuestMenu = false;
+  }
+
+  closeMenus(): void {
+    this.showGuestMenu = false;
+    this.showBudgetMenu = false;
   }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     if (!target.closest('.inv-menu-wrapper')) {
-      this.showInvMenu = false;
+      this.closeMenus();
     }
   }
 

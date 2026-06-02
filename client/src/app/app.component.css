@@ -234,3 +234,5 @@
   max-width: 1200px;
   margin: 0 auto;
 }
+
+.nav-brand { text-decoration: none; cursor: pointer; }

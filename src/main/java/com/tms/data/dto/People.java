@@ -19,9 +19,9 @@ public class People {
     private List<Integer> invitedFunctionIds = new ArrayList<>();
     // key: functionId (as string for JSON compat), value: "INVITED" | "NOT_INVITED"
     private Map<String, String> functionStatuses = new LinkedHashMap<>();
-    // named persons (guests) listed under this invitation.
-    // null means "not provided" (partial update) — distinct from an empty list ("remove all").
-    private List<InvitationPerson> persons;
+    // Guest Group this guest belongs to (null = no group); groupName is read-only display
+    private Integer groupId;
+    private String groupName;
 
     public People() {}
 
@@ -70,6 +70,9 @@ public class People {
         this.functionStatuses = functionStatuses != null ? functionStatuses : new LinkedHashMap<>();
     }
 
-    public List<InvitationPerson> getPersons() { return persons; }
-    public void setPersons(List<InvitationPerson> persons) { this.persons = persons; }
+    public Integer getGroupId() { return groupId; }
+    public void setGroupId(Integer groupId) { this.groupId = groupId; }
+
+    public String getGroupName() { return groupName; }
+    public void setGroupName(String groupName) { this.groupName = groupName; }
 }

@@ -8,9 +8,11 @@ import com.tms.sheet.GoogleSheetService;
 import com.tms.sheet.SheetConfig;
 import com.tms.sheet.ServerMode;
 import com.tms.sheet.SheetSyncManager;
+import com.tms.sheet.impl.BudgetItemSplitsTable;
+import com.tms.sheet.impl.BudgetItemsTable;
 import com.tms.sheet.impl.FunctionsTable;
-import com.tms.sheet.impl.InvitationPersonFunctionsTable;
-import com.tms.sheet.impl.InvitationPersonsTable;
+import com.tms.sheet.impl.GuestGroupsTable;
+import com.tms.sheet.impl.IncomeItemsTable;
 import com.tms.sheet.impl.InvitationsTable;
 import com.tms.sheet.impl.PersonFunctionsTable;
 import jakarta.servlet.http.HttpServlet;
@@ -127,10 +129,12 @@ public class AdminServlet extends HttpServlet {
             sheetService.ensureInitialized(config.getCredentialsPath());
             System.out.println("[Restore] GoogleSheetService initialized OK");
 
-            // Restore in FK-safe order: Functions → Invitations → Person_Functions → Invitation_Persons → Invitation_Person_Functions
-            DBTable[] tables = { new FunctionsTable(), new InvitationsTable(),
-                                 new PersonFunctionsTable(), new InvitationPersonsTable(),
-                                 new InvitationPersonFunctionsTable() };
+            // Restore in FK-safe order: Functions/Guest_Groups → Invitations → Person_Functions
+            //   → Budget_Items → Budget_Item_Splits; Income_Items is independent.
+            DBTable[] tables = { new FunctionsTable(), new GuestGroupsTable(),
+                                 new InvitationsTable(), new PersonFunctionsTable(),
+                                 new BudgetItemsTable(), new BudgetItemSplitsTable(),
+                                 new IncomeItemsTable() };
             try (Connection conn = TmsDB.openConnection()) {
                 System.out.println("[Restore] DB connection opened: " + conn);
                 for (DBTable table : tables) {

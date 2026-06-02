@@ -1,0 +1,79 @@
+<div class="home-head">
+  <h2 class="page-title">{{ 'income.title' | translate }}</h2>
+  <button class="btn-primary" (click)="startAdd()" *ngIf="!editing || editingId !== null">
+    <i class="bi bi-plus-lg"></i> {{ 'income.addIncome' | translate }}
+  </button>
+</div>
+
+<div *ngIf="feedbackMessage" class="feedback-toast" [class.toast-error]="feedbackType === 'error'">
+  <i class="bi" [ngClass]="feedbackType === 'error' ? 'bi-exclamation-circle' : 'bi-check-circle'"></i>
+  {{ feedbackMessage }}
+</div>
+
+<!-- Totals -->
+<div *ngIf="!isLoading" class="grand-bar">
+  <div class="grand-stat"><span class="g-lbl">{{ 'income.estimated' | translate }}</span><span class="g-num">₹{{ totalEstimated() }}</span></div>
+  <div class="grand-stat g-paid"><span class="g-lbl">{{ 'income.received' | translate }}</span><span class="g-num">₹{{ totalReceived() }}</span></div>
+  <div class="grand-stat g-rem"><span class="g-lbl">{{ 'income.pending' | translate }}</span><span class="g-num">₹{{ totalPending() }}</span></div>
+</div>
+
+<p *ngIf="isLoading" class="loading-text"><i class="bi bi-arrow-repeat spin"></i> {{ 'common.loading' | translate }}</p>
+
+<!-- Add editor (when adding) -->
+<div *ngIf="editing && editingId === null" class="card inc-editor">
+  <ng-container *ngTemplateOutlet="editorTpl"></ng-container>
+</div>
+
+<div *ngIf="!isLoading && items.length === 0 && !editing" class="empty-state card">
+  <i class="bi bi-wallet2 empty-icon"></i>
+  <p>{{ 'income.empty' | translate }}</p>
+</div>
+
+<!-- Income rows -->
+<div *ngIf="!isLoading && items.length > 0" class="card inc-list">
+  <ng-container *ngFor="let item of items">
+    <div *ngIf="editing && editingId === item.id" class="inc-row editing">
+      <ng-container *ngTemplateOutlet="editorTpl"></ng-container>
+    </div>
+    <div *ngIf="!(editing && editingId === item.id)" class="inc-row">
+      <div class="inc-main">
+        <div class="inc-src">
+          <span class="inc-source">{{ item.source }}</span>
+          <span class="inc-date" *ngIf="item.incomeDate"><i class="bi bi-calendar-event"></i> {{ item.incomeDate }}</span>
+        </div>
+        <div class="inc-figs">
+          <span class="fig"><span class="fig-lbl">{{ 'income.est' | translate }}</span>₹{{ item.estimatedAmount }}</span>
+          <span class="fig fig-rec"><span class="fig-lbl">{{ 'income.received' | translate }}</span>{{ item.actualAmount != null ? '₹' + item.actualAmount : '—' }}</span>
+        </div>
+        <div class="inc-actions">
+          <button class="btn-icon" (click)="startEdit(item)"><i class="bi bi-pencil-square"></i></button>
+          <button class="btn-icon btn-icon-danger" (click)="requestDelete(item.id!)"><i class="bi bi-trash3"></i></button>
+        </div>
+      </div>
+      <div class="inc-notes" *ngIf="item.notes"><i class="bi bi-sticky"></i> {{ item.notes }}</div>
+      <div class="inc-delete" *ngIf="deleteConfirmId === item.id">
+        <span>{{ 'income.confirmDelete' | translate }}</span>
+        <div class="confirm-actions">
+          <button class="btn-danger btn-sm" (click)="confirmDelete(item.id!)">{{ 'income.yesDelete' | translate }}</button>
+          <button class="btn-ghost btn-sm" (click)="cancelDelete()">{{ 'income.cancel' | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>
+
+<ng-template #editorTpl>
+  <div class="inc-edit-form" *ngIf="editing as e">
+    <input class="ed-src" type="text" [(ngModel)]="e.source" [placeholder]="'income.source' | translate" />
+    <div class="ed-amounts">
+      <label><span>{{ 'income.date' | translate }}</span><input type="date" [(ngModel)]="e.incomeDate" /></label>
+      <label><span>{{ 'income.estimated' | translate }}</span><input type="number" min="0" [(ngModel)]="e.estimatedAmount" /></label>
+      <label><span>{{ 'income.received' | translate }}</span><input type="number" min="0" [(ngModel)]="e.actualAmount" /></label>
+    </div>
+    <input class="ed-notes" type="text" [(ngModel)]="e.notes" [placeholder]="'income.notes' | translate" />
+    <div class="confirm-actions">
+      <button class="btn-primary btn-sm" (click)="save()">{{ 'income.save' | translate }}</button>
+      <button class="btn-ghost btn-sm" (click)="cancelEdit()">{{ 'income.cancel' | translate }}</button>
+    </div>
+  </div>
+</ng-template>

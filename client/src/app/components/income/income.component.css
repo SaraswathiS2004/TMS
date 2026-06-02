@@ -1,0 +1,57 @@
+.home-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+
+.feedback-toast { display: flex; align-items: center; gap: 8px; background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; margin-bottom: 16px; }
+.feedback-toast.toast-error { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+
+.empty-state { text-align: center; padding: 48px; color: #94a3b8; }
+.empty-icon { font-size: 48px; display: block; margin-bottom: 12px; color: #cbd5e1; }
+
+.grand-bar { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
+.grand-stat { flex: 1 1 150px; background: #fff; border-radius: 12px; padding: 14px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); border-left: 5px solid #4f46e5; display: flex; flex-direction: column; gap: 4px; }
+.grand-stat.g-paid { border-left-color: #16a34a; }
+.grand-stat.g-rem  { border-left-color: #f59e0b; }
+.g-lbl { font-size: 12px; font-weight: 600; color: #64748b; }
+.g-num { font-size: 26px; font-weight: 800; color: #1e293b; }
+.g-paid .g-num { color: #16a34a; }
+.g-rem .g-num  { color: #f59e0b; }
+
+.inc-list { padding: 0; overflow: hidden; }
+.inc-row { padding: 12px 18px; border-bottom: 1px solid #f8fafc; }
+.inc-row:last-child { border-bottom: none; }
+.inc-row.editing { background: #f8fafc; }
+.inc-editor { padding: 16px; margin-bottom: 16px; }
+
+.inc-main { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.inc-src { display: flex; flex-direction: column; gap: 2px; flex: 1 1 160px; min-width: 0; }
+.inc-source { font-size: 14px; font-weight: 700; color: #1e293b; }
+.inc-date { font-size: 12px; color: #4f46e5; font-weight: 600; }
+.inc-figs { display: flex; flex-wrap: wrap; gap: 12px; }
+.fig { font-size: 13px; color: #334155; display: inline-flex; align-items: baseline; gap: 4px; }
+.fig-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px; color: #94a3b8; font-weight: 700; }
+.fig-rec { color: #15803d; font-weight: 700; }
+.inc-actions { display: flex; gap: 6px; margin-left: auto; }
+.inc-notes { font-size: 12px; color: #64748b; margin-top: 6px; display: flex; align-items: center; gap: 5px; }
+.inc-delete { margin-top: 8px; background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; padding: 10px; font-size: 13px; color: #9f1239; display: flex; flex-direction: column; gap: 8px; }
+
+.inc-edit-form { display: flex; flex-direction: column; gap: 10px; }
+.ed-src { padding: 9px 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 14px; }
+.ed-amounts { display: flex; flex-wrap: wrap; gap: 10px; }
+.ed-amounts label { display: flex; flex-direction: column; gap: 4px; flex: 1 1 120px; font-size: 11px; font-weight: 600; color: #64748b; }
+.ed-amounts input { padding: 8px 10px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 14px; }
+.ed-notes { padding: 9px 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 14px; }
+
+.btn-primary { display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; background: #4f46e5; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.btn-primary:hover { background: #4338ca; }
+.btn-ghost { padding: 8px 14px; background: #f1f5f9; color: #475569; border: none; border-radius: 7px; font-weight: 600; cursor: pointer; }
+.btn-ghost:hover { background: #e2e8f0; }
+.btn-danger { padding: 8px 14px; background: #dc2626; color: #fff; border: none; border-radius: 7px; font-weight: 600; cursor: pointer; }
+.btn-danger:hover { background: #b91c1c; }
+.btn-sm { padding: 6px 12px; font-size: 13px; }
+.confirm-actions { display: flex; gap: 8px; }
+.btn-icon { width: 32px; height: 32px; border-radius: 8px; border: 1.5px solid #e2e8f0; background: #fff; color: #475569; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.btn-icon:hover { border-color: #4f46e5; color: #4f46e5; }
+.btn-icon-danger { border-color: #fecdd3; background: #fff1f2; color: #dc2626; }
+.btn-icon-danger:hover { background: #fee2e2; }
+
+.spin { animation: spin 1s linear infinite; display: inline-block; margin-right: 6px; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }

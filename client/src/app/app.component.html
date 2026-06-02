@@ -1,41 +1,55 @@
 <nav class="navbar">
-  <div class="nav-brand">
+  <a class="nav-brand" routerLink="/home" (click)="closeMenus()">
     <i class="bi bi-stars nav-brand-icon"></i>
     <span class="nav-title">{{ 'app.title' | translate }}</span>
-  </div>
+  </a>
 
   <div class="nav-links">
+    <!-- Manage Guests -->
     <div class="inv-menu-wrapper">
-      <button
-        class="inv-menu-trigger"
-        [class.inv-menu-open]="showInvMenu"
-        (click)="toggleInvMenu()"
-      >
-        <i class="bi bi-journal-bookmark-fill"></i>
-        {{ 'nav.invitationManager' | translate }}
-        <i class="bi" [ngClass]="showInvMenu ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+      <button class="inv-menu-trigger" [class.inv-menu-open]="showGuestMenu" (click)="toggleGuestMenu()">
+        <i class="bi bi-people-fill"></i>
+        {{ 'nav.manageGuests' | translate }}
+        <i class="bi" [ngClass]="showGuestMenu ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
       </button>
+      <div class="inv-menu-panel" *ngIf="showGuestMenu">
+        <a routerLink="/dashboard" routerLinkActive="active-link" (click)="closeMenus()">
+          <i class="bi bi-speedometer2"></i> {{ 'nav.guestDashboard' | translate }}
+        </a>
+        <a routerLink="/add" routerLinkActive="active-link" (click)="closeMenus()">
+          <i class="bi bi-person-plus"></i> {{ 'nav.addPerson' | translate }}
+        </a>
+        <a routerLink="/list" routerLinkActive="active-link" (click)="closeMenus()">
+          <i class="bi bi-people"></i> {{ 'nav.peopleList' | translate }}
+        </a>
+        <a routerLink="/city-group" routerLinkActive="active-link" (click)="closeMenus()">
+          <i class="bi bi-geo-alt"></i> {{ 'nav.byCity' | translate }}
+        </a>
+        <a routerLink="/by-group" routerLinkActive="active-link" (click)="closeMenus()">
+          <i class="bi bi-collection"></i> {{ 'nav.byGroup' | translate }}
+        </a>
+        <a routerLink="/guest-groups" routerLinkActive="active-link" (click)="closeMenus()">
+          <i class="bi bi-collection-fill"></i> {{ 'nav.manageGuestGroups' | translate }}
+        </a>
+      </div>
+    </div>
 
-      <div class="inv-menu-panel" *ngIf="showInvMenu">
-        <a routerLink="/dashboard" routerLinkActive="active-link" (click)="showInvMenu = false">
-          <i class="bi bi-speedometer2"></i>
-          {{ 'nav.dashboard' | translate }}
+    <!-- Budget Plan -->
+    <div class="inv-menu-wrapper">
+      <button class="inv-menu-trigger" [class.inv-menu-open]="showBudgetMenu" (click)="toggleBudgetMenu()">
+        <i class="bi bi-cash-coin"></i>
+        {{ 'nav.budgetPlan' | translate }}
+        <i class="bi" [ngClass]="showBudgetMenu ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+      </button>
+      <div class="inv-menu-panel" *ngIf="showBudgetMenu">
+        <a routerLink="/budget-dashboard" routerLinkActive="active-link" (click)="closeMenus()">
+          <i class="bi bi-graph-up"></i> {{ 'nav.budgetDashboard' | translate }}
         </a>
-        <a routerLink="/add" routerLinkActive="active-link" (click)="showInvMenu = false">
-          <i class="bi bi-person-plus"></i>
-          {{ 'nav.addPerson' | translate }}
+        <a routerLink="/budget" routerLinkActive="active-link" (click)="closeMenus()">
+          <i class="bi bi-receipt"></i> {{ 'nav.expenses' | translate }}
         </a>
-        <a routerLink="/list" routerLinkActive="active-link" (click)="showInvMenu = false">
-          <i class="bi bi-people"></i>
-          {{ 'nav.peopleList' | translate }}
-        </a>
-        <a routerLink="/city-group" routerLinkActive="active-link" (click)="showInvMenu = false">
-          <i class="bi bi-geo-alt"></i>
-          {{ 'nav.byCity' | translate }}
-        </a>
-        <a routerLink="/functions" routerLinkActive="active-link" (click)="showInvMenu = false">
-          <i class="bi bi-calendar2-event"></i>
-          {{ 'nav.manageFunctions' | translate }}
+        <a routerLink="/income" routerLinkActive="active-link" (click)="closeMenus()">
+          <i class="bi bi-wallet2"></i> {{ 'nav.income' | translate }}
         </a>
       </div>
     </div>

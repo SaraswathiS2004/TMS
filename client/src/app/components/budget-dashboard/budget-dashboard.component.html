@@ -1,0 +1,83 @@
+<h2 class="page-title">{{ 'budgetDashboard.title' | translate }}</h2>
+
+<p *ngIf="isLoading" class="loading-text"><i class="bi bi-arrow-repeat spin"></i> {{ 'common.loading' | translate }}</p>
+
+<ng-container *ngIf="!isLoading">
+
+  <!-- Headline -->
+  <div class="stats-row">
+    <div class="stat-card stat-highlight">
+      <i class="bi bi-cash-stack stat-icon"></i>
+      <div class="stat-body">
+        <span class="stat-number">₹{{ totalEstimated }}</span>
+        <span class="stat-label">{{ 'budgetDashboard.totalEstimated' | translate }}</span>
+      </div>
+    </div>
+    <div class="stat-card stat-paid">
+      <i class="bi bi-check2-circle stat-icon"></i>
+      <div class="stat-body">
+        <span class="stat-number">₹{{ totalPaid }}</span>
+        <span class="stat-label">{{ 'budgetDashboard.totalPaid' | translate }}</span>
+        <span class="stat-sub">{{ paidPct }}% {{ 'budgetDashboard.ofEstimated' | translate }}</span>
+      </div>
+    </div>
+    <div class="stat-card stat-rem">
+      <i class="bi bi-hourglass-split stat-icon"></i>
+      <div class="stat-body">
+        <span class="stat-number">₹{{ totalRemaining }}</span>
+        <span class="stat-label">{{ 'budgetDashboard.totalRemaining' | translate }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Income vs Expense balance -->
+  <div class="balance-banner" [class.deficit]="cashPosition < 0">
+    <div class="bal-part">
+      <span class="bal-lbl">{{ 'budgetDashboard.incomeReceived' | translate }}</span>
+      <span class="bal-num">₹{{ incomeReceived }}</span>
+    </div>
+    <i class="bi bi-dash-lg bal-op"></i>
+    <div class="bal-part">
+      <span class="bal-lbl">{{ 'budgetDashboard.paidOut' | translate }}</span>
+      <span class="bal-num">₹{{ totalPaid }}</span>
+    </div>
+    <i class="bi bi-arrow-right bal-op"></i>
+    <div class="bal-part bal-result">
+      <span class="bal-lbl">{{ cashPosition >= 0 ? ('budgetDashboard.surplus' | translate) : ('budgetDashboard.deficit' | translate) }}</span>
+      <span class="bal-num">₹{{ cashPosition }}</span>
+    </div>
+    <div class="bal-planned">
+      {{ 'budgetDashboard.planned' | translate }}: ₹{{ incomeEstimated }} {{ 'budgetDashboard.vs' | translate }} ₹{{ totalEstimated }}
+      <strong [class.neg]="plannedBalance < 0">(₹{{ plannedBalance }})</strong>
+    </div>
+  </div>
+
+  <!-- Per-function bars -->
+  <h3 class="section-title"><i class="bi bi-grid-1x2-fill"></i> {{ 'budgetDashboard.byFunction' | translate }}</h3>
+  <div class="fn-rollups" *ngIf="rollups.length > 0; else noFns">
+    <div *ngFor="let r of rollups" class="rollup-card card" [style.--fn-color]="r.fn.color">
+      <div class="rollup-head">
+        <span class="rollup-name"><span class="rollup-dot"></span>{{ r.fn.name }}</span>
+        <span class="overspent-badge" *ngIf="r.overspent"><i class="bi bi-exclamation-triangle-fill"></i> {{ 'budgetDashboard.over' | translate }}</span>
+      </div>
+      <div class="rollup-figs">
+        <span>{{ 'budgetDashboard.est' | translate }} ₹{{ r.estimated }}</span>
+        <span class="rf-paid">{{ 'budgetDashboard.paid' | translate }} ₹{{ r.paid }}</span>
+        <span class="rf-rem">{{ 'budgetDashboard.left' | translate }} ₹{{ r.remaining }}</span>
+      </div>
+      <div class="rollup-bar"><div class="rollup-fill" [style.width.%]="r.paidPct > 100 ? 100 : r.paidPct"></div></div>
+      <div class="rollup-pct">{{ r.paidPct }}% {{ 'budgetDashboard.paidLower' | translate }}</div>
+    </div>
+  </div>
+  <ng-template #noFns><div class="empty-state card"><p>{{ 'budgetDashboard.noData' | translate }}</p></div></ng-template>
+
+  <!-- Top expenses -->
+  <h3 class="section-title" *ngIf="topExpenses.length > 0"><i class="bi bi-bar-chart-fill"></i> {{ 'budgetDashboard.topExpenses' | translate }}</h3>
+  <div class="card top-list" *ngIf="topExpenses.length > 0">
+    <div class="top-row" *ngFor="let item of topExpenses">
+      <span class="top-name">{{ item.name }}</span>
+      <span class="top-amt">₹{{ est(item) }}</span>
+    </div>
+  </div>
+
+</ng-container>

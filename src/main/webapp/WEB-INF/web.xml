@@ -90,12 +90,30 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>InvitationPersonFunctionServlet</servlet-name>
-        <servlet-class>com.tms.servlets.InvitationPersonFunctionServlet</servlet-class>
+        <servlet-name>GuestGroupServlet</servlet-name>
+        <servlet-class>com.tms.servlets.GuestGroupServlet</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>InvitationPersonFunctionServlet</servlet-name>
-        <url-pattern>/api/invitation-person-function</url-pattern>
+        <servlet-name>GuestGroupServlet</servlet-name>
+        <url-pattern>/api/guest-groups</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>BudgetServlet</servlet-name>
+        <servlet-class>com.tms.servlets.BudgetServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BudgetServlet</servlet-name>
+        <url-pattern>/api/budget</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>IncomeServlet</servlet-name>
+        <servlet-class>com.tms.servlets.IncomeServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>IncomeServlet</servlet-name>
+        <url-pattern>/api/income</url-pattern>
     </servlet-mapping>
 
 </web-app>

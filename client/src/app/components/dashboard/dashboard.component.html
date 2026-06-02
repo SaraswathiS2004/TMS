@@ -10,7 +10,7 @@
   <!-- Overview: the headline numbers -->
   <div class="stats-row">
 
-    <div class="stat-card">
+    <div class="stat-card stat-highlight">
       <i class="bi bi-people-fill stat-icon"></i>
       <div class="stat-body">
         <span class="stat-number">{{ totalPeople }}</span>
@@ -72,9 +72,10 @@
         <div class="fnw-progress-fill" [style.width.%]="invitedPercent(stat)"></div>
       </div>
 
-      <div class="fnw-footer">
+      <div class="fnw-headcount">
         <i class="bi bi-people-fill"></i>
-        {{ stat.expectedCount }} {{ 'dashboard.expectedAttendees' | translate }}
+        <span class="fnw-headcount-num">{{ stat.expectedCount }}</span>
+        <span class="fnw-headcount-lbl">{{ 'dashboard.headCount' | translate }}</span>
       </div>
 
     </div>

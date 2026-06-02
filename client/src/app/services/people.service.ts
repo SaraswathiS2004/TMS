@@ -30,11 +30,6 @@ export class PeopleService {
     return this.http.put<ApiMessage>('api/person-function', { personId, functionId, status });
   }
 
-  // personId is the individual person's (Invitation_Persons) id
-  updatePersonInvitedStatus(personId: number, functionId: number, status: string): Observable<ApiMessage> {
-    return this.http.put<ApiMessage>('api/invitation-person-function', { personId, functionId, status });
-  }
-
   deletePerson(id: number): Observable<ApiMessage> {
     return this.http.delete<ApiMessage>(`${this.apiUrl}?id=${id}`);
   }

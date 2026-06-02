@@ -113,48 +113,16 @@
     </span>
   </div>
 
-  <!-- Named persons in this invitation -->
+  <!-- Guest Group -->
   <div class="form-group">
-    <label>{{ 'addPerson.personsLabel' | translate }}</label>
-    <p class="field-hint">{{ 'addPerson.personsHint' | translate }}</p>
-
-    <div formArrayName="persons" class="persons-list">
-      <div
-        *ngFor="let row of personsArray.controls; let i = index"
-        [formGroupName]="i"
-        class="person-row"
-      >
-        <div class="input-with-icon person-name">
-          <i class="bi bi-person-fill field-icon"></i>
-          <input
-            type="text"
-            formControlName="name"
-            [placeholder]="'addPerson.personNamePlaceholder' | translate"
-            autocomplete="off"
-          />
-        </div>
-        <input
-          type="text"
-          formControlName="note"
-          class="person-note"
-          [placeholder]="'addPerson.personNotePlaceholder' | translate"
-          autocomplete="off"
-        />
-        <button
-          type="button"
-          class="btn-remove-person"
-          (click)="removePersonRow(i)"
-          [title]="'addPerson.removePerson' | translate"
-        >
-          <i class="bi bi-x-lg"></i>
-        </button>
-      </div>
+    <label for="pf-groupId">{{ 'addPerson.guestGroup' | translate }}</label>
+    <div class="input-with-icon">
+      <i class="bi bi-collection field-icon"></i>
+      <select id="pf-groupId" formControlName="groupId">
+        <option [ngValue]="null">{{ 'addPerson.noGroup' | translate }}</option>
+        <option *ngFor="let g of groups" [ngValue]="g.id">{{ g.name }}</option>
+      </select>
     </div>
-
-    <button type="button" class="btn-add-person" (click)="addPersonRow()">
-      <i class="bi bi-plus-lg"></i>
-      {{ 'addPerson.addPerson' | translate }}
-    </button>
   </div>
 
   <!-- Relation Type -->

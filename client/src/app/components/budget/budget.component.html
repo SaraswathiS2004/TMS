@@ -1,0 +1,133 @@
+<h2 class="page-title">{{ 'budget.title' | translate }}</h2>
+
+<div *ngIf="feedbackMessage" class="feedback-toast" [class.toast-error]="feedbackType === 'error'">
+  <i class="bi" [ngClass]="feedbackType === 'error' ? 'bi-exclamation-circle' : 'bi-check-circle'"></i>
+  {{ feedbackMessage }}
+</div>
+
+<p *ngIf="isLoading" class="loading-text"><i class="bi bi-arrow-repeat spin"></i> {{ 'common.loading' | translate }}</p>
+
+<!-- Grand totals -->
+<div *ngIf="!isLoading && functions.length > 0" class="grand-bar">
+  <div class="grand-stat"><span class="g-lbl">{{ 'budget.estimated' | translate }}</span><span class="g-num">₹{{ grandTotal('est') }}</span></div>
+  <div class="grand-stat g-paid"><span class="g-lbl">{{ 'budget.paid' | translate }}</span><span class="g-num">₹{{ grandTotal('paid') }}</span></div>
+  <div class="grand-stat g-rem"><span class="g-lbl">{{ 'budget.remaining' | translate }}</span><span class="g-num">₹{{ grandTotal('remaining') }}</span></div>
+</div>
+
+<div *ngIf="!isLoading && functions.length === 0" class="empty-state card">
+  <i class="bi bi-calendar2-x empty-icon"></i>
+  <p>{{ 'budget.noFunctions' | translate }}</p>
+</div>
+
+<!-- Editor template -->
+<ng-template #editor>
+  <div class="exp-editor" *ngIf="editing as e">
+    <div class="ed-row">
+      <input class="ed-name" type="text" [(ngModel)]="e.name" [placeholder]="'budget.expenseName' | translate" />
+    </div>
+    <div class="ed-amounts">
+      <label>
+        <span>{{ 'budget.estimated' | translate }}</span>
+        <input type="number" min="0" [(ngModel)]="e.estimatedAmount" [disabled]="hasSplits(e)"
+               [title]="hasSplits(e) ? ('budget.autoSum' | translate) : ''" />
+      </label>
+      <label><span>{{ 'budget.actual' | translate }}</span><input type="number" min="0" [(ngModel)]="e.actualAmount" /></label>
+      <label><span>{{ 'budget.paid' | translate }}</span><input type="number" min="0" [(ngModel)]="e.paidAmount" /></label>
+    </div>
+    <input class="ed-notes" type="text" [(ngModel)]="e.notes" [placeholder]="'budget.notes' | translate" />
+
+    <!-- Split-ups -->
+    <div class="splits">
+      <div class="splits-head">{{ 'budget.splitUp' | translate }}<span *ngIf="hasSplits(e)" class="splits-sum">₹{{ splitsTotal(e) }}</span></div>
+      <div class="split-row" *ngFor="let s of e.splits; let i = index">
+        <input type="text" [(ngModel)]="s.label" [placeholder]="'budget.splitLabel' | translate" />
+        <input type="number" min="0" [(ngModel)]="s.amount" [placeholder]="'budget.amount' | translate" />
+        <button class="btn-icon btn-icon-danger" (click)="removeSplitRow(i)"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <button class="btn-add-split" (click)="addSplitRow()"><i class="bi bi-plus-lg"></i> {{ 'budget.addSplit' | translate }}</button>
+    </div>
+
+    <div class="confirm-actions">
+      <button class="btn-primary btn-sm" (click)="save()">{{ 'budget.save' | translate }}</button>
+      <button class="btn-ghost btn-sm" (click)="cancelEdit()">{{ 'budget.cancel' | translate }}</button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Function groups -->
+<div *ngIf="!isLoading && functions.length > 0" class="fn-budget-list">
+  <div *ngFor="let group of groups" class="fn-budget card" [style.--fn-color]="group.fn.color">
+
+    <div class="fb-header">
+      <div class="fb-title">
+        <span class="fb-dot"></span>
+        <span class="fb-name">{{ group.fn.name }}</span>
+        <span class="fb-date" *ngIf="group.fn.eventDate"><i class="bi bi-calendar-event"></i> {{ group.fn.eventDate }}</span>
+      </div>
+      <div class="fb-totals">
+        <span class="fb-pill">{{ 'budget.estimated' | translate }} ₹{{ fnTotal(group, 'est') }}</span>
+        <span class="fb-pill pill-paid">{{ 'budget.paid' | translate }} ₹{{ fnTotal(group, 'paid') }}</span>
+        <span class="fb-pill pill-rem">{{ 'budget.remaining' | translate }} ₹{{ fnTotal(group, 'remaining') }}</span>
+      </div>
+    </div>
+
+    <!-- Expense rows -->
+    <div class="exp-rows">
+      <ng-container *ngFor="let item of group.items">
+
+        <!-- edit mode -->
+        <div *ngIf="isEditingRow(item)" class="exp-row editing">
+          <ng-container *ngTemplateOutlet="editor"></ng-container>
+        </div>
+
+        <!-- display mode -->
+        <div *ngIf="!isEditingRow(item)" class="exp-row">
+          <div class="exp-main">
+            <div class="exp-name-wrap">
+              <button class="exp-expand" *ngIf="item.splits && item.splits.length > 0" (click)="toggleExpand(item)">
+                <i class="bi" [ngClass]="expandedId === item.id ? 'bi-caret-down-fill' : 'bi-caret-right-fill'"></i>
+              </button>
+              <span class="exp-name">{{ item.name }}</span>
+              <span class="overspent-badge" *ngIf="isOverspent(item)" [title]="'budget.overspent' | translate"><i class="bi bi-exclamation-triangle-fill"></i></span>
+            </div>
+            <div class="exp-figs">
+              <span class="fig"><span class="fig-lbl">{{ 'budget.est' | translate }}</span>₹{{ estimated(item) }}</span>
+              <span class="fig"><span class="fig-lbl">{{ 'budget.actualShort' | translate }}</span>{{ item.actualAmount != null ? '₹' + item.actualAmount : '—' }}</span>
+              <span class="fig"><span class="fig-lbl">{{ 'budget.paid' | translate }}</span>₹{{ item.paidAmount }}</span>
+              <span class="fig fig-rem" [class.fig-neg]="remaining(item) < 0"><span class="fig-lbl">{{ 'budget.remaining' | translate }}</span>₹{{ remaining(item) }}</span>
+            </div>
+            <div class="exp-actions">
+              <button class="btn-icon" (click)="startEdit(item)"><i class="bi bi-pencil-square"></i></button>
+              <button class="btn-icon btn-icon-danger" (click)="requestDelete(item.id!)"><i class="bi bi-trash3"></i></button>
+            </div>
+          </div>
+          <div class="exp-notes" *ngIf="item.notes"><i class="bi bi-sticky"></i> {{ item.notes }}</div>
+
+          <!-- splits view -->
+          <div class="exp-splits" *ngIf="expandedId === item.id && item.splits && item.splits.length > 0">
+            <div class="exp-split" *ngFor="let s of item.splits"><span>{{ s.label }}</span><span>₹{{ s.amount }}</span></div>
+          </div>
+
+          <!-- delete confirm -->
+          <div class="exp-delete" *ngIf="deleteConfirmId === item.id">
+            <span>{{ 'budget.confirmDelete' | translate }}</span>
+            <div class="confirm-actions">
+              <button class="btn-danger btn-sm" (click)="confirmDelete(item.id!)">{{ 'budget.yesDelete' | translate }}</button>
+              <button class="btn-ghost btn-sm" (click)="cancelDelete()">{{ 'budget.cancel' | translate }}</button>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- add editor -->
+      <div *ngIf="isAddingTo(group.fn.id)" class="exp-row editing">
+        <ng-container *ngTemplateOutlet="editor"></ng-container>
+      </div>
+    </div>
+
+    <button *ngIf="!isAddingTo(group.fn.id)" class="btn-add-expense" (click)="startAdd(group.fn.id)">
+      <i class="bi bi-plus-lg"></i> {{ 'budget.addExpense' | translate }}
+    </button>
+
+  </div>
+</div>

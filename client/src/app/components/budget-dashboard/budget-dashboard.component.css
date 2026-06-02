@@ -1,0 +1,50 @@
+.stats-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.stat-card { background: #fff; border-radius: 14px; padding: 22px; display: flex; align-items: flex-start; gap: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); border-left: 5px solid #4f46e5; }
+.stat-icon { font-size: 28px; color: #4f46e5; flex-shrink: 0; margin-top: 2px; }
+.stat-body { display: flex; flex-direction: column; gap: 4px; }
+.stat-number { font-size: 30px; font-weight: 800; line-height: 1; color: #1e293b; }
+.stat-label { font-size: 13px; font-weight: 600; color: #475569; }
+.stat-sub { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+
+.stat-highlight { background: linear-gradient(135deg, #4f46e5, #6366f1); border-left: none; box-shadow: 0 6px 22px rgba(79,70,229,0.35); }
+.stat-highlight .stat-icon, .stat-highlight .stat-number { color: #fff; }
+.stat-highlight .stat-label { color: rgba(255,255,255,0.92); font-weight: 700; }
+.stat-paid { border-left-color: #16a34a; } .stat-paid .stat-icon { color: #16a34a; }
+.stat-rem  { border-left-color: #f59e0b; } .stat-rem .stat-icon { color: #f59e0b; }
+
+/* Balance banner */
+.balance-banner { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin: 20px 0; padding: 18px 22px; border-radius: 14px; background: linear-gradient(135deg, #0f766e, #0d9488); color: #fff; box-shadow: 0 4px 18px rgba(13,148,136,0.3); }
+.balance-banner.deficit { background: linear-gradient(135deg, #b91c1c, #dc2626); box-shadow: 0 4px 18px rgba(220,38,38,0.3); }
+.bal-part { display: flex; flex-direction: column; gap: 2px; }
+.bal-lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; opacity: 0.9; font-weight: 700; }
+.bal-num { font-size: 22px; font-weight: 800; }
+.bal-op { font-size: 16px; opacity: 0.8; }
+.bal-result .bal-num { font-size: 26px; }
+.bal-planned { margin-left: auto; font-size: 12px; opacity: 0.92; }
+.bal-planned .neg { color: #fecaca; }
+
+.section-title { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; color: #334155; margin: 28px 0 14px; }
+.section-title i { color: #6366f1; }
+
+.fn-rollups { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+.rollup-card { padding: 16px; border-top: 4px solid var(--fn-color); display: flex; flex-direction: column; gap: 10px; }
+.rollup-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.rollup-name { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; color: #1e293b; }
+.rollup-dot { width: 11px; height: 11px; border-radius: 50%; background: var(--fn-color); }
+.overspent-badge { font-size: 11px; font-weight: 700; color: #dc2626; display: inline-flex; align-items: center; gap: 4px; }
+.rollup-figs { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; color: #475569; }
+.rf-paid { color: #16a34a; font-weight: 600; }
+.rf-rem  { color: #b45309; font-weight: 600; }
+.rollup-bar { height: 8px; border-radius: 99px; background: #eef2f7; overflow: hidden; }
+.rollup-fill { height: 100%; border-radius: 99px; background: var(--fn-color); transition: width 0.3s ease; }
+.rollup-pct { font-size: 11px; color: #94a3b8; font-weight: 600; }
+
+.top-list { padding: 8px 0; }
+.top-row { display: flex; justify-content: space-between; padding: 10px 18px; border-bottom: 1px solid #f8fafc; font-size: 14px; }
+.top-row:last-child { border-bottom: none; }
+.top-name { color: #1e293b; font-weight: 600; }
+.top-amt { color: #4f46e5; font-weight: 700; }
+
+.empty-state { text-align: center; padding: 32px; color: #94a3b8; }
+.spin { animation: spin 1s linear infinite; display: inline-block; margin-right: 6px; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }

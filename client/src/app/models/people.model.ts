@@ -1,13 +1,5 @@
 export type RelationType = 'CLOSE_RELATIVE' | 'DISTANCE_RELATIVE' | 'FRIENDS';
 
-export interface InvitationPerson {
-  id?: number;
-  name: string;
-  note?: string;
-  // per-function invited status for this individual person (functionId as string → "INVITED" | "NOT_INVITED")
-  functionStatuses?: { [fnId: string]: string };
-}
-
 export interface People {
   id?: number;
   name: string;
@@ -17,8 +9,9 @@ export interface People {
   invitedFunctionIds: number[];
   // key is functionId as string (JSON map keys are always strings)
   functionStatuses?: { [fnId: string]: string };
-  // named persons (guests) listed under this invitation
-  persons?: InvitationPerson[];
+  // the Guest Group this guest belongs to (null/undefined = no group)
+  groupId?: number | null;
+  groupName?: string;
 }
 
 export interface ApiMessage {

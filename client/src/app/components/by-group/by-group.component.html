@@ -1,0 +1,88 @@
+<h2 class="page-title">{{ 'byGroup.title' | translate }}</h2>
+
+<p *ngIf="isLoading" class="loading-text">
+  <i class="bi bi-arrow-repeat spin"></i>
+  {{ 'common.loading' | translate }}
+</p>
+
+<div *ngIf="!isLoading && buckets.length === 0" class="empty-state card">
+  <i class="bi bi-collection empty-icon"></i>
+  <p>{{ 'byGroup.empty' | translate }}</p>
+</div>
+
+<div *ngIf="!isLoading && buckets.length > 0" class="city-list">
+
+  <div *ngFor="let bucket of buckets" class="city-section card" [style.--grp-color]="bucket.color">
+
+    <!-- Group header (highlighted name) -->
+    <div class="city-header" (click)="toggle(bucket)">
+      <div class="city-title-wrap">
+        <span class="grp-dot"></span>
+        <span class="city-name grp-name">{{ bucket.name }}</span>
+      </div>
+      <div class="city-meta">
+        <span class="meta-pill pill-count">
+          <i class="bi bi-people"></i>
+          {{ bucket.people.length }} {{ 'cityGroup.people' | translate }}
+        </span>
+        <span class="meta-pill pill-expected">
+          <i class="bi bi-person-check"></i>
+          {{ totalExpected(bucket) }} {{ 'cityGroup.expected' | translate }}
+        </span>
+        <i class="bi chevron" [class.bi-chevron-down]="bucket.expanded" [class.bi-chevron-right]="!bucket.expanded"></i>
+      </div>
+    </div>
+
+    <ng-container *ngIf="bucket.expanded">
+
+      <div class="status-summary" *ngIf="functions.length > 0 && bucket.people.length > 0">
+        <span
+          *ngFor="let fn of functions"
+          class="fn-pill"
+          [style.background]="fn.color + '22'"
+          [style.color]="fn.color"
+          [style.border-color]="fn.color + '55'"
+        >
+          <i class="bi bi-calendar2-check"></i>
+          {{ countByFunction(bucket, fn.id) }} {{ fn.name }}
+        </span>
+        <span class="fn-pill pill-none" *ngIf="notInvitedCount(bucket) > 0">
+          <i class="bi bi-clock"></i>
+          {{ notInvitedCount(bucket) }} {{ 'cityGroup.notInvited' | translate }}
+        </span>
+      </div>
+
+      <div class="empty-bucket" *ngIf="bucket.people.length === 0">
+        {{ 'byGroup.noGuests' | translate }}
+      </div>
+
+      <div class="people-rows">
+        <div *ngFor="let person of bucket.people" class="person-row">
+          <div class="person-left">
+            <span class="person-name">{{ person.name }}</span>
+            <span class="badge" [ngClass]="relationBadgeClass(person.relationType)">
+              {{ ('relationType.' + person.relationType) | translate }}
+            </span>
+          </div>
+          <div class="person-right">
+            <span class="person-count">
+              <i class="bi bi-people"></i>
+              {{ person.numberOfPerson }}
+            </span>
+            <span
+              *ngFor="let fnId of person.invitedFunctionIds"
+              class="fn-dot"
+              [style.background]="functionColor(fnId)"
+            ></span>
+            <span *ngIf="person.invitedFunctionIds.length === 0" class="not-inv-tag">
+              <i class="bi bi-clock"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </ng-container>
+
+  </div>
+
+</div>

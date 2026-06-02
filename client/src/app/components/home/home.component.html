@@ -1,0 +1,104 @@
+<div class="home-head">
+  <h2 class="page-title">{{ 'home.title' | translate }}</h2>
+  <button class="btn-primary" (click)="toggleAddForm()">
+    <i class="bi" [ngClass]="showAddForm ? 'bi-x-lg' : 'bi-plus-lg'"></i>
+    {{ (showAddForm ? 'home.cancel' : 'home.addFunction') | translate }}
+  </button>
+</div>
+
+<!-- Add form -->
+<div *ngIf="showAddForm" class="card add-card">
+  <div class="add-row">
+    <div class="field">
+      <label>{{ 'home.name' | translate }}</label>
+      <input type="text" [(ngModel)]="newName" [placeholder]="'home.namePlaceholder' | translate" [class.input-error]="nameError" />
+    </div>
+    <div class="field">
+      <label>{{ 'home.date' | translate }}</label>
+      <input type="date" [(ngModel)]="newDate" />
+    </div>
+    <div class="field field-color">
+      <label>{{ 'home.color' | translate }}</label>
+      <input type="color" [(ngModel)]="newColor" />
+    </div>
+    <button class="btn-primary" (click)="saveFunction()" [disabled]="isSaving">
+      <i class="bi bi-check2"></i> {{ (isSaving ? 'home.saving' : 'home.save') | translate }}
+    </button>
+  </div>
+  <span *ngIf="nameError" class="field-error-text">{{ 'home.nameRequired' | translate }}</span>
+</div>
+
+<div *ngIf="feedbackMessage" class="feedback-toast" [class.toast-error]="feedbackType === 'error'">
+  <i class="bi" [ngClass]="feedbackType === 'error' ? 'bi-exclamation-circle' : 'bi-check-circle'"></i>
+  {{ feedbackMessage }}
+</div>
+
+<p *ngIf="isLoading" class="loading-text"><i class="bi bi-arrow-repeat spin"></i> {{ 'common.loading' | translate }}</p>
+
+<div *ngIf="!isLoading && functions.length === 0" class="empty-state card">
+  <i class="bi bi-calendar2-event empty-icon"></i>
+  <p>{{ 'home.empty' | translate }}</p>
+</div>
+
+<!-- Function board -->
+<div *ngIf="!isLoading && functions.length > 0" class="fn-board">
+  <div *ngFor="let fn of functions" class="fn-card card" [style.--fn-color]="fn.color">
+
+    <div class="fn-accent"></div>
+
+    <ng-container *ngIf="editId !== fn.id && deleteConfirmId !== fn.id">
+      <div class="fn-card-head">
+        <h3 class="fn-card-name">{{ fn.name }}</h3>
+        <div class="fn-card-actions">
+          <button class="btn-icon" (click)="startEdit(fn)" [title]="'home.edit' | translate"><i class="bi bi-pencil-square"></i></button>
+          <button class="btn-icon btn-icon-danger" (click)="requestDelete(fn.id)" [title]="'home.delete' | translate"><i class="bi bi-trash3"></i></button>
+        </div>
+      </div>
+
+      <div class="fn-date" *ngIf="fn.eventDate">
+        <i class="bi bi-calendar-event"></i>
+        <span>{{ fn.eventDate }}</span>
+        <span class="fn-countdown" *ngIf="daysUntil(fn.eventDate) !== null">
+          <ng-container *ngIf="daysUntil(fn.eventDate)! > 0">· {{ daysUntil(fn.eventDate) }} {{ 'home.daysLeft' | translate }}</ng-container>
+          <ng-container *ngIf="daysUntil(fn.eventDate) === 0">· {{ 'home.today' | translate }}</ng-container>
+          <ng-container *ngIf="daysUntil(fn.eventDate)! < 0">· {{ 'home.past' | translate }}</ng-container>
+        </span>
+      </div>
+      <div class="fn-date fn-nodate" *ngIf="!fn.eventDate">
+        <i class="bi bi-calendar-x"></i> {{ 'home.noDate' | translate }}
+      </div>
+
+      <div class="fn-stats">
+        <a class="fn-stat" routerLink="/list">
+          <span class="fn-stat-num">{{ guestCount(fn.id) }}</span>
+          <span class="fn-stat-lbl">{{ 'home.guests' | translate }}</span>
+        </a>
+        <a class="fn-stat" routerLink="/budget">
+          <span class="fn-stat-num">{{ expectedCount(fn.id) }}</span>
+          <span class="fn-stat-lbl">{{ 'home.expected' | translate }}</span>
+        </a>
+      </div>
+    </ng-container>
+
+    <!-- Inline edit -->
+    <div *ngIf="editId === fn.id" class="fn-edit">
+      <input type="text" [(ngModel)]="editData.name" />
+      <input type="date" [(ngModel)]="editData.eventDate" />
+      <input type="color" [(ngModel)]="editData.color" />
+      <div class="confirm-actions">
+        <button class="btn-primary btn-sm" (click)="saveEdit()">{{ 'home.save' | translate }}</button>
+        <button class="btn-ghost btn-sm" (click)="cancelEdit()">{{ 'home.cancel' | translate }}</button>
+      </div>
+    </div>
+
+    <!-- Delete confirm -->
+    <div *ngIf="deleteConfirmId === fn.id" class="fn-delete">
+      <span>{{ 'home.confirmDelete' | translate }}</span>
+      <div class="confirm-actions">
+        <button class="btn-danger btn-sm" (click)="confirmDelete(fn.id)">{{ 'home.yesDelete' | translate }}</button>
+        <button class="btn-ghost btn-sm" (click)="cancelDelete()">{{ 'home.cancel' | translate }}</button>
+      </div>
+    </div>
+
+  </div>
+</div>

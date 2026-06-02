@@ -7,6 +7,16 @@
         <column name="NAME"          type="VARCHAR(100)"  notNull="true"/>
         <column name="COLOR"         type="VARCHAR(30)"   notNull="true" default="#4f46e5"/>
         <column name="DISPLAY_ORDER" type="INT"           notNull="true" default="0"/>
+        <!-- ISO yyyy-MM-dd; nullable -->
+        <column name="EVENT_DATE"    type="VARCHAR(10)"/>
+    </table>
+
+    <!-- Guest groups (e.g. households) that guests can be assigned to -->
+    <table name="Guest_Groups" sync="true">
+        <column name="ID"            type="INT"          primaryKey="true" autoIncrement="true"/>
+        <column name="NAME"          type="VARCHAR(100)"  notNull="true"/>
+        <column name="COLOR"         type="VARCHAR(30)"   notNull="true" default="#4f46e5"/>
+        <column name="DISPLAY_ORDER" type="INT"           notNull="true" default="0"/>
     </table>
 
     <table name="Invitations" sync="true">
@@ -16,15 +26,8 @@
         <column name="RELATION_TYPE"              type="VARCHAR(20)"   notNull="true" default="CLOSE"/>
         <column name="NUMBER_OF_PEOPLE_WILL_COME" type="INT"           notNull="true" default="1"/>
         <column name="INVITED_STATUS"             type="VARCHAR(30)"   notNull="true" default="NOT_INVITED"/>
-    </table>
-
-    <!-- Named persons (guests) listed under an invitation -->
-    <table name="Invitation_Persons" sync="true">
-        <column name="ID"            type="INT"          primaryKey="true" autoIncrement="true"/>
-        <column name="INVITATION_ID" type="INT"          notNull="true"/>
-        <column name="NAME"          type="VARCHAR(100)" notNull="true"/>
-        <column name="NOTE"          type="VARCHAR(255)" notNull="true" default=""/>
-        <foreignKey column="INVITATION_ID" references="Invitations.ID" onDelete="CASCADE"/>
+        <!-- nullable: the Guest Group this guest belongs to (no DB FK; cleared in code on group delete) -->
+        <column name="GROUP_ID"                   type="INT"/>
     </table>
 
     <!-- Composite-PK join table: each person ↔ function entry tracks per-function status -->
@@ -37,14 +40,39 @@
         <foreignKey column="FUNCTION_ID" references="Functions.ID"   onDelete="CASCADE"/>
     </table>
 
-    <!-- Per individual-person, per-function invited status -->
-    <table name="Invitation_Person_Functions" sync="true">
-        <column name="INVITATION_PERSON_ID" type="INT"          notNull="true"/>
-        <column name="FUNCTION_ID"          type="INT"          notNull="true"/>
-        <column name="INVITED_STATUS"       type="VARCHAR(30)"  notNull="true" default="NOT_INVITED"/>
-        <primaryKey columns="INVITATION_PERSON_ID,FUNCTION_ID"/>
-        <foreignKey column="INVITATION_PERSON_ID" references="Invitation_Persons.ID" onDelete="CASCADE"/>
-        <foreignKey column="FUNCTION_ID"          references="Functions.ID"          onDelete="CASCADE"/>
+    <!-- Budget expense line items, one per (function, expense) -->
+    <table name="Budget_Items" sync="true">
+        <column name="ID"               type="INT"          primaryKey="true" autoIncrement="true"/>
+        <column name="FUNCTION_ID"      type="INT"          notNull="true"/>
+        <column name="NAME"             type="VARCHAR(150)" notNull="true"/>
+        <column name="ESTIMATED_AMOUNT" type="INT"          notNull="true" default="0"/>
+        <!-- nullable: blank actual falls back to estimated for the remaining calc -->
+        <column name="ACTUAL_AMOUNT"    type="INT"/>
+        <column name="PAID_AMOUNT"      type="INT"          notNull="true" default="0"/>
+        <column name="NOTES"            type="VARCHAR(255)" notNull="true" default=""/>
+        <column name="DISPLAY_ORDER"    type="INT"          notNull="true" default="0"/>
+        <foreignKey column="FUNCTION_ID" references="Functions.ID" onDelete="CASCADE"/>
+    </table>
+
+    <!-- Optional split-up rows under an expense (label + amount) -->
+    <table name="Budget_Item_Splits" sync="true">
+        <column name="ID"             type="INT"          primaryKey="true" autoIncrement="true"/>
+        <column name="BUDGET_ITEM_ID" type="INT"          notNull="true"/>
+        <column name="LABEL"          type="VARCHAR(150)" notNull="true"/>
+        <column name="AMOUNT"         type="INT"          notNull="true" default="0"/>
+        <column name="DISPLAY_ORDER"  type="INT"          notNull="true" default="0"/>
+        <foreignKey column="BUDGET_ITEM_ID" references="Budget_Items.ID" onDelete="CASCADE"/>
+    </table>
+
+    <!-- Income sources (date-driven) -->
+    <table name="Income_Items" sync="true">
+        <column name="ID"               type="INT"          primaryKey="true" autoIncrement="true"/>
+        <column name="SOURCE"           type="VARCHAR(150)" notNull="true"/>
+        <column name="INCOME_DATE"      type="VARCHAR(10)"/>
+        <column name="ESTIMATED_AMOUNT" type="INT"          notNull="true" default="0"/>
+        <column name="ACTUAL_AMOUNT"    type="INT"/>
+        <column name="NOTES"            type="VARCHAR(255)" notNull="true" default=""/>
+        <column name="DISPLAY_ORDER"    type="INT"          notNull="true" default="0"/>
     </table>
 
 </schema>

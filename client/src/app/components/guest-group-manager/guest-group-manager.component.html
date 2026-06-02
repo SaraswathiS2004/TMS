@@ -1,0 +1,80 @@
+<h2 class="page-title">{{ 'guestGroups.title' | translate }}</h2>
+
+<!-- Add form -->
+<div class="card add-card">
+  <div class="add-row">
+    <div class="field">
+      <label for="gg-name">{{ 'guestGroups.name' | translate }}</label>
+      <input
+        id="gg-name"
+        type="text"
+        [(ngModel)]="newName"
+        [placeholder]="'guestGroups.namePlaceholder' | translate"
+        [class.input-error]="nameError"
+      />
+    </div>
+    <div class="field field-color">
+      <label for="gg-color">{{ 'guestGroups.color' | translate }}</label>
+      <input id="gg-color" type="color" [(ngModel)]="newColor" />
+    </div>
+    <button class="btn-primary" (click)="saveGroup()" [disabled]="isSaving">
+      <i class="bi bi-plus-lg"></i>
+      {{ (isSaving ? 'guestGroups.saving' : 'guestGroups.save') | translate }}
+    </button>
+  </div>
+  <span *ngIf="nameError" class="field-error">{{ 'guestGroups.nameRequired' | translate }}</span>
+</div>
+
+<!-- Feedback -->
+<div *ngIf="feedbackMessage" class="feedback-toast" [class.toast-error]="feedbackType === 'error'">
+  <i class="bi" [ngClass]="feedbackType === 'error' ? 'bi-exclamation-circle' : 'bi-check-circle'"></i>
+  {{ feedbackMessage }}
+</div>
+
+<p *ngIf="isLoading" class="loading-text"><i class="bi bi-arrow-repeat spin"></i> {{ 'common.loading' | translate }}</p>
+
+<div *ngIf="!isLoading && groups.length === 0" class="empty-state card">
+  <i class="bi bi-collection empty-icon"></i>
+  <p>{{ 'guestGroups.noGroups' | translate }}</p>
+</div>
+
+<!-- Group list -->
+<div *ngIf="!isLoading && groups.length > 0" class="group-grid">
+  <div *ngFor="let group of groups" class="group-card card" [style.--fn-color]="group.color">
+
+    <ng-container *ngIf="editGroupId !== group.id && deleteConfirmId !== group.id">
+      <div class="group-head">
+        <span class="group-dot"></span>
+        <span class="group-name">{{ group.name }}</span>
+      </div>
+      <div class="group-actions">
+        <button class="btn-icon" (click)="startEdit(group)" [title]="'guestGroups.edit' | translate">
+          <i class="bi bi-pencil-square"></i>
+        </button>
+        <button class="btn-icon btn-icon-danger" (click)="requestDelete(group.id)" [title]="'guestGroups.delete' | translate">
+          <i class="bi bi-trash3"></i>
+        </button>
+      </div>
+    </ng-container>
+
+    <!-- Inline edit -->
+    <div *ngIf="editGroupId === group.id" class="group-edit">
+      <input type="text" [(ngModel)]="editData.name" />
+      <input type="color" [(ngModel)]="editData.color" />
+      <div class="confirm-actions">
+        <button class="btn-primary btn-sm" (click)="saveEdit()">{{ 'guestGroups.save' | translate }}</button>
+        <button class="btn-ghost btn-sm" (click)="cancelEdit()">{{ 'guestGroups.cancel' | translate }}</button>
+      </div>
+    </div>
+
+    <!-- Delete confirm -->
+    <div *ngIf="deleteConfirmId === group.id" class="group-delete">
+      <span>{{ 'guestGroups.confirmDelete' | translate }}</span>
+      <div class="confirm-actions">
+        <button class="btn-danger btn-sm" (click)="confirmDelete(group.id)">{{ 'guestGroups.yesDelete' | translate }}</button>
+        <button class="btn-ghost btn-sm" (click)="cancelDelete()">{{ 'guestGroups.cancel' | translate }}</button>
+      </div>
+    </div>
+
+  </div>
+</div>

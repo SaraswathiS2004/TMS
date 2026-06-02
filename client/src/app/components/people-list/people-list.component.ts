@@ -4,8 +4,10 @@ import { Subject, Subscription, forkJoin } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { PeopleService } from '../../services/people.service';
 import { FunctionService } from '../../services/function.service';
-import { People, InvitationPerson } from '../../models/people.model';
+import { GuestGroupService } from '../../services/guest-group.service';
+import { People } from '../../models/people.model';
 import { TmsFunction } from '../../models/function.model';
+import { GuestGroup } from '../../models/guest-group.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { TranslateService } from '../../services/translate.service';
 import { TransliterationService } from '../../services/transliteration.service';
@@ -22,6 +24,7 @@ export class PeopleListComponent implements OnInit, OnDestroy {
 
   allPeople: People[] = [];
   functions: TmsFunction[] = [];
+  groups: GuestGroup[] = [];
   isLoading = true;
 
   activeFilter: 'ALL' | number = 'ALL';
@@ -38,15 +41,13 @@ export class PeopleListComponent implements OnInit, OnDestroy {
   quickMarkSelectedIds: number[] = [];
   isQuickMarking = false;
 
-  // In-flight per-person function toggles, keyed `${personId}_${fnId}`
-  private togglingPersonFnKeys = new Set<string>();
-
   private searchInput$ = new Subject<string>();
   private subs = new Subscription();
 
   constructor(
     private peopleService: PeopleService,
     private functionService: FunctionService,
+    private guestGroupService: GuestGroupService,
     private translateService: TranslateService,
     private transliterationService: TransliterationService
   ) {}
@@ -71,6 +72,10 @@ export class PeopleListComponent implements OnInit, OnDestroy {
     this.editPersonId = null;
     this.deleteConfirmId = null;
     this.quickMarkPersonId = null;
+
+    this.guestGroupService.getAllGroups().subscribe({
+      next: (groups) => { this.groups = groups; }
+    });
 
     this.functionService.getAllFunctions().subscribe({
       next: (fns) => {
@@ -295,39 +300,5 @@ export class PeopleListComponent implements OnInit, OnDestroy {
       CLOSE_RELATIVE: 'badge-close', DISTANCE_RELATIVE: 'badge-distance', FRIENDS: 'badge-friends'
     };
     return map[relation] ?? '';
-  }
-
-  // Per-individual-person, per-function invited marking (mobile-friendly inline toggles)
-  isPersonFnInvited(guest: InvitationPerson, fnId: number): boolean {
-    return guest.functionStatuses?.[String(fnId)] === 'INVITED';
-  }
-
-  isTogglingPersonFn(guest: InvitationPerson, fnId: number): boolean {
-    return this.togglingPersonFnKeys.has(`${guest.id}_${fnId}`);
-  }
-
-  togglePersonFn(guest: InvitationPerson, fnId: number): void {
-    if (!guest.id) { return; }
-    const key = `${guest.id}_${fnId}`;
-    if (this.togglingPersonFnKeys.has(key)) { return; }
-
-    const previous = guest.functionStatuses?.[String(fnId)] ?? 'NOT_INVITED';
-    const newStatus = previous === 'INVITED' ? 'NOT_INVITED' : 'INVITED';
-    // Optimistic update
-    guest.functionStatuses = { ...(guest.functionStatuses ?? {}), [String(fnId)]: newStatus };
-    this.togglingPersonFnKeys.add(key);
-
-    this.peopleService.updatePersonInvitedStatus(guest.id, fnId, newStatus).subscribe({
-      next: (resp) => {
-        if (resp.status !== 'SUCCESS') {
-          guest.functionStatuses = { ...(guest.functionStatuses ?? {}), [String(fnId)]: previous };
-        }
-        this.togglingPersonFnKeys.delete(key);
-      },
-      error: () => {
-        guest.functionStatuses = { ...(guest.functionStatuses ?? {}), [String(fnId)]: previous };
-        this.togglingPersonFnKeys.delete(key);
-      }
-    });
   }
 }

@@ -34,6 +34,7 @@ public class FunctionActions {
             f.setName((String) row.get(Functions.NAME));
             f.setColor((String) row.get(Functions.COLOR));
             f.setDisplayOrder(((Number) row.get(Functions.DISPLAY_ORDER)).intValue());
+            f.setEventDate((String) row.get(Functions.EVENT_DATE));
             list.add(f);
         }
         return list;
@@ -46,6 +47,7 @@ public class FunctionActions {
                 .set(Functions.NAME, function.getName())
                 .set(Functions.COLOR, function.getColor() != null ? function.getColor() : "#4f46e5")
                 .set(Functions.DISPLAY_ORDER, function.getDisplayOrder())
+                .set(Functions.EVENT_DATE, function.getEventDate())
                 .execute();
             message.setMessage("Function added successfully.");
             message.setStatus(Message.Status.SUCCESS);
@@ -63,6 +65,7 @@ public class FunctionActions {
                 .set(Functions.NAME, function.getName())
                 .set(Functions.COLOR, function.getColor() != null ? function.getColor() : "#4f46e5")
                 .set(Functions.DISPLAY_ORDER, function.getDisplayOrder())
+                .set(Functions.EVENT_DATE, function.getEventDate())
                 .where(Condition.eq(Functions.ID, function.getId()))
                 .execute();
             if (rows > 0) {

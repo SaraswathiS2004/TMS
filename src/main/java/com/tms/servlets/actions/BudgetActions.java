@@ -67,6 +67,11 @@ public class BudgetActions {
 
     public Message addItem(BudgetItem item) {
         Message message = new Message();
+        if (item == null) {
+            message.setMessage("No expense data provided.");
+            message.setStatus(Message.Status.FAIL);
+            return message;
+        }
         try {
             int estimated = effectiveEstimated(item);
             long newId = OrmX.insert(Budget_Items.TABLE_NAME)
@@ -90,6 +95,11 @@ public class BudgetActions {
 
     public Message updateItem(BudgetItem item) {
         Message message = new Message();
+        if (item == null) {
+            message.setMessage("No expense data provided.");
+            message.setStatus(Message.Status.FAIL);
+            return message;
+        }
         try {
             int estimated = effectiveEstimated(item);
             int rows = OrmX.update(Budget_Items.TABLE_NAME)

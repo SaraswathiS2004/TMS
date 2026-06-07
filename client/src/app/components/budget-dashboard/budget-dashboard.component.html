@@ -71,6 +71,29 @@
   </div>
   <ng-template #noFns><div class="empty-state card"><p>{{ 'budgetDashboard.noData' | translate }}</p></div></ng-template>
 
+  <!-- Estimated vs Actual per function -->
+  <h3 class="section-title" *ngIf="rollups.length > 0"><i class="bi bi-bar-chart-line-fill"></i> {{ 'budgetDashboard.estVsActual' | translate }}</h3>
+  <div class="eva-list" *ngIf="rollups.length > 0">
+    <div *ngFor="let r of rollups" class="eva-card card" [style.--fn-color]="r.fn.color">
+      <div class="eva-head">
+        <span class="rollup-name"><span class="rollup-dot"></span>{{ r.fn.name }}</span>
+        <span class="eva-delta" [class.over]="r.actual > r.estimated">
+          {{ r.actual > r.estimated ? '+' : '' }}₹{{ r.actual - r.estimated }}
+        </span>
+      </div>
+      <div class="eva-line">
+        <span class="eva-lbl">{{ 'budgetDashboard.est' | translate }}</span>
+        <div class="eva-track"><div class="eva-fill eva-est" [style.width.%]="evaPct(r.estimated, r)"></div></div>
+        <span class="eva-val">₹{{ r.estimated }}</span>
+      </div>
+      <div class="eva-line">
+        <span class="eva-lbl">{{ 'budgetDashboard.actual' | translate }}</span>
+        <div class="eva-track"><div class="eva-fill eva-act" [class.over]="r.actual > r.estimated" [style.width.%]="evaPct(r.actual, r)"></div></div>
+        <span class="eva-val">₹{{ r.actual }}</span>
+      </div>
+    </div>
+  </div>
+
   <!-- Top expenses -->
   <h3 class="section-title" *ngIf="topExpenses.length > 0"><i class="bi bi-bar-chart-fill"></i> {{ 'budgetDashboard.topExpenses' | translate }}</h3>
   <div class="card top-list" *ngIf="topExpenses.length > 0">

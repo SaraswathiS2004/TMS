@@ -240,6 +240,8 @@
   "budgetDashboard.vs": "vs",
   "budgetDashboard.byFunction": "By Function",
   "budgetDashboard.est": "Est",
+  "budgetDashboard.estVsActual": "Estimated vs Actual",
+  "budgetDashboard.actual": "Actual",
   "budgetDashboard.paid": "Paid",
   "budgetDashboard.left": "Left",
   "budgetDashboard.over": "Over",

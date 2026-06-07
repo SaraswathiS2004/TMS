@@ -4,7 +4,7 @@ import { forkJoin } from 'rxjs';
 import { BudgetService } from '../../services/budget.service';
 import { IncomeService } from '../../services/income.service';
 import { FunctionService } from '../../services/function.service';
-import { BudgetItem, budgetEstimated, budgetRemaining } from '../../models/budget-item.model';
+import { BudgetItem, budgetEstimated, budgetRemaining, budgetEffectiveActual } from '../../models/budget-item.model';
 import { IncomeItem } from '../../models/income-item.model';
 import { TmsFunction } from '../../models/function.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
@@ -12,6 +12,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 interface FunctionRollup {
   fn: TmsFunction;
   estimated: number;
+  actual: number;        // effective actual (blank actual falls back to estimate, calc-only)
   paid: number;
   remaining: number;
   overspent: boolean;
@@ -62,10 +63,11 @@ export class BudgetDashboardComponent implements OnInit {
     this.rollups = this.functions.map(fn => {
       const its = this.items.filter(i => i.functionId === fn.id);
       const estimated = its.reduce((s, i) => s + budgetEstimated(i), 0);
+      const actual = its.reduce((s, i) => s + budgetEffectiveActual(i), 0);
       const paid = its.reduce((s, i) => s + (i.paidAmount ?? 0), 0);
       const remaining = its.reduce((s, i) => s + budgetRemaining(i), 0);
-      const overspent = its.some(i => i.actualAmount != null && i.actualAmount > budgetEstimated(i));
-      return { fn, estimated, paid, remaining, overspent, paidPct: estimated > 0 ? Math.round((paid / estimated) * 100) : 0 };
+      const overspent = actual > estimated;
+      return { fn, estimated, actual, paid, remaining, overspent, paidPct: estimated > 0 ? Math.round((paid / estimated) * 100) : 0 };
     });
     this.topExpenses = [...this.items]
       .sort((a, b) => budgetEstimated(b) - budgetEstimated(a))
@@ -73,6 +75,12 @@ export class BudgetDashboardComponent implements OnInit {
   }
 
   est(i: BudgetItem): number { return budgetEstimated(i); }
+
+  /** Bar width as a % of the larger of estimated/actual, so the two bars are comparable in-card. */
+  evaPct(value: number, r: FunctionRollup): number {
+    const max = Math.max(r.estimated, r.actual, 1);
+    return Math.round((value / max) * 100);
+  }
 
   // ── Expense totals ──
   get totalEstimated(): number { return this.items.reduce((s, i) => s + budgetEstimated(i), 0); }

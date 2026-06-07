@@ -73,11 +73,10 @@ public class BudgetActions {
             return message;
         }
         try {
-            int estimated = effectiveEstimated(item);
             long newId = OrmX.insert(Budget_Items.TABLE_NAME)
                 .set(Budget_Items.FUNCTION_ID, item.getFunctionId())
                 .set(Budget_Items.NAME, item.getName())
-                .set(Budget_Items.ESTIMATED_AMOUNT, estimated)
+                .set(Budget_Items.ESTIMATED_AMOUNT, item.getEstimatedAmount())
                 .set(Budget_Items.ACTUAL_AMOUNT, item.getActualAmount())
                 .set(Budget_Items.PAID_AMOUNT, item.getPaidAmount())
                 .set(Budget_Items.NOTES, item.getNotes())
@@ -101,10 +100,9 @@ public class BudgetActions {
             return message;
         }
         try {
-            int estimated = effectiveEstimated(item);
             int rows = OrmX.update(Budget_Items.TABLE_NAME)
                 .set(Budget_Items.NAME, item.getName())
-                .set(Budget_Items.ESTIMATED_AMOUNT, estimated)
+                .set(Budget_Items.ESTIMATED_AMOUNT, item.getEstimatedAmount())
                 .set(Budget_Items.ACTUAL_AMOUNT, item.getActualAmount())
                 .set(Budget_Items.PAID_AMOUNT, item.getPaidAmount())
                 .set(Budget_Items.NOTES, item.getNotes())
@@ -134,13 +132,6 @@ public class BudgetActions {
             message.setStatus(Message.Status.FAIL);
         }
         return message;
-    }
-
-    /** When split rows are present, the expense estimate is their sum; otherwise the entered estimate. */
-    private int effectiveEstimated(BudgetItem item) {
-        List<BudgetSplit> splits = validSplits(item.getSplits());
-        if (splits.isEmpty()) { return item.getEstimatedAmount(); }
-        return splits.stream().mapToInt(BudgetSplit::getAmount).sum();
     }
 
     private List<BudgetSplit> validSplits(List<BudgetSplit> splits) {

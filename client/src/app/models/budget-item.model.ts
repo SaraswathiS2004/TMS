@@ -23,11 +23,15 @@ export function budgetRemaining(item: BudgetItem): number {
   return base - (item.paidAmount ?? 0);
 }
 
-/** Effective estimate = sum of splits when present, else the entered estimate. */
+/** Estimate is human-entered only; splits are audit detail and do not drive it. */
 export function budgetEstimated(item: BudgetItem): number {
-  const splits = (item.splits ?? []).filter(s => (s.label ?? '').trim().length > 0);
-  if (splits.length > 0) {
-    return splits.reduce((sum, s) => sum + (s.amount ?? 0), 0);
-  }
   return item.estimatedAmount ?? 0;
+}
+
+/**
+ * Effective actual for calculations only: when actual is blank, fall back to the estimate.
+ * This is never persisted — the DB keeps ACTUAL_AMOUNT null until the user enters one.
+ */
+export function budgetEffectiveActual(item: BudgetItem): number {
+  return item.actualAmount != null ? item.actualAmount : (item.estimatedAmount ?? 0);
 }

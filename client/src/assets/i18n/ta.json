@@ -240,6 +240,8 @@
   "budgetDashboard.vs": "எதிராக",
   "budgetDashboard.byFunction": "நிகழ்வு வாரியாக",
   "budgetDashboard.est": "மதிப்பீடு",
+  "budgetDashboard.estVsActual": "மதிப்பீடு vs உண்மை",
+  "budgetDashboard.actual": "உண்மை",
   "budgetDashboard.paid": "செலுத்தியது",
   "budgetDashboard.left": "மீதம்",
   "budgetDashboard.over": "மீறல்",

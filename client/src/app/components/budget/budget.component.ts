@@ -32,6 +32,7 @@ export class BudgetComponent implements OnInit {
   editingId: number | null = null;       // null while adding
   deleteConfirmId: number | null = null;
   expandedId: number | null = null;       // row whose splits are shown
+  activeTabId: number | null = null;      // function tab currently being viewed
 
   feedbackMessage = '';
   feedbackType: 'success' | 'error' = 'success';
@@ -68,6 +69,21 @@ export class BudgetComponent implements OnInit {
       fn,
       items: this.items.filter(i => i.functionId === fn.id)
     }));
+    // Keep the current tab if it still exists; otherwise default to the first function.
+    const stillExists = this.groups.some(g => g.fn.id === this.activeTabId);
+    if (!stillExists) { this.activeTabId = this.groups.length > 0 ? this.groups[0].fn.id : null; }
+  }
+
+  // ── Function tabs ──
+  get activeGroup(): FunctionBudget | null {
+    return this.groups.find(g => g.fn.id === this.activeTabId) ?? null;
+  }
+
+  selectTab(fnId: number): void {
+    if (this.activeTabId === fnId) { return; }
+    this.activeTabId = fnId;
+    this.cancelEdit();
+    this.deleteConfirmId = null;
   }
 
   // ── Totals ──
@@ -121,10 +137,21 @@ export class BudgetComponent implements OnInit {
   addSplitRow(): void {
     if (!this.editing) { return; }
     (this.editing.splits ??= []).push({ label: '', amount: 0 });
+    this.onSplitChange();
   }
 
   removeSplitRow(index: number): void {
     this.editing?.splits?.splice(index, 1);
+    this.onSplitChange();
+  }
+
+  /** Audit-driven: actual never sits below the split total. Client-side, in the form only. */
+  onSplitChange(): void {
+    if (!this.editing) { return; }
+    const total = this.splitsTotal(this.editing);
+    if (total <= 0) { return; }
+    const current = Number(this.editing.actualAmount) || 0;
+    this.editing.actualAmount = Math.max(current, total);
   }
 
   hasSplits(item: BudgetItem | null): boolean {

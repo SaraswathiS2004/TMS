@@ -28,8 +28,7 @@
     <div class="ed-amounts">
       <label>
         <span>{{ 'budget.estimated' | translate }}</span>
-        <input type="number" min="0" [(ngModel)]="e.estimatedAmount" [disabled]="hasSplits(e)"
-               [title]="hasSplits(e) ? ('budget.autoSum' | translate) : ''" />
+        <input type="number" min="0" [(ngModel)]="e.estimatedAmount" />
       </label>
       <label><span>{{ 'budget.actual' | translate }}</span><input type="number" min="0" [(ngModel)]="e.actualAmount" /></label>
       <label><span>{{ 'budget.paid' | translate }}</span><input type="number" min="0" [(ngModel)]="e.paidAmount" /></label>
@@ -41,7 +40,8 @@
       <div class="splits-head">{{ 'budget.splitUp' | translate }}<span *ngIf="hasSplits(e)" class="splits-sum">₹{{ splitsTotal(e) }}</span></div>
       <div class="split-row" *ngFor="let s of e.splits; let i = index">
         <input type="text" [(ngModel)]="s.label" [placeholder]="'budget.splitLabel' | translate" />
-        <input type="number" min="0" [(ngModel)]="s.amount" [placeholder]="'budget.amount' | translate" />
+        <input type="number" min="0" [(ngModel)]="s.amount"
+               (ngModelChange)="onSplitChange()" [placeholder]="'budget.amount' | translate" />
         <button class="btn-icon btn-icon-danger" (click)="removeSplitRow(i)"><i class="bi bi-x-lg"></i></button>
       </div>
       <button class="btn-add-split" (click)="addSplitRow()"><i class="bi bi-plus-lg"></i> {{ 'budget.addSplit' | translate }}</button>
@@ -54,9 +54,19 @@
   </div>
 </ng-template>
 
-<!-- Function groups -->
-<div *ngIf="!isLoading && functions.length > 0" class="fn-budget-list">
-  <div *ngFor="let group of groups" class="fn-budget card" [style.--fn-color]="group.fn.color">
+<!-- Function tabs -->
+<div *ngIf="!isLoading && functions.length > 0" class="fn-tabs" role="tablist">
+  <button *ngFor="let group of groups" class="fn-tab" role="tab"
+          [class.active]="group.fn.id === activeTabId" [style.--fn-color]="group.fn.color"
+          [attr.aria-selected]="group.fn.id === activeTabId" (click)="selectTab(group.fn.id)">
+    <span class="fn-tab-dot"></span>
+    <span class="fn-tab-name">{{ group.fn.name }}</span>
+    <span class="fn-tab-count">{{ group.items.length }}</span>
+  </button>
+</div>
+
+<!-- Active function's expenses -->
+<div *ngIf="!isLoading && activeGroup as group" class="fn-budget card" [style.--fn-color]="group.fn.color">
 
     <div class="fb-header">
       <div class="fb-title">
@@ -129,5 +139,4 @@
       <i class="bi bi-plus-lg"></i> {{ 'budget.addExpense' | translate }}
     </button>
 
-  </div>
 </div>

@@ -49,7 +49,7 @@
         <!-- nullable: blank actual falls back to estimated for the remaining calc -->
         <column name="ACTUAL_AMOUNT"    type="INT"/>
         <column name="PAID_AMOUNT"      type="INT"          notNull="true" default="0"/>
-        <column name="NOTES"            type="VARCHAR(255)" notNull="true" default=""/>
+        <column name="NOTES"            type="VARCHAR(255)"  default=""/>
         <column name="DISPLAY_ORDER"    type="INT"          notNull="true" default="0"/>
         <foreignKey column="FUNCTION_ID" references="Functions.ID" onDelete="CASCADE"/>
     </table>
@@ -71,7 +71,7 @@
         <column name="INCOME_DATE"      type="VARCHAR(10)"/>
         <column name="ESTIMATED_AMOUNT" type="INT"          notNull="true" default="0"/>
         <column name="ACTUAL_AMOUNT"    type="INT"/>
-        <column name="NOTES"            type="VARCHAR(255)" notNull="true" default=""/>
+        <column name="NOTES"            type="VARCHAR(255)"  default=""/>
         <column name="DISPLAY_ORDER"    type="INT"          notNull="true" default="0"/>
     </table>
 

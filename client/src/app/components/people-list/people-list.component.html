@@ -133,6 +133,19 @@
       </span>
     </div>
 
+    <!-- Gifts recorded for this person (filtered to the active function) -->
+    <div class="gift-tags" *ngIf="giftsFor(person).length > 0">
+      <span
+        *ngFor="let gift of giftsFor(person)"
+        class="gift-tag"
+        [style.--fn-color]="functionColor(gift.functionId)"
+      >
+        <i class="bi bi-gift"></i>
+        {{ giftLabel(gift) }}
+        <span class="gift-tag-ev">{{ functionName(gift.functionId) }}</span>
+      </span>
+    </div>
+
     <!-- Delete confirmation -->
     <div *ngIf="deleteConfirmId === person.id" class="delete-confirm">
       <span>{{ 'peopleList.confirmDelete' | translate }} <strong>{{ person.name }}</strong>?</span>
@@ -194,10 +207,65 @@
       ></app-person-form>
     </div>
 
+    <!-- Add Gift panel -->
+    <div *ngIf="giftPersonId === person.id" class="gift-panel">
+      <div class="edit-section-title">
+        <i class="bi bi-gift"></i>
+        {{ 'peopleList.addGift' | translate }}
+        <span class="gift-for" *ngIf="giftDraft.functionId != null && activeFilter !== 'ALL'">
+          · {{ 'peopleList.giftFor' | translate }} {{ functionName(giftDraft.functionId) }}
+        </span>
+      </div>
+
+      <!-- Function: read-only on a function tab, dropdown on the All tab -->
+      <div class="gift-field" *ngIf="activeFilter === 'ALL'">
+        <label>{{ 'peopleList.giftFor' | translate }}</label>
+        <select [(ngModel)]="giftDraft.functionId">
+          <option [ngValue]="null" disabled>—</option>
+          <option *ngFor="let fn of personFunctions(person)" [ngValue]="fn.id">{{ fn.name }}</option>
+        </select>
+      </div>
+
+      <div class="gift-field">
+        <label>{{ 'peopleList.giftType' | translate }}</label>
+        <div class="gift-seg">
+          <button type="button" [class.sel]="giftDraft.giftType === 'CASH'" (click)="giftDraft.giftType = 'CASH'">
+            <i class="bi bi-cash"></i> {{ 'peopleList.cash' | translate }}
+          </button>
+          <button type="button" [class.sel]="giftDraft.giftType === 'ITEM'" (click)="giftDraft.giftType = 'ITEM'">
+            <i class="bi bi-box-seam"></i> {{ 'peopleList.item' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <div class="gift-field">
+        <label>{{ 'peopleList.giftValue' | translate }}</label>
+        <input type="number" min="0" [(ngModel)]="giftDraft.value" />
+      </div>
+
+      <div class="gift-field">
+        <label>{{ 'peopleList.giftDescription' | translate }}</label>
+        <input type="text" [(ngModel)]="giftDraft.description" />
+      </div>
+
+      <div class="gift-field">
+        <label>{{ 'peopleList.giftNotes' | translate }}</label>
+        <input type="text" [(ngModel)]="giftDraft.notes" />
+      </div>
+
+      <div class="confirm-actions">
+        <button class="btn-invite" [disabled]="!canSaveGift() || isSavingGift" (click)="saveGift(person)">
+          <i class="bi bi-check2"></i>
+          {{ (isSavingGift ? 'peopleList.saving' : 'peopleList.saveGift') | translate }}
+        </button>
+        <button class="btn-ghost" (click)="cancelGift()">{{ 'peopleList.cancel' | translate }}</button>
+      </div>
+    </div>
+
     <!-- Card Footer -->
     <div
       class="card-footer"
-      *ngIf="editPersonId !== person.id && deleteConfirmId !== person.id && quickMarkPersonId !== person.id"
+      *ngIf="editPersonId !== person.id && deleteConfirmId !== person.id && quickMarkPersonId !== person.id && giftPersonId !== person.id"
     >
       <button
         *ngIf="hasPendingFunctions(person)"
@@ -210,6 +278,10 @@
       <button class="btn-invite" (click)="startEditPerson(person)">
         <i class="bi bi-pencil-square"></i>
         {{ 'peopleList.editInvitations' | translate }}
+      </button>
+      <button class="btn-invite btn-gift" (click)="startGift(person)">
+        <i class="bi bi-gift"></i>
+        {{ 'peopleList.addGift' | translate }}
       </button>
     </div>
 

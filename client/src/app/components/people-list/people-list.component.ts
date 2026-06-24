@@ -1,11 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Subject, Subscription, forkJoin } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { PeopleService } from '../../services/people.service';
 import { FunctionService } from '../../services/function.service';
 import { GuestGroupService } from '../../services/guest-group.service';
+import { GiftService } from '../../services/gift.service';
 import { People } from '../../models/people.model';
+import { Gift, GiftType } from '../../models/gift.model';
 import { TmsFunction } from '../../models/function.model';
 import { GuestGroup } from '../../models/guest-group.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
@@ -16,7 +19,7 @@ import { PersonFormComponent } from '../person-form/person-form.component';
 @Component({
   selector: 'app-people-list',
   standalone: true,
-  imports: [CommonModule, TranslatePipe, PersonFormComponent],
+  imports: [CommonModule, FormsModule, TranslatePipe, PersonFormComponent],
   templateUrl: './people-list.component.html',
   styleUrl: './people-list.component.css'
 })
@@ -41,6 +44,13 @@ export class PeopleListComponent implements OnInit, OnDestroy {
   quickMarkSelectedIds: number[] = [];
   isQuickMarking = false;
 
+  // Gift entry state
+  gifts: Gift[] = [];
+  giftPersonId: number | null = null;
+  giftDraft: { functionId: number | null; giftType: GiftType; value: number | null; description: string; notes: string } =
+    { functionId: null, giftType: 'CASH', value: null, description: '', notes: '' };
+  isSavingGift = false;
+
   private searchInput$ = new Subject<string>();
   private subs = new Subscription();
 
@@ -48,6 +58,7 @@ export class PeopleListComponent implements OnInit, OnDestroy {
     private peopleService: PeopleService,
     private functionService: FunctionService,
     private guestGroupService: GuestGroupService,
+    private giftService: GiftService,
     private translateService: TranslateService,
     private transliterationService: TransliterationService
   ) {}
@@ -72,9 +83,14 @@ export class PeopleListComponent implements OnInit, OnDestroy {
     this.editPersonId = null;
     this.deleteConfirmId = null;
     this.quickMarkPersonId = null;
+    this.giftPersonId = null;
 
     this.guestGroupService.getAllGroups().subscribe({
       next: (groups) => { this.groups = groups; }
+    });
+
+    this.giftService.getAll().subscribe({
+      next: (gifts) => { this.gifts = gifts; }
     });
 
     this.functionService.getAllFunctions().subscribe({
@@ -170,6 +186,7 @@ export class PeopleListComponent implements OnInit, OnDestroy {
     this.editPersonId = null;
     this.deleteConfirmId = null;
     this.quickMarkPersonId = null;
+    this.giftPersonId = null;
   }
 
   setSubFilter(sf: 'NONE' | 'IN' | 'NOT_IN' | 'INVITED' | 'YET_TO_INVITE'): void {
@@ -177,6 +194,7 @@ export class PeopleListComponent implements OnInit, OnDestroy {
     this.editPersonId = null;
     this.deleteConfirmId = null;
     this.quickMarkPersonId = null;
+    this.giftPersonId = null;
   }
 
   functionName(id: number): string {
@@ -191,6 +209,7 @@ export class PeopleListComponent implements OnInit, OnDestroy {
     this.editPersonId = person.id!;
     this.deleteConfirmId = null;
     this.quickMarkPersonId = null;
+    this.giftPersonId = null;
   }
 
   cancelEditPerson(): void {
@@ -213,6 +232,7 @@ export class PeopleListComponent implements OnInit, OnDestroy {
     this.quickMarkPersonId = person.id!;
     this.editPersonId = null;
     this.deleteConfirmId = null;
+    this.giftPersonId = null;
     // Pre-select the function currently being browsed, if the person still needs it.
     const pendingIds = this.pendingFunctions(person).map(fn => fn.id);
     this.quickMarkSelectedIds =
@@ -272,6 +292,7 @@ export class PeopleListComponent implements OnInit, OnDestroy {
     this.deleteConfirmId = id;
     this.editPersonId = null;
     this.quickMarkPersonId = null;
+    this.giftPersonId = null;
   }
 
   cancelDelete(): void {
@@ -290,6 +311,86 @@ export class PeopleListComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.feedbackMessage = this.translateService.translate('peopleList.deleteFailed');
+        setTimeout(() => { this.feedbackMessage = ''; }, 3000);
+      }
+    });
+  }
+
+  /** Gifts for a person, narrowed to the active function when a specific function tab is selected. */
+  giftsFor(person: People): Gift[] {
+    return this.gifts.filter(g =>
+      g.personId === person.id &&
+      (typeof this.activeFilter !== 'number' || g.functionId === this.activeFilter)
+    );
+  }
+
+  /** Short label for a gift tag, e.g. "₹5,000 Cash" or "Gold clock". */
+  giftLabel(gift: Gift): string {
+    const value = gift.value != null ? '₹' + gift.value : '';
+    if (gift.giftType === 'CASH') {
+      return (value || this.translateService.translate('peopleList.cash')).trim();
+    }
+    const desc = gift.description?.trim() || this.translateService.translate('peopleList.item');
+    return value ? `${desc} · ${value}` : desc;
+  }
+
+  /** The functions a person is on — options for the gift function dropdown on the "All" tab. */
+  personFunctions(person: People): TmsFunction[] {
+    return this.functions.filter(fn => person.invitedFunctionIds.includes(fn.id));
+  }
+
+  startGift(person: People): void {
+    this.giftPersonId = person.id!;
+    this.editPersonId = null;
+    this.deleteConfirmId = null;
+    this.quickMarkPersonId = null;
+    // Pre-fill the function from the active tab, else fall back to the person's first function.
+    const fallback = this.personFunctions(person)[0]?.id ?? null;
+    this.giftDraft = {
+      functionId: typeof this.activeFilter === 'number' ? this.activeFilter : fallback,
+      giftType: 'CASH',
+      value: null,
+      description: '',
+      notes: ''
+    };
+  }
+
+  cancelGift(): void {
+    this.giftPersonId = null;
+  }
+
+  /** Validity mirrors the backend rules: function required; value for cash, description for item. */
+  canSaveGift(): boolean {
+    const d = this.giftDraft;
+    if (d.functionId == null) { return false; }
+    if (d.giftType === 'CASH') { return d.value != null && (d.value as any) !== ''; }
+    return !!d.description.trim();
+  }
+
+  saveGift(person: People): void {
+    if (!this.canSaveGift() || this.isSavingGift) { return; }
+    this.isSavingGift = true;
+    const d = this.giftDraft;
+    const payload: Gift = {
+      personId: person.id!,
+      functionId: d.functionId!,
+      giftType: d.giftType,
+      value: d.value === null || (d.value as any) === '' ? null : Number(d.value),
+      description: d.description.trim(),
+      notes: d.notes.trim()
+    };
+    this.giftService.add(payload).subscribe({
+      next: (resp) => {
+        this.isSavingGift = false;
+        this.feedbackMessage = resp.status === 'SUCCESS'
+          ? `${person.name} ${this.translateService.translate('peopleList.giftSaved')}`
+          : this.translateService.translate('peopleList.giftSaveFailed');
+        if (resp.status === 'SUCCESS') { this.loadAll(); }
+        setTimeout(() => { this.feedbackMessage = ''; }, 3000);
+      },
+      error: () => {
+        this.isSavingGift = false;
+        this.feedbackMessage = this.translateService.translate('peopleList.giftSaveFailed');
         setTimeout(() => { this.feedbackMessage = ''; }, 3000);
       }
     });

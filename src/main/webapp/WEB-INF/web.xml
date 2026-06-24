@@ -116,4 +116,13 @@
         <url-pattern>/api/income</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>GiftServlet</servlet-name>
+        <servlet-class>com.tms.servlets.GiftServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GiftServlet</servlet-name>
+        <url-pattern>/api/gifts</url-pattern>
+    </servlet-mapping>
+
 </web-app>

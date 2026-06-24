@@ -36,6 +36,18 @@
       </div>
     </div>
 
+    <div class="stat-card stat-gift">
+      <i class="bi bi-gift-fill stat-icon"></i>
+      <div class="stat-body">
+        <span class="stat-number">₹{{ totalGiftValue }}</span>
+        <span class="stat-label">{{ 'dashboard.giftsReceived' | translate }}</span>
+        <span class="stat-sub">
+          {{ totalGiftCount }} {{ 'dashboard.gifts' | translate }}
+          <ng-container *ngIf="uncostedGiftCount > 0"> · {{ uncostedGiftCount }} {{ 'dashboard.uncosted' | translate }}</ng-container>
+        </span>
+      </div>
+    </div>
+
   </div>
 
   <!-- Per-function widgets: Total / Invited / Yet To Invite -->
@@ -76,6 +88,16 @@
         <i class="bi bi-people-fill"></i>
         <span class="fnw-headcount-num">{{ stat.expectedCount }}</span>
         <span class="fnw-headcount-lbl">{{ 'dashboard.headCount' | translate }}</span>
+      </div>
+
+      <div class="fnw-gift">
+        <span class="fnw-gift-left">
+          <i class="bi bi-gift"></i> {{ 'dashboard.gifts' | translate }}
+        </span>
+        <span class="fnw-gift-vals">
+          <span class="fnw-gift-num">{{ stat.giftCount }}</span>
+          <span class="fnw-gift-val">₹{{ stat.giftValue }}</span>
+        </span>
       </div>
 
     </div>

@@ -52,6 +52,7 @@
 
 .stat-invited  { border-left-color: #16a34a; }
 .stat-expected { border-left-color: #0d9488; }
+.stat-gift     { border-left-color: #b45309; }
 
 /* Highlighted headline card — Total Guests */
 .stat-highlight {
@@ -77,6 +78,7 @@
 
 .stat-invited  .stat-icon { color: #16a34a; }
 .stat-expected .stat-icon { color: #0d9488; }
+.stat-gift     .stat-icon { color: #b45309; }
 
 .stat-body {
   display: flex;
@@ -232,6 +234,43 @@
   text-transform: uppercase;
   letter-spacing: 0.4px;
   opacity: 0.95;
+}
+
+/* Per-function gift line */
+.fnw-gift {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px dashed #fed7aa;
+}
+
+.fnw-gift-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #b45309;
+}
+
+.fnw-gift-vals {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.fnw-gift-num {
+  font-size: 16px;
+  font-weight: 800;
+  color: #b45309;
+}
+
+.fnw-gift-val {
+  font-size: 14px;
+  font-weight: 700;
+  color: #92400e;
 }
 
 /* Loading */

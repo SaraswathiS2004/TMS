@@ -376,3 +376,110 @@
 .spin { animation: spin 1s linear infinite; display: inline-block; margin-right: 6px; }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
+/* Gift tags */
+.gift-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.gift-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 8px;
+  border: 1px dashed #fdba74;
+  background: #fff7ed;
+  color: #b45309;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.gift-tag i { font-size: 11px; }
+
+.gift-tag-ev {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  opacity: 0.7;
+}
+
+/* Add Gift panel */
+.gift-panel {
+  background: #fffdf9;
+  border: 1.5px solid #fed7aa;
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gift-panel .edit-section-title { color: #b45309; margin-bottom: 2px; }
+.gift-for { text-transform: none; letter-spacing: 0; font-weight: 600; }
+
+.gift-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gift-field > label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #92400e;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.gift-field input,
+.gift-field select {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 7px;
+  padding: 8px 10px;
+  font-size: 13.5px;
+  color: #1e293b;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.gift-field input:focus,
+.gift-field select:focus { border-color: #f59e0b; }
+
+.gift-seg { display: flex; gap: 8px; }
+
+.gift-seg button {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.gift-seg button.sel {
+  background: #fff7ed;
+  border-color: #fdba74;
+  color: #b45309;
+}
+
+/* Add Gift footer button (amber accent over the shared .btn-invite base) */
+.btn-gift {
+  background: #fff7ed;
+  color: #b45309;
+  border-color: #fed7aa;
+}
+
+.btn-gift:hover { background: #ffedd5; }
+

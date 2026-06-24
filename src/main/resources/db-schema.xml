@@ -75,4 +75,21 @@
         <column name="DISPLAY_ORDER"    type="INT"          notNull="true" default="0"/>
     </table>
 
+    <!-- Gifts received from a guest for a specific function (cash or physical item) -->
+    <table name="Gift_Items" sync="true">
+        <column name="ID"            type="INT"          primaryKey="true" autoIncrement="true"/>
+        <column name="PERSON_ID"     type="INT"          notNull="true"/>
+        <column name="FUNCTION_ID"   type="INT"          notNull="true"/>
+        <column name="GIFT_TYPE"     type="VARCHAR(20)"  notNull="true" default="CASH"/>
+        <!-- nullable: blank for items with no set worth -->
+        <column name="VALUE"         type="INT"/>
+        <column name="DESCRIPTION"   type="VARCHAR(255)" default=""/>
+        <!-- ISO yyyy-MM-dd, nullable -->
+        <column name="GIFT_DATE"     type="VARCHAR(10)"/>
+        <column name="NOTES"         type="VARCHAR(255)" default=""/>
+        <column name="DISPLAY_ORDER" type="INT"          notNull="true" default="0"/>
+        <foreignKey column="PERSON_ID"   references="Invitations.ID" onDelete="CASCADE"/>
+        <foreignKey column="FUNCTION_ID" references="Functions.ID"   onDelete="CASCADE"/>
+    </table>
+
 </schema>

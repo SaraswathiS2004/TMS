@@ -3,6 +3,16 @@
   <h2 class="page-title">{{ 'report.guestCityTitle' | translate }}</h2>
 
   <div class="toolbar-row">
+    <label class="opt-blank">
+      {{ 'report.function' | translate }}
+      <select [(ngModel)]="selectedFunctionId" (ngModelChange)="applyFunctionFilter()">
+        <option [ngValue]="'ALL'">{{ 'report.allFunctions' | translate }}</option>
+        <option *ngFor="let fn of functions" [ngValue]="fn.id">{{ fn.name }}</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="toolbar-row">
     <span class="opt-group-label">{{ 'report.fields' | translate }}:</span>
     <label class="opt-check"><input type="checkbox" [(ngModel)]="showMembers" /> {{ 'report.members' | translate }}</label>
     <label class="opt-check"><input type="checkbox" [(ngModel)]="showRelation" /> {{ 'report.relation' | translate }}</label>
@@ -41,10 +51,14 @@
   <p>{{ 'cityGroup.noPeople' | translate }}</p>
 </div>
 
-<!-- Report body: one page per city -->
-<div class="report" *ngIf="!isLoading && cityPages.length > 0">
+<div *ngIf="!isLoading && cityPages.length > 0 && visiblePages.length === 0" class="empty-state card no-print">
+  <p>{{ 'peopleList.noResults' | translate }}</p>
+</div>
 
-  <section class="city-page" *ngFor="let page of cityPages">
+<!-- Report body: one page per city -->
+<div class="report" *ngIf="!isLoading && visiblePages.length > 0">
+
+  <section class="city-page" *ngFor="let page of visiblePages">
 
     <header class="city-page-header">
       <h1 class="city-title">{{ page.city }}</h1>
@@ -67,7 +81,7 @@
           <th *ngIf="showRelation">{{ 'report.relation' | translate }}</th>
           <th *ngIf="showGroup">{{ 'report.group' | translate }}</th>
           <ng-container *ngIf="showFunctions">
-            <th *ngFor="let fn of functions" class="col-fn">{{ fn.name }}</th>
+            <th *ngFor="let fn of visibleFunctions()" class="col-fn">{{ fn.name }}</th>
           </ng-container>
           <th *ngFor="let label of blankColumns()" class="col-blank">{{ label }}</th>
         </tr>
@@ -80,7 +94,7 @@
           <td *ngIf="showRelation">{{ ('relationType.' + person.relationType) | translate }}</td>
           <td *ngIf="showGroup">{{ person.groupName || '—' }}</td>
           <ng-container *ngIf="showFunctions">
-            <td *ngFor="let fn of functions" class="col-fn">{{ isInvited(person, fn.id) ? '✓' : '' }}</td>
+            <td *ngFor="let fn of visibleFunctions()" class="col-fn">{{ isInvited(person, fn.id) ? '✓' : '' }}</td>
           </ng-container>
           <td *ngFor="let label of blankColumns()" class="col-blank"></td>
         </tr>

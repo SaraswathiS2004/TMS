@@ -26,9 +26,13 @@ const MAX_BLANK_COLUMNS = 5;
 export class GuestCityReportComponent implements OnInit, OnDestroy {
 
   cityPages: CityPage[] = [];
+  visiblePages: CityPage[] = [];
   functions: TmsFunction[] = [];
   isLoading = true;
   generatedOn = new Date();
+
+  // 'ALL' or a function id — limits the report to guests invited to one function
+  selectedFunctionId: number | 'ALL' = 'ALL';
 
   // Field selection (name and # are always shown)
   showMembers = true;
@@ -60,6 +64,7 @@ export class GuestCityReportComponent implements OnInit, OnDestroy {
       next: ({ fns, people }) => {
         this.functions = fns;
         this.cityPages = this.buildPages(people);
+        this.applyFunctionFilter();
         this.isLoading = false;
       },
       error: () => { this.isLoading = false; }
@@ -83,6 +88,22 @@ export class GuestCityReportComponent implements OnInit, OnDestroy {
         people: [...members].sort((a, b) => a.name.localeCompare(b.name))
       }))
       .sort((a, b) => a.city.localeCompare(b.city));
+  }
+
+  applyFunctionFilter(): void {
+    if (this.selectedFunctionId === 'ALL') {
+      this.visiblePages = this.cityPages;
+      return;
+    }
+    const fnId = this.selectedFunctionId;
+    this.visiblePages = this.cityPages
+      .map(page => ({ city: page.city, people: page.people.filter(p => p.invitedFunctionIds.includes(fnId)) }))
+      .filter(page => page.people.length > 0);
+  }
+
+  visibleFunctions(): TmsFunction[] {
+    if (this.selectedFunctionId === 'ALL') { return this.functions; }
+    return this.functions.filter(fn => fn.id === this.selectedFunctionId);
   }
 
   onBlankCountChange(): void {

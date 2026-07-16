@@ -12,6 +12,7 @@ import { BudgetDashboardComponent } from './components/budget-dashboard/budget-d
 import { AdminComponent } from './components/admin/admin.component';
 import { BudgetReportComponent } from './components/budget-report/budget-report.component';
 import { GuestCityReportComponent } from './components/guest-city-report/guest-city-report.component';
+import { GiftReportComponent } from './components/gift-report/gift-report.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -27,5 +28,6 @@ export const routes: Routes = [
   { path: 'budget-dashboard', component: BudgetDashboardComponent },
   { path: 'report/budget', component: BudgetReportComponent },
   { path: 'report/guests-by-city', component: GuestCityReportComponent },
+  { path: 'report/gifts', component: GiftReportComponent },
   { path: 'admin', component: AdminComponent }
 ];

@@ -253,6 +253,8 @@
 
   "report.budgetTitle": "Budget Report",
   "report.guestCityTitle": "Guest List by City",
+  "report.function": "Function",
+  "report.allFunctions": "All Functions",
   "report.print": "Print / Save PDF",
   "report.fields": "Fields",
   "report.estimated": "Estimated",

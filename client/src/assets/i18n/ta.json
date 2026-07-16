@@ -253,6 +253,8 @@
 
   "report.budgetTitle": "பட்ஜெட் அறிக்கை",
   "report.guestCityTitle": "நகரம் வாரியான விருந்தினர் பட்டியல்",
+  "report.function": "நிகழ்வு",
+  "report.allFunctions": "அனைத்து நிகழ்வுகளும்",
   "report.print": "அச்சிடு / PDF சேமி",
   "report.fields": "புலங்கள்",
   "report.estimated": "மதிப்பீடு",

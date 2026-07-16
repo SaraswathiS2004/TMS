@@ -3,6 +3,16 @@
   <h2 class="page-title">{{ 'report.budgetTitle' | translate }}</h2>
 
   <div class="toolbar-row">
+    <label class="opt-blank">
+      {{ 'report.function' | translate }}
+      <select [(ngModel)]="selectedFunctionId">
+        <option [ngValue]="'ALL'">{{ 'report.allFunctions' | translate }}</option>
+        <option *ngFor="let section of sections" [ngValue]="section.fn.id">{{ section.fn.name }}</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="toolbar-row">
     <span class="opt-group-label">{{ 'report.fields' | translate }}:</span>
     <label class="opt-check"><input type="checkbox" [(ngModel)]="showEstimated" /> {{ 'report.estimated' | translate }}</label>
     <label class="opt-check"><input type="checkbox" [(ngModel)]="showActual" /> {{ 'report.actual' | translate }}</label>
@@ -54,7 +64,7 @@
     <div class="report-meta">{{ 'report.generatedOn' | translate }} {{ generatedOn | date:'mediumDate' }}</div>
   </header>
 
-  <section class="fn-section" *ngFor="let section of sections">
+  <section class="fn-section" *ngFor="let section of visibleSections">
 
     <div class="fn-section-header" [style.border-left-color]="section.fn.color">
       <span class="fn-section-name">{{ section.fn.name }}</span>
@@ -101,8 +111,8 @@
 
   </section>
 
-  <!-- Grand total -->
-  <table class="report-table grand-table">
+  <!-- Grand total (redundant when a single function's subtotal is already shown) -->
+  <table class="report-table grand-table" *ngIf="visibleSections.length > 1">
     <tbody>
       <tr class="grand-row">
         <td class="col-idx"></td>

@@ -32,6 +32,9 @@ export class BudgetReportComponent implements OnInit, OnDestroy {
   isLoading = true;
   generatedOn = new Date();
 
+  // 'ALL' or a function id — limits the report to one function
+  selectedFunctionId: number | 'ALL' = 'ALL';
+
   // Amount column selection — all on by default
   showEstimated = true;
   showActual = true;
@@ -81,6 +84,15 @@ export class BudgetReportComponent implements OnInit, OnDestroy {
     document.title = this.previousTitle;
   }
 
+  get visibleSections(): FunctionSection[] {
+    if (this.selectedFunctionId === 'ALL') { return this.sections; }
+    return this.sections.filter(s => s.fn.id === this.selectedFunctionId);
+  }
+
+  private visibleItems(): BudgetItem[] {
+    return this.visibleSections.flatMap(s => s.items);
+  }
+
   onBlankCountChange(): void {
     const n = Math.floor(Number(this.blankCount) || 0);
     this.blankCount = Math.min(Math.max(n, 0), MAX_BLANK_COLUMNS);
@@ -106,7 +118,7 @@ export class BudgetReportComponent implements OnInit, OnDestroy {
   }
 
   grandTotal(field: AmountField): number {
-    return this.items.reduce((sum, i) => sum + this.itemValue(i, field), 0);
+    return this.visibleItems().reduce((sum, i) => sum + this.itemValue(i, field), 0);
   }
 
   splitsText(item: BudgetItem): string {

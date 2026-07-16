@@ -31,6 +31,34 @@ body {
   margin-bottom: 24px;
 }
 
+/* Page title with an action link on the right */
+.page-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.btn-report-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn-report-link:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
 /* Relation badges */
 .badge {
   display: inline-block;
@@ -59,3 +87,26 @@ body {
 
 /* Bootstrap Icons global tweaks */
 .bi { line-height: 1; }
+
+/* Print (report pages use browser print → Save as PDF) */
+@page {
+  size: A4;
+  margin: 12mm;
+}
+
+@media print {
+  .navbar,
+  .sync-warning-banner,
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .main-content {
+    padding: 0 !important;
+    max-width: none !important;
+  }
+}

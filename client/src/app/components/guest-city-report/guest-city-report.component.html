@@ -1,0 +1,92 @@
+<!-- Options toolbar (hidden when printing) -->
+<div class="report-toolbar no-print card">
+  <h2 class="page-title">{{ 'report.guestCityTitle' | translate }}</h2>
+
+  <div class="toolbar-row">
+    <span class="opt-group-label">{{ 'report.fields' | translate }}:</span>
+    <label class="opt-check"><input type="checkbox" [(ngModel)]="showMembers" /> {{ 'report.members' | translate }}</label>
+    <label class="opt-check"><input type="checkbox" [(ngModel)]="showRelation" /> {{ 'report.relation' | translate }}</label>
+    <label class="opt-check"><input type="checkbox" [(ngModel)]="showGroup" /> {{ 'report.group' | translate }}</label>
+    <label class="opt-check"><input type="checkbox" [(ngModel)]="showFunctions" /> {{ 'report.functionColumns' | translate }}</label>
+  </div>
+
+  <div class="toolbar-row">
+    <label class="opt-blank">
+      {{ 'report.blankColumns' | translate }}
+      <input type="number" min="0" [max]="maxBlankColumns" [(ngModel)]="blankCount" (ngModelChange)="onBlankCountChange()" />
+    </label>
+    <ng-container *ngIf="blankCount > 0">
+      <input
+        *ngFor="let label of blankColumns(); let i = index; trackBy: trackByIndex"
+        class="blank-label-input"
+        type="text"
+        [(ngModel)]="blankLabels[i]"
+        [placeholder]="('report.blankColumnLabel' | translate) + ' ' + (i + 1)"
+      />
+    </ng-container>
+  </div>
+
+  <div class="toolbar-row">
+    <button class="btn-print" (click)="print()">
+      <i class="bi bi-printer"></i> {{ 'report.print' | translate }}
+    </button>
+  </div>
+</div>
+
+<p *ngIf="isLoading" class="loading-text no-print">
+  <i class="bi bi-arrow-repeat spin"></i> {{ 'common.loading' | translate }}
+</p>
+
+<div *ngIf="!isLoading && cityPages.length === 0" class="empty-state card no-print">
+  <p>{{ 'cityGroup.noPeople' | translate }}</p>
+</div>
+
+<!-- Report body: one page per city -->
+<div class="report" *ngIf="!isLoading && cityPages.length > 0">
+
+  <section class="city-page" *ngFor="let page of cityPages">
+
+    <header class="city-page-header">
+      <h1 class="city-title">{{ page.city }}</h1>
+      <div class="city-stats">
+        <span>{{ page.people.length }} {{ 'report.families' | translate }}</span>
+        <span>{{ totalExpected(page) }} {{ 'report.totalExpected' | translate }}</span>
+        <span *ngIf="notInvitedCount(page) > 0">{{ notInvitedCount(page) }} {{ 'report.yetToInvite' | translate }}</span>
+      </div>
+      <div class="report-meta">
+        {{ 'report.guestCityTitle' | translate }} · {{ 'report.generatedOn' | translate }} {{ generatedOn | date:'mediumDate' }}
+      </div>
+    </header>
+
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th class="col-idx">#</th>
+          <th class="col-name">{{ 'report.name' | translate }}</th>
+          <th *ngIf="showMembers" class="col-num">{{ 'report.members' | translate }}</th>
+          <th *ngIf="showRelation">{{ 'report.relation' | translate }}</th>
+          <th *ngIf="showGroup">{{ 'report.group' | translate }}</th>
+          <ng-container *ngIf="showFunctions">
+            <th *ngFor="let fn of functions" class="col-fn">{{ fn.name }}</th>
+          </ng-container>
+          <th *ngFor="let label of blankColumns()" class="col-blank">{{ label }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let person of page.people; let i = index">
+          <td class="col-idx">{{ i + 1 }}</td>
+          <td class="col-name">{{ person.name }}</td>
+          <td *ngIf="showMembers" class="col-num">{{ person.numberOfPerson }}</td>
+          <td *ngIf="showRelation">{{ ('relationType.' + person.relationType) | translate }}</td>
+          <td *ngIf="showGroup">{{ person.groupName || '—' }}</td>
+          <ng-container *ngIf="showFunctions">
+            <td *ngFor="let fn of functions" class="col-fn">{{ isInvited(person, fn.id) ? '✓' : '' }}</td>
+          </ng-container>
+          <td *ngFor="let label of blankColumns()" class="col-blank"></td>
+        </tr>
+      </tbody>
+    </table>
+
+  </section>
+
+</div>

@@ -1,0 +1,119 @@
+<!-- Options toolbar (hidden when printing) -->
+<div class="report-toolbar no-print card">
+  <h2 class="page-title">{{ 'report.budgetTitle' | translate }}</h2>
+
+  <div class="toolbar-row">
+    <span class="opt-group-label">{{ 'report.fields' | translate }}:</span>
+    <label class="opt-check"><input type="checkbox" [(ngModel)]="showEstimated" /> {{ 'report.estimated' | translate }}</label>
+    <label class="opt-check"><input type="checkbox" [(ngModel)]="showActual" /> {{ 'report.actual' | translate }}</label>
+    <label class="opt-check"><input type="checkbox" [(ngModel)]="showPaid" /> {{ 'report.paid' | translate }}</label>
+    <label class="opt-check"><input type="checkbox" [(ngModel)]="showBalance" /> {{ 'report.balance' | translate }}</label>
+  </div>
+
+  <div class="toolbar-row">
+    <label class="opt-check"><input type="checkbox" [(ngModel)]="includeSplits" /> {{ 'report.includeSplits' | translate }}</label>
+    <label class="opt-check"><input type="checkbox" [(ngModel)]="includeNotes" /> {{ 'report.includeNotes' | translate }}</label>
+  </div>
+
+  <div class="toolbar-row">
+    <label class="opt-blank">
+      {{ 'report.blankColumns' | translate }}
+      <input type="number" min="0" [max]="maxBlankColumns" [(ngModel)]="blankCount" (ngModelChange)="onBlankCountChange()" />
+    </label>
+    <ng-container *ngIf="blankCount > 0">
+      <input
+        *ngFor="let label of blankColumns(); let i = index; trackBy: trackByIndex"
+        class="blank-label-input"
+        type="text"
+        [(ngModel)]="blankLabels[i]"
+        [placeholder]="('report.blankColumnLabel' | translate) + ' ' + (i + 1)"
+      />
+    </ng-container>
+  </div>
+
+  <div class="toolbar-row">
+    <button class="btn-print" (click)="print()">
+      <i class="bi bi-printer"></i> {{ 'report.print' | translate }}
+    </button>
+  </div>
+</div>
+
+<p *ngIf="isLoading" class="loading-text no-print">
+  <i class="bi bi-arrow-repeat spin"></i> {{ 'common.loading' | translate }}
+</p>
+
+<div *ngIf="!isLoading && sections.length === 0" class="empty-state card no-print">
+  <p>{{ 'budgetDashboard.noData' | translate }}</p>
+</div>
+
+<!-- Report body -->
+<div class="report" *ngIf="!isLoading && sections.length > 0">
+
+  <header class="report-header">
+    <h1 class="report-title">{{ 'report.budgetTitle' | translate }}</h1>
+    <div class="report-meta">{{ 'report.generatedOn' | translate }} {{ generatedOn | date:'mediumDate' }}</div>
+  </header>
+
+  <section class="fn-section" *ngFor="let section of sections">
+
+    <div class="fn-section-header" [style.border-left-color]="section.fn.color">
+      <span class="fn-section-name">{{ section.fn.name }}</span>
+      <span class="fn-section-date" *ngIf="section.fn.eventDate">{{ section.fn.eventDate }}</span>
+    </div>
+
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th class="col-idx">#</th>
+          <th class="col-name">{{ 'report.item' | translate }}</th>
+          <th *ngIf="showEstimated" class="col-amt">{{ 'report.estimated' | translate }}</th>
+          <th *ngIf="showActual" class="col-amt">{{ 'report.actual' | translate }}</th>
+          <th *ngIf="showPaid" class="col-amt">{{ 'report.paid' | translate }}</th>
+          <th *ngIf="showBalance" class="col-amt">{{ 'report.balance' | translate }}</th>
+          <th *ngFor="let label of blankColumns()" class="col-blank">{{ label }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of section.items; let i = index">
+          <td class="col-idx">{{ i + 1 }}</td>
+          <td class="col-name">
+            {{ item.name }}
+            <div class="item-sub" *ngIf="includeSplits && splitsText(item)">{{ splitsText(item) }}</div>
+            <div class="item-sub" *ngIf="includeNotes && item.notes">{{ item.notes }}</div>
+          </td>
+          <td *ngIf="showEstimated" class="col-amt">₹{{ estimated(item) | number }}</td>
+          <td *ngIf="showActual" class="col-amt">{{ item.actualAmount != null ? '₹' + (item.actualAmount | number) : '' }}</td>
+          <td *ngIf="showPaid" class="col-amt">₹{{ item.paidAmount | number }}</td>
+          <td *ngIf="showBalance" class="col-amt" [class.amt-neg]="remaining(item) < 0">₹{{ remaining(item) | number }}</td>
+          <td *ngFor="let label of blankColumns()" class="col-blank"></td>
+        </tr>
+        <tr class="subtotal-row">
+          <td class="col-idx"></td>
+          <td class="col-name">{{ 'report.subtotal' | translate }}</td>
+          <td *ngIf="showEstimated" class="col-amt">₹{{ sectionTotal(section, 'estimated') | number }}</td>
+          <td *ngIf="showActual" class="col-amt">₹{{ sectionTotal(section, 'actual') | number }}</td>
+          <td *ngIf="showPaid" class="col-amt">₹{{ sectionTotal(section, 'paid') | number }}</td>
+          <td *ngIf="showBalance" class="col-amt" [class.amt-neg]="sectionTotal(section, 'balance') < 0">₹{{ sectionTotal(section, 'balance') | number }}</td>
+          <td *ngFor="let label of blankColumns()" class="col-blank"></td>
+        </tr>
+      </tbody>
+    </table>
+
+  </section>
+
+  <!-- Grand total -->
+  <table class="report-table grand-table">
+    <tbody>
+      <tr class="grand-row">
+        <td class="col-idx"></td>
+        <td class="col-name">{{ 'report.grandTotal' | translate }}</td>
+        <td *ngIf="showEstimated" class="col-amt">₹{{ grandTotal('estimated') | number }}</td>
+        <td *ngIf="showActual" class="col-amt">₹{{ grandTotal('actual') | number }}</td>
+        <td *ngIf="showPaid" class="col-amt">₹{{ grandTotal('paid') | number }}</td>
+        <td *ngIf="showBalance" class="col-amt" [class.amt-neg]="grandTotal('balance') < 0">₹{{ grandTotal('balance') | number }}</td>
+        <td *ngFor="let label of blankColumns()" class="col-blank"></td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>

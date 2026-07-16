@@ -10,6 +10,8 @@ import { BudgetComponent } from './components/budget/budget.component';
 import { IncomeComponent } from './components/income/income.component';
 import { BudgetDashboardComponent } from './components/budget-dashboard/budget-dashboard.component';
 import { AdminComponent } from './components/admin/admin.component';
+import { BudgetReportComponent } from './components/budget-report/budget-report.component';
+import { GuestCityReportComponent } from './components/guest-city-report/guest-city-report.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -23,5 +25,7 @@ export const routes: Routes = [
   { path: 'budget', component: BudgetComponent },
   { path: 'income', component: IncomeComponent },
   { path: 'budget-dashboard', component: BudgetDashboardComponent },
+  { path: 'report/budget', component: BudgetReportComponent },
+  { path: 'report/guests-by-city', component: GuestCityReportComponent },
   { path: 'admin', component: AdminComponent }
 ];

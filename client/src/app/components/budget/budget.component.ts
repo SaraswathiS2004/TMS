@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BudgetService } from '../../services/budget.service';
 import { FunctionService } from '../../services/function.service';
@@ -16,7 +17,7 @@ interface FunctionBudget {
 @Component({
   selector: 'app-budget',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe],
+  imports: [CommonModule, RouterLink, FormsModule, TranslatePipe],
   templateUrl: './budget.component.html',
   styleUrl: './budget.component.css'
 })

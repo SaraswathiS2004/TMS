@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { PeopleService } from '../../services/people.service';
 import { FunctionService } from '../../services/function.service';
 import { People } from '../../models/people.model';
@@ -15,7 +16,7 @@ interface CityGroup {
 @Component({
   selector: 'app-city-group',
   standalone: true,
-  imports: [CommonModule, TranslatePipe],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   templateUrl: './city-group.component.html',
   styleUrl: './city-group.component.css'
 })

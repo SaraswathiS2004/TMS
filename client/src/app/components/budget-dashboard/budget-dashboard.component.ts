@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { BudgetService } from '../../services/budget.service';
 import { IncomeService } from '../../services/income.service';
@@ -22,7 +23,7 @@ interface FunctionRollup {
 @Component({
   selector: 'app-budget-dashboard',
   standalone: true,
-  imports: [CommonModule, TranslatePipe],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   templateUrl: './budget-dashboard.component.html',
   styleUrl: './budget-dashboard.component.css'
 })

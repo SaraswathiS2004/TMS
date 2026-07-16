@@ -31,6 +31,9 @@
         <a routerLink="/guest-groups" routerLinkActive="active-link" (click)="closeMenus()">
           <i class="bi bi-collection-fill"></i> {{ 'nav.manageGuestGroups' | translate }}
         </a>
+        <a routerLink="/report/guests-by-city" routerLinkActive="active-link" (click)="closeMenus()">
+          <i class="bi bi-printer"></i> {{ 'nav.printGuestList' | translate }}
+        </a>
       </div>
     </div>
 
@@ -50,6 +53,9 @@
         </a>
         <a routerLink="/income" routerLinkActive="active-link" (click)="closeMenus()">
           <i class="bi bi-wallet2"></i> {{ 'nav.income' | translate }}
+        </a>
+        <a routerLink="/report/budget" routerLinkActive="active-link" (click)="closeMenus()">
+          <i class="bi bi-printer"></i> {{ 'nav.budgetReport' | translate }}
         </a>
       </div>
     </div>

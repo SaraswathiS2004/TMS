@@ -1,4 +1,9 @@
-<h2 class="page-title">{{ 'budget.title' | translate }}</h2>
+<div class="page-title-row">
+  <h2 class="page-title">{{ 'budget.title' | translate }}</h2>
+  <a routerLink="/report/budget" class="btn-report-link">
+    <i class="bi bi-printer"></i> {{ 'nav.budgetReport' | translate }}
+  </a>
+</div>
 
 <div *ngIf="feedbackMessage" class="feedback-toast" [class.toast-error]="feedbackType === 'error'">
   <i class="bi" [ngClass]="feedbackType === 'error' ? 'bi-exclamation-circle' : 'bi-check-circle'"></i>

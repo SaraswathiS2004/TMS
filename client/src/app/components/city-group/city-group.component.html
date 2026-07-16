@@ -1,4 +1,9 @@
-<h2 class="page-title">{{ 'cityGroup.title' | translate }}</h2>
+<div class="page-title-row">
+  <h2 class="page-title">{{ 'cityGroup.title' | translate }}</h2>
+  <a routerLink="/report/guests-by-city" class="btn-report-link">
+    <i class="bi bi-printer"></i> {{ 'nav.printGuestList' | translate }}
+  </a>
+</div>
 
 <p *ngIf="isLoading" class="loading-text">
   <i class="bi bi-arrow-repeat spin"></i>
